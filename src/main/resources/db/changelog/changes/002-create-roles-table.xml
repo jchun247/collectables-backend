@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="002" author="jchun247">
+        <createTable tableName="roles" schemaName="collectables">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+            </column>
+        </createTable>
+        <insert schemaName="collectables" tableName="roles">
+            <column name="id" value="1" />
+            <column name="name" value="ROLE_USER" />
+        </insert>
+        <insert schemaName="collectables" tableName="roles">
+            <column name="id" value="2" />
+            <column name="name" value="ROLE_ADMIN" />
+        </insert>
+        <createTable tableName="user_roles" schemaName="collectables">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="role_id" type="int">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        
+        <addPrimaryKey tableName="user_roles" schemaName="collectables"
+                       columnNames="user_id, role_id"
+                       constraintName="pk_user_roles" />
+        
+        <addForeignKeyConstraint baseTableName="user_roles" baseColumnNames="user_id" 
+                                 baseTableSchemaName="collectables"
+                                 constraintName="fk_user_roles_user"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"
+                                 referencedTableSchemaName="collectables"/>
+        
+        <addForeignKeyConstraint baseTableName="user_roles" baseColumnNames="role_id"
+                                 baseTableSchemaName="collectables"
+                                 constraintName="fk_user_roles_role"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="id"
+                                 referencedTableSchemaName="collectables"/>
+    </changeSet>
+</databaseChangeLog>
