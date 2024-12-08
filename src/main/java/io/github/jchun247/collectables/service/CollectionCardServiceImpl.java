@@ -22,33 +22,43 @@ public class CollectionCardServiceImpl implements CollectionCardService {
 
     @Override
     public CollectionCard addCardToCollection(Long collectionId, Long cardId) {
+        // check that collection and card both exist
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
 
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
 
+        CollectionCard collectionCard = new CollectionCard();
+        collectionCard.setCollection(collection);
+        collectionCard.setCard(card);
 
-
-        return null;
+        return collectionCardRepository.save(collectionCard);
     }
 
     @Override
     public List<CollectionCard> getCardsInCollection(Long collectionId) {
-        return List.of();
+        // check if collection exists
+        collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
+        return collectionCardRepository.findByCollectionId(collectionId);
     }
 
     @Override
     public CollectionCard updateCardQuantity(Long collectionCardId, int newQuantity) {
-        return null;
+        CollectionCard collectionCard = collectionCardRepository.findById(collectionCardId)
+                .orElseThrow(() -> new ResourceNotFoundException("CollectionCard not found with id: " + collectionCardId));
+
+        collectionCard.setQuantity(newQuantity);
+        return collectionCardRepository.save(collectionCard);
     }
 
     @Override
     public void removeCardFromCollection(Long collectionCardId) {
+        CollectionCard collectionCard = collectionCardRepository.findById(collectionCardId)
+                .orElseThrow(() -> new ResourceNotFoundException("CollectionCard not found with id: " + collectionCardId));
 
+        collectionCardRepository.delete(collectionCard);
     }
-
-    // Add a card to a collection
-
 
 }
