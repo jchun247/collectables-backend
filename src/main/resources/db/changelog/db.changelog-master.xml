@@ -7,4 +7,5 @@
     <!-- Add more changelog files here as your schema evolves -->
     <include file="db/changelog/changes/001-create-initial-tables.xml"/>
     <include file="db/changelog/changes/002-create-roles-table.xml"/>
+    <include file="db/changelog/changes/003-create-card-tables.xml"/>
 </databaseChangeLog>

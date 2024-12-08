@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="003" author="jchun247">
+        <createTable tableName="cards" schemaName="collectables">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+            </column>
+            <column name="game" type="varchar(255)">
+            </column>
+            <column name="set" type="varchar(255)">
+            </column>
+            <column name="set_number" type="varchar(255)">
+            </column>
+            <column name="rarity" type="varchar(255)">
+            </column>
+        </createTable>
+        <createTable tableName="collections" schemaName="collectables">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_collections_users" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="collection_cards">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="collection_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_collectioncards_collections" referencedTableName="collections" referencedColumnNames="id"/>
+            </column>
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_collectioncards_cards" referencedTableName="cards" referencedColumnNames="id"/>
+            </column>
+            <column name="quantity" type="int" defaultValue="1">
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
