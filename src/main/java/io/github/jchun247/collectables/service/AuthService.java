@@ -85,6 +85,7 @@ public class AuthService {
             roles.add(userRole);
         } else {
             registerDto.getRoles().forEach(role -> {
+                // TODO: case sensitive?
                 if (role.equals("admin")) {
                     Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
                             .orElseThrow(() -> new RuntimeException("Error: Admin role not found."));
