@@ -24,7 +24,6 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // TODO: change liquibase to reflect new changes in User table
     private LocalDateTime lastLogin;
     private LocalDateTime createdAt;
 }
