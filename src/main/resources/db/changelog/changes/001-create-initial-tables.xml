@@ -10,8 +10,11 @@
             CREATE SCHEMA IF NOT EXISTS collectables;
         </sql>
         <createTable tableName="users" schemaName="collectables">
-            <column name="id" type="varchar(255)">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="auth0_id" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="username" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
@@ -43,7 +46,7 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="user_id" type="varchar(255)">
+            <column name="user_id" type="bigint">
                 <constraints nullable="false" foreignKeyName="fk_collections_users" referencedTableName="users" referencedColumnNames="id"/>
             </column>
             <column name="name" type="varchar(255)">

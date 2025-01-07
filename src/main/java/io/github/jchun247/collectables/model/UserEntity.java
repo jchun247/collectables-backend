@@ -16,7 +16,11 @@ import java.time.LocalDateTime;
 @Builder
 public class UserEntity {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, name="auth0_id")
+    private String auth0Id;
 
     @Column(nullable = false, unique = true)
     private String username;
