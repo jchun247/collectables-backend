@@ -58,7 +58,7 @@ public class SecurityConfig {
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
-        converter.setAuthoritiesClaimName("role"); // permissions is a custom claim name
+//        converter.setAuthoritiesClaimName("role"); // permissions is a custom claim name
 //        converter.setAuthorityPrefix(""); // no prefix will be added to authorities in the token
 
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();

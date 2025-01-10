@@ -22,12 +22,8 @@ public class UserEntity {
     @Column(nullable = false, unique = true, name="auth0_id")
     private String auth0Id;
 
-    @Column(nullable = false, unique = true)
     private String username;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
     private LocalDateTime lastLogin;
     private LocalDateTime createdAt;
 }

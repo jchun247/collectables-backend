@@ -17,10 +17,8 @@
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="username" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
             </column>
             <column name="email" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
             </column>
             <column name="last_login" type="timestamp">
             </column>
