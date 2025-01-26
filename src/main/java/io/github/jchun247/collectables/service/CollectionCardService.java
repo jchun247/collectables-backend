@@ -1,7 +1,7 @@
 package io.github.jchun247.collectables.service;
 
 
-import io.github.jchun247.collectables.model.CollectionCard;
+import io.github.jchun247.collectables.model.collection.CollectionCard;
 
 import java.util.List;
 

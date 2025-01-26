@@ -10,4 +10,9 @@
     <include file="db/changelog/changes/003-remove-column-card-table.xml"/>
     <include file="db/changelog/changes/004-add-set-name-table.xml"/>
     <include file="db/changelog/changes/005-add-code-column-sets-table.xml"/>
+    <include file="db/changelog/changes/006-add-image_url-column.xml"/>
+    <include file="db/changelog/changes/007-change-set-type.xml"/>
+    <include file="db/changelog/changes/008-rename-set-column-cards-table.xml"/>
+    <include file="db/changelog/changes/009-rename-set-column-cards-table.xml"/>
+    <include file="db/changelog/changes/010-change-set-column-type.xml"/>
 </databaseChangeLog>

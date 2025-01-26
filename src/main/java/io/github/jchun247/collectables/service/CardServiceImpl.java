@@ -3,9 +3,9 @@ package io.github.jchun247.collectables.service;
 import io.github.jchun247.collectables.dto.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
-import io.github.jchun247.collectables.model.*;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.repository.CardRepository;
+import io.github.jchun247.collectables.repository.CardSetRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,15 +22,19 @@ import java.util.List;
 public class CardServiceImpl implements CardService{
 
     private final CardRepository cardRepository;
+    private final CardSetRepository cardSetRepository;
 
     @Override
     @Transactional
     public CardDto createCard(CreateCardRequest cardRequest) {
+        // Fetch the cardSet entity from the code
+        CardSet cardSet = cardSetRepository.findByCode(cardRequest.getSetCode()).orElseThrow(() -> new ResourceNotFoundException("Invalid set code: " + cardRequest.getSetCode()));
+
         // set card attributes from request
         Card newCard = new Card();
         newCard.setName(cardRequest.getName());
         newCard.setGame(cardRequest.getGame());
-        newCard.setSet(cardRequest.getSet());
+        newCard.setSet(cardSet);
         newCard.setSetNumber(cardRequest.getSetNumber());
         newCard.setRarity(cardRequest.getRarity());
 
@@ -47,14 +51,14 @@ public class CardServiceImpl implements CardService{
 
     @Override
     public PagedResponse<CardDto> getCards(int page, int size, String[] sort, CardGame game,
-                                           CardSet set, CardRarity rarity, CardCondition condition,
+                                           String setCode, CardRarity rarity, CardCondition condition,
                                            Double minPrice, Double maxPrice) {
 
         List<Sort.Order> orders = createSortOrders(sort);
         Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
 
         Page<Card> cardPage = cardRepository.findByFilters(
-                game, set, rarity, condition,
+                game, setCode, rarity, condition,
                 minPrice == null ? 0.0 : minPrice,
                 maxPrice == null ? Double.MAX_VALUE : maxPrice,
                 pageable

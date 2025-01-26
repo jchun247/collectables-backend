@@ -2,7 +2,6 @@ package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.dto.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
-import io.github.jchun247.collectables.model.*;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.service.CardService;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +27,14 @@ public class CardController {
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "name,asc") String [] sort,
             @RequestParam(required = false) CardGame game,
-            @RequestParam(required = false) CardSet set,
+            @RequestParam(required = false) String setCode,
             @RequestParam(required = false) CardRarity rarity,
             @RequestParam(required = false) CardCondition condition,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice
     ){
         PagedResponse<CardDto> response = cardService.getCards(page, size, sort, game,
-                set, rarity, condition, minPrice, maxPrice);
+                setCode, rarity, condition, minPrice, maxPrice);
         return ResponseEntity.ok(response);
     }
 

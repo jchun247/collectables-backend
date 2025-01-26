@@ -1,7 +1,7 @@
 package io.github.jchun247.collectables.service;
 
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
-import io.github.jchun247.collectables.model.Collection;
+import io.github.jchun247.collectables.model.collection.Collection;
 import io.github.jchun247.collectables.repository.CollectionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

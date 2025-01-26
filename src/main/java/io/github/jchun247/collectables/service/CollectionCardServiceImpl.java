@@ -2,8 +2,8 @@ package io.github.jchun247.collectables.service;
 
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.model.card.Card;
-import io.github.jchun247.collectables.model.Collection;
-import io.github.jchun247.collectables.model.CollectionCard;
+import io.github.jchun247.collectables.model.collection.Collection;
+import io.github.jchun247.collectables.model.collection.CollectionCard;
 import io.github.jchun247.collectables.repository.CardRepository;
 import io.github.jchun247.collectables.repository.CollectionCardRepository;
 import io.github.jchun247.collectables.repository.CollectionRepository;

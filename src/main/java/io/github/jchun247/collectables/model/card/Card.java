@@ -21,7 +21,10 @@ public class Card {
 
     @Enumerated(EnumType.STRING)
     private CardGame game;
-    private Long set;
+
+    @ManyToOne
+    @JoinColumn(name = "set_id")
+    private CardSet set;
     private String setNumber;
 
     @Enumerated(EnumType.STRING)
@@ -29,6 +32,8 @@ public class Card {
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardPrice> prices = new ArrayList<>();
+
+    private String imageUrl;
 
     public void addPrice(CardPrice price) {
         prices.add(price);

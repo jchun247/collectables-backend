@@ -12,20 +12,22 @@ import java.util.stream.Collectors;
 public class CardDto {
     private String name;
     private CardGame game;
-    private Long set;
+    private String setCode;
     private String setNumber;
     private CardRarity rarity;
     private List<CardPriceDto> prices;
+    private String imageUrl;
 
     public CardDto(Card card) {
         this.name = card.getName();
         this.game = card.getGame();
-        this.set = card.getSet();
+        this.setCode = card.getSet().getCode();
         this.setNumber = card.getSetNumber();
         this.rarity = card.getRarity();
         this.prices = card.getPrices().stream()
                 .map(CardPriceDto::new)
                 .collect(Collectors.toList());
+        this.imageUrl = card.getImageUrl();
     }
 
 }

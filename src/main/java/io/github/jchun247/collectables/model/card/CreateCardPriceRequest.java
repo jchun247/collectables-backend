@@ -1,6 +1,5 @@
-package io.github.jchun247.collectables.model;
+package io.github.jchun247.collectables.model.card;
 
-import io.github.jchun247.collectables.model.card.CardCondition;
 import lombok.Data;
 
 @Data

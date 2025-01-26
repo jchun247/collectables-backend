@@ -1,5 +1,6 @@
-package io.github.jchun247.collectables.model;
+package io.github.jchun247.collectables.model.collection;
 
+import io.github.jchun247.collectables.model.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

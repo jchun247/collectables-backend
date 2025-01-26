@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.model;
+package io.github.jchun247.collectables.model.collection;
 
 import io.github.jchun247.collectables.model.card.Card;
 import jakarta.persistence.*;
