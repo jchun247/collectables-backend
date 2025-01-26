@@ -6,4 +6,7 @@
 
     <!-- Add more changelog files here as your schema evolves -->
     <include file="db/changelog/changes/001-create-initial-tables.xml"/>
+    <include file="db/changelog/changes/002-add-card-price-table.xml"/>
+    <include file="db/changelog/changes/003-remove-column-card-table.xml"/>
+    <include file="db/changelog/changes/004-add-set-name-table.xml"/>
 </databaseChangeLog>

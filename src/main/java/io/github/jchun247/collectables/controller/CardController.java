@@ -1,8 +1,14 @@
 package io.github.jchun247.collectables.controller;
 
+import io.github.jchun247.collectables.dto.CardDto;
+import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.model.Card;
+import io.github.jchun247.collectables.model.CardCondition;
+import io.github.jchun247.collectables.model.CardRarity;
+import io.github.jchun247.collectables.model.CreateCardRequest;
 import io.github.jchun247.collectables.service.CardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,13 +21,26 @@ public class CardController {
     private final CardService cardService;
 
     @PostMapping("/create")
-    public ResponseEntity<Card> createCard(@RequestBody Card card) {
-        return ResponseEntity.ok(cardService.createCard(card));
+    public ResponseEntity<CardDto> createCard(@RequestBody CreateCardRequest cardRequest) {
+        CardDto createdCard = cardService.createCard(cardRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Card>> getAllCards(){
-        return ResponseEntity.ok(cardService.getAllCards());
+    @GetMapping
+    public ResponseEntity<PagedResponse<CardDto>> getAllCards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "name,asc") String [] sort,
+            @RequestParam(required = false) String game,
+            @RequestParam(required = false) Long set,
+            @RequestParam(required = false) CardRarity rarity,
+            @RequestParam(required = false) CardCondition condition,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice
+    ){
+        PagedResponse<CardDto> response = cardService.getCards(page, size, sort, game,
+                set, rarity, condition, minPrice, maxPrice);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
