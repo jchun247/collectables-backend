@@ -1,6 +1,6 @@
 package io.github.jchun247.collectables.dto;
 
-import io.github.jchun247.collectables.model.Card;
+import io.github.jchun247.collectables.model.card.Card;
 import lombok.Data;
 import org.springframework.data.domain.Page;
 

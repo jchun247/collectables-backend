@@ -2,17 +2,13 @@ package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.dto.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
-import io.github.jchun247.collectables.model.Card;
-import io.github.jchun247.collectables.model.CardCondition;
-import io.github.jchun247.collectables.model.CardRarity;
-import io.github.jchun247.collectables.model.CreateCardRequest;
+import io.github.jchun247.collectables.model.*;
+import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/cards")
@@ -31,8 +27,8 @@ public class CardController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "name,asc") String [] sort,
-            @RequestParam(required = false) String game,
-            @RequestParam(required = false) Long set,
+            @RequestParam(required = false) CardGame game,
+            @RequestParam(required = false) CardSet set,
             @RequestParam(required = false) CardRarity rarity,
             @RequestParam(required = false) CardCondition condition,
             @RequestParam(required = false) Double minPrice,

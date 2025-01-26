@@ -9,4 +9,5 @@
     <include file="db/changelog/changes/002-add-card-price-table.xml"/>
     <include file="db/changelog/changes/003-remove-column-card-table.xml"/>
     <include file="db/changelog/changes/004-add-set-name-table.xml"/>
+    <include file="db/changelog/changes/005-add-code-column-sets-table.xml"/>
 </databaseChangeLog>

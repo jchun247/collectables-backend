@@ -4,6 +4,7 @@ import io.github.jchun247.collectables.dto.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.model.*;
+import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.repository.CardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +46,8 @@ public class CardServiceImpl implements CardService{
     }
 
     @Override
-    public PagedResponse<CardDto> getCards(int page, int size, String[] sort, String game,
-                                           Long set, CardRarity rarity, CardCondition condition,
+    public PagedResponse<CardDto> getCards(int page, int size, String[] sort, CardGame game,
+                                           CardSet set, CardRarity rarity, CardCondition condition,
                                            Double minPrice, Double maxPrice) {
 
         List<Sort.Order> orders = createSortOrders(sort);

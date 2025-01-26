@@ -1,5 +1,6 @@
 package io.github.jchun247.collectables.model;
 
+import io.github.jchun247.collectables.model.card.Card;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

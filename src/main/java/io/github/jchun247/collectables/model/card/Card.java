@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.model;
+package io.github.jchun247.collectables.model.card;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,9 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String game;
+
+    @Enumerated(EnumType.STRING)
+    private CardGame game;
     private Long set;
     private String setNumber;
 

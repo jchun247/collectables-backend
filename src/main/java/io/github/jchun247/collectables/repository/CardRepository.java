@@ -1,8 +1,6 @@
 package io.github.jchun247.collectables.repository;
 
-import io.github.jchun247.collectables.model.Card;
-import io.github.jchun247.collectables.model.CardCondition;
-import io.github.jchun247.collectables.model.CardRarity;
+import io.github.jchun247.collectables.model.card.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,8 +16,8 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "AND (:condition IS NULL OR p.condition = :condition) " +
             "AND p.price BETWEEN :minPrice AND :maxPrice")
     Page<Card> findByFilters(
-            @Param("game") String game,
-            @Param("set") Long set,
+            @Param("game") CardGame game,
+            @Param("set") CardSet set,
             @Param("rarity") CardRarity rarity,
             @Param("condition") CardCondition condition,
             @Param("minPrice") Double minPrice,

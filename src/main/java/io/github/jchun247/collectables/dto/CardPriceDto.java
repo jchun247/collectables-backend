@@ -1,7 +1,7 @@
 package io.github.jchun247.collectables.dto;
 
-import io.github.jchun247.collectables.model.CardCondition;
-import io.github.jchun247.collectables.model.CardPrice;
+import io.github.jchun247.collectables.model.card.CardCondition;
+import io.github.jchun247.collectables.model.card.CardPrice;
 import lombok.Data;
 
 @Data
