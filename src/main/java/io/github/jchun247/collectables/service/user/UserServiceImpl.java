@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.service;
+package io.github.jchun247.collectables.service.user;
 
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.model.UserEntity;
@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.service;
+package io.github.jchun247.collectables.service.collection;
 
 import io.github.jchun247.collectables.model.collection.Collection;
 

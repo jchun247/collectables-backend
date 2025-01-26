@@ -1,7 +1,7 @@
 package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.dto.UserDashboardDto;
-import io.github.jchun247.collectables.service.DashboardService;
+import io.github.jchun247.collectables.service.dashboard.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

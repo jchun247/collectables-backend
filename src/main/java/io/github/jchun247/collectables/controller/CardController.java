@@ -1,9 +1,9 @@
 package io.github.jchun247.collectables.controller;
 
-import io.github.jchun247.collectables.dto.CardDto;
+import io.github.jchun247.collectables.dto.card.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.model.card.*;
-import io.github.jchun247.collectables.service.CardService;
+import io.github.jchun247.collectables.service.card.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

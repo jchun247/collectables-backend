@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.repository;
+package io.github.jchun247.collectables.repository.card;
 
 import io.github.jchun247.collectables.model.card.CardSet;
 import org.springframework.data.jpa.repository.JpaRepository;

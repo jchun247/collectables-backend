@@ -1,7 +1,7 @@
 package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.model.collection.Collection;
-import io.github.jchun247.collectables.service.CollectionService;
+import io.github.jchun247.collectables.service.collection.CollectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

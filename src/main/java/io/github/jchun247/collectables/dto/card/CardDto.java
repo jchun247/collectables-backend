@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.dto;
+package io.github.jchun247.collectables.dto.card;
 
 import io.github.jchun247.collectables.model.card.Card;
 import io.github.jchun247.collectables.model.card.CardGame;

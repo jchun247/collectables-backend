@@ -1,6 +1,6 @@
-package io.github.jchun247.collectables.service;
+package io.github.jchun247.collectables.service.card;
 
-import io.github.jchun247.collectables.dto.CardDto;
+import io.github.jchun247.collectables.dto.card.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.model.card.*;
 

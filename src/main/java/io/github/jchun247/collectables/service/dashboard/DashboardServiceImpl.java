@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.service;
+package io.github.jchun247.collectables.service.dashboard;
 
 import io.github.jchun247.collectables.dto.UserDashboardDto;
 import lombok.RequiredArgsConstructor;

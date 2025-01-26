@@ -1,7 +1,7 @@
 package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.model.UserEntity;
-import io.github.jchun247.collectables.service.UserServiceImpl;
+import io.github.jchun247.collectables.service.user.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
