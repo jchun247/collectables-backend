@@ -9,8 +9,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("SELECT DISTINCT t FROM Card t " +
-            "JOIN t.prices p " +
-            "WHERE (:game IS NULL OR t.game LIKE %:game%) " +
+            "LEFT JOIN FETCH t.prices p " +
+            "WHERE (:game IS NULL OR t.game = :game) " +
             "AND (:setCode IS NULL OR t.set.code = :setCode) " +
             "AND (:rarity IS NULL OR t.rarity = :rarity) " +
             "AND (:condition IS NULL OR p.condition = :condition) " +

@@ -15,4 +15,5 @@
     <include file="db/changelog/changes/008-rename-set-column-cards-table.xml"/>
     <include file="db/changelog/changes/009-rename-set-column-cards-table.xml"/>
     <include file="db/changelog/changes/010-change-set-column-type.xml"/>
+    <include file="db/changelog/changes/011-add-release-date-column-sets-table.xml"/>
 </databaseChangeLog>

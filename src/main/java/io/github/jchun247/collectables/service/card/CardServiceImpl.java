@@ -6,15 +6,14 @@ import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.repository.card.CardRepository;
 import io.github.jchun247.collectables.repository.card.CardSetRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,6 +36,7 @@ public class CardServiceImpl implements CardService{
         newCard.setSet(cardSet);
         newCard.setSetNumber(cardRequest.getSetNumber());
         newCard.setRarity(cardRequest.getRarity());
+        newCard.setImageUrl(cardRequest.getImageUrl());
 
         for (CreateCardPriceRequest priceRequest : cardRequest.getPrices()) {
             CardPrice cardPrice = new CardPrice();
@@ -50,12 +50,21 @@ public class CardServiceImpl implements CardService{
     }
 
     @Override
-    public PagedResponse<CardDto> getCards(int page, int size, String[] sort, CardGame game,
+    @Transactional(readOnly = true)
+    public PagedResponse<CardDto> getCards(int page, int size, CardGame game,
                                            String setCode, CardRarity rarity, CardCondition condition,
-                                           Double minPrice, Double maxPrice) {
+                                           String sortOption, Double minPrice, Double maxPrice) {
 
-        List<Sort.Order> orders = createSortOrders(sort);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
+//        List<Sort.Order> orders = createSortOrders(sort);
+        Sort sort = switch (sortOption) {
+            case "name" -> Sort.by(Sort.Direction.ASC, "name");
+            case "name-desc" -> Sort.by(Sort.Direction.DESC, "name");
+            case "price-asc" -> Sort.by(Sort.Direction.ASC, "prices.price");
+            case "price-desc" -> Sort.by(Sort.Direction.DESC, "prices.price");
+            default -> Sort.unsorted();
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<Card> cardPage = cardRepository.findByFilters(
                 game, setCode, rarity, condition,
@@ -71,24 +80,25 @@ public class CardServiceImpl implements CardService{
 
     }
 
-    private List<Sort.Order> createSortOrders(String[] sort) {
-        List<Sort.Order> orders = new ArrayList<>();
+    /* Used for multiple sort orders, may use in the future */
+//    private List<Sort.Order> createSortOrders(String[] sort) {
+//        List<Sort.Order> orders = new ArrayList<>();
+//
+//        if (sort[0].contains(",")) {
+//            for (String sortOrder : sort) {
+//                String[] _sort = sortOrder.split(",");
+//                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
+//            }
+//        } else {
+//            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
+//        }
+//
+//        return orders;
+//    }
 
-        if (sort[0].contains(",")) {
-            for (String sortOrder : sort) {
-                String[] _sort = sortOrder.split(",");
-                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
-            }
-        } else {
-            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
-        }
-
-        return orders;
-    }
-
-    private Sort.Direction getSortDirection(String direction) {
-        return direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-    }
+//    private Sort.Direction getSortDirection(String direction) {
+//        return direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+//    }
 
     @Override
     public Card getCardById(Long id) {

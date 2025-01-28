@@ -25,16 +25,16 @@ public class CardController {
     public ResponseEntity<PagedResponse<CardDto>> getAllCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
-            @RequestParam(defaultValue = "name,asc") String [] sort,
+            @RequestParam(defaultValue = "name") String sortOption,
             @RequestParam(required = false) CardGame game,
             @RequestParam(required = false) String setCode,
             @RequestParam(required = false) CardRarity rarity,
-            @RequestParam(required = false) CardCondition condition,
+            @RequestParam(defaultValue = "NEAR_MINT") CardCondition condition,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice
     ){
-        PagedResponse<CardDto> response = cardService.getCards(page, size, sort, game,
-                setCode, rarity, condition, minPrice, maxPrice);
+        PagedResponse<CardDto> response = cardService.getCards(page, size, game,
+                setCode, rarity, condition, sortOption, minPrice, maxPrice);
         return ResponseEntity.ok(response);
     }
 
@@ -42,4 +42,5 @@ public class CardController {
     public ResponseEntity<Card> getCardById(@PathVariable Long id) {
         return ResponseEntity.ok(cardService.getCardById(id));
     }
+
 }

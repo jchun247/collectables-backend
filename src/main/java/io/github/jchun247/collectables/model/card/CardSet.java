@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name="sets")
 @Data
@@ -17,4 +19,5 @@ public class CardSet {
     private String code;
 
     private String name;
+    private LocalDate releaseDate;
 }

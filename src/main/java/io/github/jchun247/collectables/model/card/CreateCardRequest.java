@@ -11,5 +11,6 @@ public class CreateCardRequest {
     private String setCode;
     private String setNumber;
     private CardRarity rarity;
+    private String imageUrl;
     private List<CreateCardPriceRequest> prices;
 }
