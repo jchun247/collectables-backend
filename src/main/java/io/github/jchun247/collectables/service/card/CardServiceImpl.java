@@ -57,10 +57,10 @@ public class CardServiceImpl implements CardService{
 
 //        List<Sort.Order> orders = createSortOrders(sort);
         Sort sort = switch (sortOption) {
-            case "name" -> Sort.by(Sort.Direction.ASC, "name");
-            case "name-desc" -> Sort.by(Sort.Direction.DESC, "name");
-            case "price-asc" -> Sort.by(Sort.Direction.ASC, "prices.price");
-            case "price-desc" -> Sort.by(Sort.Direction.DESC, "prices.price");
+            case "name" -> Sort.by(Sort.Direction.ASC, "t.name");
+            case "name-desc" -> Sort.by(Sort.Direction.DESC, "t.name");
+            case "price-asc" -> Sort.by(Sort.Direction.ASC, "p.price");
+            case "price-desc" -> Sort.by(Sort.Direction.DESC, "p.price");
             default -> Sort.unsorted();
         };
 
