@@ -27,6 +27,7 @@ public class CardServiceImpl implements CardService{
     @Transactional
     public CardDto createCard(CreateCardRequest cardRequest) {
         // Fetch the cardSet entity from the code
+        // TODO: handle case where game in set code table does not match game in card request
         CardSet cardSet = cardSetRepository.findByCode(cardRequest.getSetCode()).orElseThrow(() -> new ResourceNotFoundException("Invalid set code: " + cardRequest.getSetCode()));
 
         // set card attributes from request
@@ -51,14 +52,14 @@ public class CardServiceImpl implements CardService{
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<CardDto> getCards(int page, int size, CardGame game,
+    public PagedResponse<CardDto> getCards(int page, int size, List<CardGame> games,
                                            String setCode, CardRarity rarity, CardCondition condition,
-                                           String sortOption, Double minPrice, Double maxPrice) {
+                                           String sortOption, Double minPrice, Double maxPrice, String query) {
 
 //        List<Sort.Order> orders = createSortOrders(sort);
         Sort sort = switch (sortOption) {
-            case "name" -> Sort.by(Sort.Direction.ASC, "t.name");
-            case "name-desc" -> Sort.by(Sort.Direction.DESC, "t.name");
+            case "name" -> Sort.by(Sort.Direction.ASC, "c.name");
+            case "name-desc" -> Sort.by(Sort.Direction.DESC, "c.name");
             case "price-asc" -> Sort.by(Sort.Direction.ASC, "p.price");
             case "price-desc" -> Sort.by(Sort.Direction.DESC, "p.price");
             default -> Sort.unsorted();
@@ -67,7 +68,7 @@ public class CardServiceImpl implements CardService{
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<Card> cardPage = cardRepository.findByFilters(
-                game, setCode, rarity, condition,
+                games, setCode, rarity, condition, query,
                 minPrice == null ? 0.0 : minPrice,
                 maxPrice == null ? Double.MAX_VALUE : maxPrice,
                 pageable

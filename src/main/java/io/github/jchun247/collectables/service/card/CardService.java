@@ -4,10 +4,12 @@ import io.github.jchun247.collectables.dto.card.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.model.card.*;
 
+import java.util.List;
+
 public interface CardService {
     CardDto createCard(CreateCardRequest cardRequest);
-    PagedResponse<CardDto> getCards(int page, int size, CardGame game,
-                                             String setCode, CardRarity rarity, CardCondition condition,
-                                             String sortOption, Double minPrice, Double maxPrice);
+    PagedResponse<CardDto> getCards(int page, int size, List<CardGame> games,
+                                     String setCode, CardRarity rarity, CardCondition condition,
+                                     String sortOption, Double minPrice, Double maxPrice, String query);
     Card getCardById(Long id);
 }

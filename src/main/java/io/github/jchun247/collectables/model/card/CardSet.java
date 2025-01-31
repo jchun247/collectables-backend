@@ -20,4 +20,7 @@ public class CardSet {
 
     private String name;
     private LocalDate releaseDate;
+
+    @Enumerated(EnumType.STRING)
+    private CardGame game;
 }

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/cards")
 @RequiredArgsConstructor
@@ -22,19 +24,20 @@ public class CardController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedResponse<CardDto>> getAllCards(
+    public ResponseEntity<PagedResponse<CardDto>> getFilteredCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "name") String sortOption,
-            @RequestParam(required = false) CardGame game,
+            @RequestParam(required = false) List<CardGame> games,
             @RequestParam(required = false) String setCode,
             @RequestParam(required = false) CardRarity rarity,
             @RequestParam(defaultValue = "NEAR_MINT") CardCondition condition,
             @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String query
     ){
-        PagedResponse<CardDto> response = cardService.getCards(page, size, game,
-                setCode, rarity, condition, sortOption, minPrice, maxPrice);
+        PagedResponse<CardDto> response = cardService.getCards(page, size, games,
+                setCode, rarity, condition, sortOption, minPrice, maxPrice, query);
         return ResponseEntity.ok(response);
     }
 
