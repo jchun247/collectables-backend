@@ -7,6 +7,7 @@ import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.repository.card.CardRepository;
 import io.github.jchun247.collectables.repository.card.CardSetRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -102,8 +103,11 @@ public class CardServiceImpl implements CardService{
 //    }
 
     @Override
+    @Transactional(readOnly = true)
     public Card getCardById(Long id) {
-        return cardRepository.findById(id)
+        Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id));
+        Hibernate.initialize(card.getPrices()); // Explicitly initialize the prices collection
+        return card;
     }
 }

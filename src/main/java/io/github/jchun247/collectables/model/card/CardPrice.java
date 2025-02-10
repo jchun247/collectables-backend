@@ -1,5 +1,6 @@
 package io.github.jchun247.collectables.model.card;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class CardPrice {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_id")
+    @JsonIgnore
     private Card card;
 
     @Enumerated(EnumType.STRING)
