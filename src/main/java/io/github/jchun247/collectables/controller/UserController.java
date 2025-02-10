@@ -1,7 +1,7 @@
 package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.model.UserEntity;
-import io.github.jchun247.collectables.service.user.UserServiceImpl;
+import io.github.jchun247.collectables.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @GetMapping("/user")
     public UserEntity getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
