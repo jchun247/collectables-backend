@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.model;
+package io.github.jchun247.collectables.model.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -26,4 +28,7 @@ public class UserEntity {
     private String email;
     private LocalDateTime lastLogin;
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPortfolio> portfolios = new ArrayList<>();
 }

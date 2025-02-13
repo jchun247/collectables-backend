@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 @Data
 public class CardDto {
+    private Long id;
     private String name;
     private CardGame game;
     private String setCode;
@@ -19,6 +20,7 @@ public class CardDto {
     private String imageUrl;
 
     public CardDto(Card card) {
+        this.id = card.getId();
         this.name = card.getName();
         this.game = card.getGame();
         this.setCode = card.getSet().getCode();
