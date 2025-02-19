@@ -1,5 +1,6 @@
 package io.github.jchun247.collectables.model.user;
 
+import io.github.jchun247.collectables.model.collection.Collection;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,5 +31,5 @@ public class UserEntity {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserPortfolio> portfolios = new ArrayList<>();
+    private List<Collection> portfolios = new ArrayList<>();
 }
