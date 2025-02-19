@@ -17,4 +17,5 @@
     <include file="db/changelog/changes/010-change-set-column-type.xml"/>
     <include file="db/changelog/changes/011-add-release-date-column-sets-table.xml"/>
     <include file="db/changelog/changes/012-add-game-column-to-sets-table.xml"/>
+    <include file="db/changelog/changes/013-remove-collection-tables.xml"/>
 </databaseChangeLog>
