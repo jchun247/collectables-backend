@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -38,13 +39,13 @@ public class Collection {
     @JoinColumn(name= "user_id")
     private UserEntity user;
 
-//    public double calculateCurrentValue() {
-//        return cards.stream()
-//                .mapToDouble(collectionCard -> collectionCard.getCard().getPrices().stream()
-//                        .filter(price -> price.getCondition() == collectionCard.getCondition())
-//                        .findFirst()
-//                        .map(price -> price.getPrice() * collectionCard.getQuantity())
-//                        .orElse(0.0))
-//                .sum();
-//    }
+    public BigDecimal calculateCurrentValue() {
+        return cards.stream()
+                .map(collectionCard -> collectionCard.getCard().getPrices().stream()
+                        .filter(price -> price.getCondition() == collectionCard.getCondition())
+                        .findFirst()
+                        .map(price -> price.getPrice().multiply(BigDecimal.valueOf(collectionCard.getQuantity())))
+                        .orElse(BigDecimal.ZERO))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }

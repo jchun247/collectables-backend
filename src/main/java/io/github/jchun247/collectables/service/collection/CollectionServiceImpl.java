@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -58,10 +59,10 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void updateCollectionValue(Collection collection) {
-//        double currentValue = collection.calculateCurrentValue();
+        BigDecimal currentValue = collection.calculateCurrentValue();
         CollectionValueHistory valueHistory = new CollectionValueHistory();
         valueHistory.setCollection(collection);
-//        valueHistory.setValue(currentValue);
+        valueHistory.setValue(currentValue);
         valueHistory.setTimestamp(LocalDateTime.now());
         collectionValueHistoryRepository.save(valueHistory);
     }
