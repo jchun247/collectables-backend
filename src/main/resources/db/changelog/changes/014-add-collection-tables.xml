@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="014" author="jchun247">
+        <createTable tableName="collections" schemaName="collectables">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_collections_users" references="collectables.users(id)"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="isPublic" type="boolean" defaultValue="true"/>
+            <column name="numProducts" type="int" defaultValue="0"/>
+        </createTable>
+
+        <createTable tableName="collection_cards" schemaName="collectables">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="portfolio_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_collectioncards_collections" references="collectables.collections(id)"/>
+            </column>
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_collectioncards_cards" references="collectables.cards(id)"/>
+            </column>
+            <column name="condition" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="int" defaultValue="1"/>
+        </createTable>
+
+        <createTable tableName="collection_value_history" schemaName="collectables">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="portfolio_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_valuehistory_collections" references="collectables.collections(id)"/>
+            </column>
+            <column name="value" type="decimal(19,2)"/>
+            <column name="timestamp" type="timestamp"/>
+        </createTable>
+
+        <modifyDataType tableName="card_price" schemaName="collectables"
+                        columnName="price" newDataType="decimal(19,2)" />
+    </changeSet>
+</databaseChangeLog>

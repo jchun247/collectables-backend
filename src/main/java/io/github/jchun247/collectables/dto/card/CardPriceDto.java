@@ -4,10 +4,12 @@ import io.github.jchun247.collectables.model.card.CardCondition;
 import io.github.jchun247.collectables.model.card.CardPrice;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class CardPriceDto {
     private CardCondition condition;
-    private Double price;
+    private BigDecimal price;
 
     public CardPriceDto(CardPrice price) {
         this.condition = price.getCondition();

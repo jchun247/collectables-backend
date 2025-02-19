@@ -18,4 +18,8 @@
     <include file="db/changelog/changes/011-add-release-date-column-sets-table.xml"/>
     <include file="db/changelog/changes/012-add-game-column-to-sets-table.xml"/>
     <include file="db/changelog/changes/013-remove-collection-tables.xml"/>
+    <include file="db/changelog/changes/014-add-collection-tables.xml"/>
+    <include file="db/changelog/changes/015-rename-portfolio_id-columns.xml"/>
+    <include file="db/changelog/changes/016-rename-isPublic-column.xml"/>
+    <include file="db/changelog/changes/017-rename-numProducts-column.xml"/>
 </databaseChangeLog>

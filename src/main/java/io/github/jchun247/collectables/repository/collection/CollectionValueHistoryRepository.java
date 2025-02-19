@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CollectionValueHistoryRepository extends JpaRepository<CollectionValueHistory, Long>  {
-    List<CollectionValueHistory> findAllByPortfolioId(Long portfolioId);
+    List<CollectionValueHistory> findAllByCollectionId(Long collectionId);
 }

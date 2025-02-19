@@ -30,6 +30,6 @@ public class UserEntity {
     private LocalDateTime lastLogin;
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Collection> portfolios = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Collection> collections = new ArrayList<>();
 }

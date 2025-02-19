@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.dto.portfolio;
+package io.github.jchun247.collectables.dto.collection;
 
 import io.github.jchun247.collectables.model.card.CardCondition;
 import jakarta.validation.constraints.Min;
@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class AddCardRequestDto {
     @NotNull
-    private Long portfolioId;
+    private Long collectionId;
     @NotNull
     private Long cardId;
     @NotNull

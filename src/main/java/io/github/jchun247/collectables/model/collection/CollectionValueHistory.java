@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,9 +17,9 @@ public class CollectionValueHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "portfolio_id", nullable = false)
-    private Collection portfolio;
+    @JoinColumn(name = "collection_id", nullable = false)
+    private Collection collection;
 
-    private Double value;
+    private BigDecimal value;
     private LocalDateTime timestamp;
 }

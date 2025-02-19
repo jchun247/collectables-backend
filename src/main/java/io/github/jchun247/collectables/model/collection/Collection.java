@@ -22,26 +22,29 @@ public class Collection {
 
     private String name;
     private String description;
+
+    @Column(name="is_public")
     private boolean isPublic;
+    @Column(name="num_products")
     private int numProducts;
 
-    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CollectionValueHistory> valueHistory;
 
-    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CollectionCard> cards;
 
     @ManyToOne
     @JoinColumn(name= "user_id")
     private UserEntity user;
 
-    public double calculateCurrentValue() {
-        return cards.stream()
-                .mapToDouble(portfolioCard -> portfolioCard.getCard().getPrices().stream()
-                        .filter(price -> price.getCondition() == portfolioCard.getCondition())
-                        .findFirst()
-                        .map(price -> price.getPrice() * portfolioCard.getQuantity())
-                        .orElse(0.0))
-                .sum();
-    }
+//    public double calculateCurrentValue() {
+//        return cards.stream()
+//                .mapToDouble(collectionCard -> collectionCard.getCard().getPrices().stream()
+//                        .filter(price -> price.getCondition() == collectionCard.getCondition())
+//                        .findFirst()
+//                        .map(price -> price.getPrice() * collectionCard.getQuantity())
+//                        .orElse(0.0))
+//                .sum();
+//    }
 }

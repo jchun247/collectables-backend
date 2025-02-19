@@ -20,8 +20,8 @@ public class CollectionCard {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "portfolio_id")
-    private Collection portfolio;
+    @JoinColumn(name = "collection_id")
+    private Collection collection;
 
     @ManyToOne
     @JoinColumn(name = "card_id")

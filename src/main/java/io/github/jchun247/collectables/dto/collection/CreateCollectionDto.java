@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.dto.portfolio;
+package io.github.jchun247.collectables.dto.collection;
 
 import lombok.Data;
 

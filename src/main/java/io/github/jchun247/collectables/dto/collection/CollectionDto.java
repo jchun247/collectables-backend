@@ -1,4 +1,4 @@
-package io.github.jchun247.collectables.dto.portfolio;
+package io.github.jchun247.collectables.dto.collection;
 
 import io.github.jchun247.collectables.model.collection.Collection;
 import lombok.Builder;
@@ -13,12 +13,12 @@ public class CollectionDto {
     private boolean isPublic;
     private int quantity;
 
-    public static CollectionDto fromEntity(Collection portfolio) {
+    public static CollectionDto fromEntity(Collection collection) {
         return CollectionDto.builder()
-                .id(portfolio.getId())
-                .name(portfolio.getName())
-                .description(portfolio.getDescription())
-                .isPublic(portfolio.isPublic())
+                .id(collection.getId())
+                .name(collection.getName())
+                .description(collection.getDescription())
+                .isPublic(collection.isPublic())
                 .build();
     }
 }

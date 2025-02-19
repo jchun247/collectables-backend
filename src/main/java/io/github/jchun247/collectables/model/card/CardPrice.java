@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name="card_price")
 @Data
@@ -24,5 +26,5 @@ public class CardPrice {
     @Enumerated(EnumType.STRING)
     private CardCondition condition;
 
-    private Double price;
+    private BigDecimal price;
 }
