@@ -36,18 +36,28 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     @Transactional
-    // TODO: change method to return a DTO
     public CollectionCardDto addCardToCollection(Long collectionId, Long cardId, CardCondition condition, int quantity) {
-        Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
+        if (quantity <= 0 ) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
 
-        CollectionCard collectionCard = new CollectionCard();
-        collectionCard.setCollection(collection);
-        collectionCard.setCard(card);
-        collectionCard.setCondition(condition);
-        collectionCard.setQuantity(quantity);
+        CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndCondition(collectionId, cardId, condition)
+                .orElseGet(() -> {
+                    Collection collection = collectionRepository.findById(collectionId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
+                    Card card = cardRepository.findById(cardId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
+
+                    CollectionCard newCollectionCard = new CollectionCard();
+                    newCollectionCard.setCollection(collection);
+                    newCollectionCard.setCard(card);
+                    newCollectionCard.setCondition(condition);
+                    newCollectionCard.setQuantity(0); // quantity will be updated below
+                    return newCollectionCard;
+                });
+
+        // Update quantity
+        collectionCard.setQuantity(collectionCard.getQuantity() + quantity);
 
         CollectionCard savedCard = collectionCardRepository.save(collectionCard);
         return CollectionCardDto.fromEntity(savedCard);
