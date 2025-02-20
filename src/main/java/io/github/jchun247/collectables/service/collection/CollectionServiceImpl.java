@@ -1,5 +1,6 @@
 package io.github.jchun247.collectables.service.collection;
 
+import io.github.jchun247.collectables.dto.collection.CollectionCardDto;
 import io.github.jchun247.collectables.dto.collection.CreateCollectionDto;
 import io.github.jchun247.collectables.dto.collection.CollectionDto;
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
@@ -36,7 +37,7 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     @Transactional
     // TODO: change method to return a DTO
-    public void addCardToCollection(Long collectionId, Long cardId, CardCondition condition, int quantity) {
+    public CollectionCardDto addCardToCollection(Long collectionId, Long cardId, CardCondition condition, int quantity) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
         Card card = cardRepository.findById(cardId)
@@ -47,9 +48,9 @@ public class CollectionServiceImpl implements CollectionService {
         collectionCard.setCard(card);
         collectionCard.setCondition(condition);
         collectionCard.setQuantity(quantity);
-        collectionCardRepository.save(collectionCard);
 
-//        userPortfolioRepository.save(collection);
+        CollectionCard savedCard = collectionCardRepository.save(collectionCard);
+        return CollectionCardDto.fromEntity(savedCard);
     }
 
     @Override

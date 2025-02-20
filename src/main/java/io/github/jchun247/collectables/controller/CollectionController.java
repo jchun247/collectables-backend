@@ -1,6 +1,7 @@
 package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.dto.collection.AddCardRequestDto;
+import io.github.jchun247.collectables.dto.collection.CollectionCardDto;
 import io.github.jchun247.collectables.dto.collection.CreateCollectionDto;
 import io.github.jchun247.collectables.dto.collection.CollectionDto;
 import io.github.jchun247.collectables.model.collection.CollectionValueHistory;
@@ -23,10 +24,9 @@ public class CollectionController {
         return collectionService.getCollectionValueHistory(collectionId);
     }
 
-    // TODO: change method to return a DTO
     @PostMapping("/addCard")
-    public void addCardToCollection(@RequestBody @Valid AddCardRequestDto request) {
-        collectionService.addCardToCollection(
+    public CollectionCardDto addCardToCollection(@RequestBody @Valid AddCardRequestDto request) {
+        return collectionService.addCardToCollection(
                 request.getCollectionId(),
                 request.getCardId(),
                 request.getCondition(),
