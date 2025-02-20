@@ -2,8 +2,10 @@ package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.dto.card.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
+import io.github.jchun247.collectables.dto.card.CreateCardRequestDto;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.service.card.CardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ public class CardController {
     private final CardService cardService;
 
     @PostMapping("/create")
-    public ResponseEntity<CardDto> createCard(@RequestBody CreateCardRequest cardRequest) {
+    public ResponseEntity<CardDto> createCard(@RequestBody @Valid CreateCardRequestDto cardRequest) {
         CardDto createdCard = cardService.createCard(cardRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
     }

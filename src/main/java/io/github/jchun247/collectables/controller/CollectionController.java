@@ -35,7 +35,7 @@ public class CollectionController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeCardsFromCollection(@PathVariable Long collectionId,
                                           @PathVariable Long cardId,
-                                          @RequestBody RemoveCardRequestDto request) {
+                                          @RequestBody @Valid RemoveCardRequestDto request) {
         collectionService.deleteCardFromCollection(collectionId, cardId, request.getCondition(), request.getQuantity());
     }
 

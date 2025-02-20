@@ -2,6 +2,8 @@ package io.github.jchun247.collectables.service.card;
 
 import io.github.jchun247.collectables.dto.card.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
+import io.github.jchun247.collectables.dto.card.CreateCardPriceRequestDto;
+import io.github.jchun247.collectables.dto.card.CreateCardRequestDto;
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.repository.card.CardRepository;
@@ -26,7 +28,7 @@ public class CardServiceImpl implements CardService{
 
     @Override
     @Transactional
-    public CardDto createCard(CreateCardRequest cardRequest) {
+    public CardDto createCard(CreateCardRequestDto cardRequest) {
         // Fetch the cardSet entity from the code
         // TODO: handle case where game in set code table does not match game in card request
         CardSet cardSet = cardSetRepository.findByCode(cardRequest.getSetCode()).orElseThrow(() -> new ResourceNotFoundException("Invalid set code: " + cardRequest.getSetCode()));
@@ -40,7 +42,7 @@ public class CardServiceImpl implements CardService{
         newCard.setRarity(cardRequest.getRarity());
         newCard.setImageUrl(cardRequest.getImageUrl());
 
-        for (CreateCardPriceRequest priceRequest : cardRequest.getPrices()) {
+        for (CreateCardPriceRequestDto priceRequest : cardRequest.getPrices()) {
             CardPrice cardPrice = new CardPrice();
             cardPrice.setCondition(priceRequest.getCondition());
             cardPrice.setPrice(priceRequest.getPrice());
