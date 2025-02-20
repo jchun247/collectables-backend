@@ -13,7 +13,7 @@ public class CollectionCardDto {
     private Long collectionId;
     private CardCondition condition;
     private int quantity;
-    // Optionally, you could include some denormalized data for convenience:
+    // Denormalized data to avoid additional queries
     private String cardName;
     private String collectionName;
 

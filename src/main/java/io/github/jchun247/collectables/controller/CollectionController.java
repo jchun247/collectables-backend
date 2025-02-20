@@ -1,13 +1,11 @@
 package io.github.jchun247.collectables.controller;
 
-import io.github.jchun247.collectables.dto.collection.AddCardRequestDto;
-import io.github.jchun247.collectables.dto.collection.CollectionCardDto;
-import io.github.jchun247.collectables.dto.collection.CreateCollectionDto;
-import io.github.jchun247.collectables.dto.collection.CollectionDto;
+import io.github.jchun247.collectables.dto.collection.*;
 import io.github.jchun247.collectables.model.collection.CollectionValueHistory;
 import io.github.jchun247.collectables.service.collection.CollectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,9 +16,8 @@ import java.util.List;
 public class CollectionController {
     private final CollectionService collectionService;
 
-    // TODO: might need to have pathvariable for id?
-    @GetMapping("/history")
-    public List<CollectionValueHistory> getCollectionValueHistory(@RequestParam Long collectionId) {
+    @GetMapping("/collections/{collectionId}/history")
+    public List<CollectionValueHistory> getCollectionValueHistory(@PathVariable Long collectionId) {
         return collectionService.getCollectionValueHistory(collectionId);
     }
 
@@ -32,6 +29,14 @@ public class CollectionController {
                 request.getCondition(),
                 request.getQuantity()
         );
+    }
+
+    @DeleteMapping("/{collectionId}/cards/{cardId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeCardsFromCollection(@PathVariable Long collectionId,
+                                          @PathVariable Long cardId,
+                                          @RequestBody RemoveCardRequestDto request) {
+        collectionService.deleteCardFromCollection(collectionId, cardId, request.getCondition(), request.getQuantity());
     }
 
     @PostMapping("/create")

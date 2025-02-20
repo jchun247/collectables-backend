@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface CollectionService {
     CollectionCardDto addCardToCollection(Long collectionId, Long cardId, CardCondition condition, int quantity);
+    void deleteCardFromCollection(Long collectionId, Long cardId, CardCondition condition, int quantity);
     List<CollectionValueHistory> getCollectionValueHistory(Long collectionId);
     void updateCollectionValue(Collection collection);
     void updateAllCollections();

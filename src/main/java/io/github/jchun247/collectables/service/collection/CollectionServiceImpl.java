@@ -15,6 +15,7 @@ import io.github.jchun247.collectables.repository.collection.CollectionCardRepos
 import io.github.jchun247.collectables.repository.collection.CollectionRepository;
 import io.github.jchun247.collectables.repository.collection.CollectionValueHistoryRepository;
 import io.github.jchun247.collectables.repository.user.UserRepository;
+import io.github.jchun247.collectables.security.VerifyCollectionCardAccess;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,6 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     @Transactional
     public CollectionCardDto addCardToCollection(Long collectionId, Long cardId, CardCondition condition, int quantity) {
-        if (quantity <= 0 ) {
-            throw new IllegalArgumentException("Quantity must be greater than 0");
-        }
-
         CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndCondition(collectionId, cardId, condition)
                 .orElseGet(() -> {
                     Collection collection = collectionRepository.findById(collectionId)
@@ -61,6 +58,23 @@ public class CollectionServiceImpl implements CollectionService {
 
         CollectionCard savedCard = collectionCardRepository.save(collectionCard);
         return CollectionCardDto.fromEntity(savedCard);
+    }
+
+    @Override
+    @Transactional
+    @VerifyCollectionCardAccess
+    public void deleteCardFromCollection(Long collectionId, Long cardId, CardCondition condition, int quantity) {
+        CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndCondition(collectionId, cardId, condition)
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found in collection"));
+        int newCardQuantity = collectionCard.getQuantity() - quantity;
+        if (newCardQuantity < 0) {
+            throw new IllegalArgumentException("Cannot remove more cards than are in the collection");
+        } else if (newCardQuantity == 0) {
+            collectionCardRepository.delete(collectionCard);
+        } else {
+            collectionCard.setQuantity(newCardQuantity);
+            collectionCardRepository.save(collectionCard);
+        }
     }
 
     @Override
