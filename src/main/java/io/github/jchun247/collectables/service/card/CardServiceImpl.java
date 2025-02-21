@@ -30,7 +30,7 @@ public class CardServiceImpl implements CardService{
     @Transactional
     public CardDto createCard(CreateCardRequestDto cardRequest) {
         // Fetch the cardSet entity from the code
-        // TODO: handle case where game in set code table does not match game in card request
+        // TODO: ensure set code belongs to the specified game
         CardSet cardSet = cardSetRepository.findByCode(cardRequest.getSetCode()).orElseThrow(() -> new ResourceNotFoundException("Invalid set code: " + cardRequest.getSetCode()));
 
         // set card attributes from request
@@ -78,7 +78,7 @@ public class CardServiceImpl implements CardService{
         );
 
         List<CardDto> cardDTOs = cardPage.getContent().stream()
-                .map(CardDto::new).toList();
+                .map(CardDto::fromEntity).toList();
 
         return new PagedResponse<>(cardDTOs, cardPage);
 

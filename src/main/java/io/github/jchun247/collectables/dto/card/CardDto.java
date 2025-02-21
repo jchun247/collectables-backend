@@ -21,19 +21,6 @@ public class CardDto {
     private List<CardPriceDto> prices;
     private String imageUrl;
 
-    public CardDto(Card card) {
-        this.id = card.getId();
-        this.name = card.getName();
-        this.game = card.getGame();
-        this.setCode = card.getSet().getCode();
-        this.setNumber = card.getSetNumber();
-        this.rarity = card.getRarity();
-        this.prices = card.getPrices().stream()
-                .map(CardPriceDto::new)
-                .collect(Collectors.toList());
-        this.imageUrl = card.getImageUrl();
-    }
-
     public static CardDto fromEntity(Card card) {
         return CardDto.builder()
                 .id(card.getId())
