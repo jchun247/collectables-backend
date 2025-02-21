@@ -4,6 +4,8 @@ import io.github.jchun247.collectables.model.collection.Collection;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 public class CollectionDto {
@@ -11,7 +13,8 @@ public class CollectionDto {
     private String name;
     private String description;
     private boolean isPublic;
-    private int quantity;
+    private int numProducts;
+    private BigDecimal currentValue;
 
     public static CollectionDto fromEntity(Collection collection) {
         return CollectionDto.builder()
@@ -19,6 +22,8 @@ public class CollectionDto {
                 .name(collection.getName())
                 .description(collection.getDescription())
                 .isPublic(collection.isPublic())
+                .numProducts(collection.getNumProducts())
+                .currentValue(collection.calculateCurrentValue())
                 .build();
     }
 }

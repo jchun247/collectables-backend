@@ -50,7 +50,7 @@ public class CardServiceImpl implements CardService{
         }
 
         Card savedCard = cardRepository.save(newCard);
-        return new CardDto(savedCard);
+        return CardDto.fromEntity(savedCard);
     }
 
     @Override
@@ -77,10 +77,10 @@ public class CardServiceImpl implements CardService{
                 pageable
         );
 
-        List<CardDto> cardDtos = cardPage.getContent().stream()
+        List<CardDto> cardDTOs = cardPage.getContent().stream()
                 .map(CardDto::new).toList();
 
-        return new PagedResponse<>(cardDtos, cardPage);
+        return new PagedResponse<>(cardDTOs, cardPage);
 
     }
 

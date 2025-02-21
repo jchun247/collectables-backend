@@ -6,6 +6,7 @@ import io.github.jchun247.collectables.service.collection.CollectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +17,9 @@ import java.util.List;
 public class CollectionController {
     private final CollectionService collectionService;
 
-    @GetMapping("/collections/{collectionId}/history")
-    public List<CollectionValueHistory> getCollectionValueHistory(@PathVariable Long collectionId) {
-        return collectionService.getCollectionValueHistory(collectionId);
+    @PostMapping("/create")
+    public CollectionDto createCollection(@RequestBody CreateCollectionDto createCollectionDto) {
+        return collectionService.createCollection(createCollectionDto);
     }
 
     @PostMapping("/addCard")
@@ -39,8 +40,15 @@ public class CollectionController {
         collectionService.deleteCardFromCollection(collectionId, cardId, request.getCondition(), request.getQuantity());
     }
 
-    @PostMapping("/create")
-    public CollectionDto createCollection(@RequestBody CreateCollectionDto createCollectionDto) {
-        return collectionService.createCollection(createCollectionDto);
+    @GetMapping("/{collectionId}/details")
+    public CollectionDto getCollectionDetails(@PathVariable Long collectionId) {
+        return collectionService.getCollectionDetails(collectionId);
+    }
+
+    @GetMapping("/{collectionId}/details/history")
+    public ResponseEntity<CollectionValueHistoryResponse> getCollectionValueHistory(@PathVariable Long collectionId) {
+        List<CollectionValueHistory> history = collectionService.getCollectionValueHistory(collectionId);
+        CollectionValueHistoryResponse response = new CollectionValueHistoryResponse(history);
+        return ResponseEntity.ok(response);
     }
 }

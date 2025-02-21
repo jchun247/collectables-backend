@@ -78,8 +78,18 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CollectionValueHistory> getCollectionValueHistory(Long collectionId) {
         return collectionValueHistoryRepository.findAllByCollectionId(collectionId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CollectionDto getCollectionDetails(Long collectionId) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
+        collection.setNumProducts(collectionCardRepository.sumQuantityByCollectionId(collectionId));
+        return CollectionDto.fromEntity(collection);
     }
 
     @Override
