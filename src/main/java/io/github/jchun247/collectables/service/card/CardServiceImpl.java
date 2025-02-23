@@ -2,6 +2,7 @@ package io.github.jchun247.collectables.service.card;
 
 import io.github.jchun247.collectables.dto.card.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
+import io.github.jchun247.collectables.dto.card.CreateCardImageRequestDto;
 import io.github.jchun247.collectables.dto.card.CreateCardPriceRequestDto;
 import io.github.jchun247.collectables.dto.card.CreateCardRequestDto;
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
@@ -40,7 +41,14 @@ public class CardServiceImpl implements CardService{
         newCard.setSet(cardSet);
         newCard.setSetNumber(cardRequest.getSetNumber());
         newCard.setRarity(cardRequest.getRarity());
-        newCard.setImageUrl(cardRequest.getImageUrl());
+//        newCard.setImageUrl(cardRequest.getImageUrl());
+
+        for (CreateCardImageRequestDto imageRequest : cardRequest.getImages()) {
+            CardImage cardImage = new CardImage();
+            cardImage.setUrl(imageRequest.getUrl());
+            cardImage.setResolution(imageRequest.getResolution());
+            newCard.addImage(cardImage);
+        }
 
         for (CreateCardPriceRequestDto priceRequest : cardRequest.getPrices()) {
             CardPrice cardPrice = new CardPrice();

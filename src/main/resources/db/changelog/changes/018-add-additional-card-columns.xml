@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="015" author="jchun247">
+        <!-- Add new columns to cards table -->
+        <addColumn tableName="cards">
+            <column name="illustrator_name" type="varchar(50)"/>
+            <column name="hit_points" type="int"/>
+            <column name="flavour_text" type="varchar(1000)"/>
+            <column name="type" type="varchar(50)"/>
+            <column name="weakness" type="varchar(50)"/>
+            <column name="resistance" type="varchar(50)"/>
+            <column name="retreat_cost" type="int"/>
+        </addColumn>
+
+        <!-- Create card_attacks table -->
+        <createTable tableName="card_attacks">
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_attacks_card" references="cards(id)"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cost" type="varchar(50)"/>
+            <column name="converted_energy_cost" type="int"/>
+            <column name="damage" type="varchar(50)"/>
+            <column name="text" type="varchar(500)"/>
+        </createTable>
+
+        <!-- Create card_abilities table -->
+        <createTable tableName="card_abilities">
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_abilities_card" references="cards(id)"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="varchar(500)"/>
+            <column name="type" type="varchar(50)"/>
+        </createTable>
+
+        <!-- Create card_images table -->
+        <createTable tableName="card_images">
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_images_card" references="cards(id)"/>
+            </column>
+            <column name="url" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resolution" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+
+    </changeSet>
+</databaseChangeLog>

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Valid
@@ -15,6 +16,6 @@ public class CreateCardRequestDto {
     private String setCode;
     private String setNumber;
     private CardRarity rarity;
-    private String imageUrl;
+    private Set<CreateCardImageRequestDto> images;
     private List<CreateCardPriceRequestDto> prices;
 }

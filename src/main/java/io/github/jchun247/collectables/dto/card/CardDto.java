@@ -2,11 +2,13 @@ package io.github.jchun247.collectables.dto.card;
 
 import io.github.jchun247.collectables.model.card.Card;
 import io.github.jchun247.collectables.model.card.CardGame;
+import io.github.jchun247.collectables.model.card.CardImage;
 import io.github.jchun247.collectables.model.card.CardRarity;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -19,7 +21,7 @@ public class CardDto {
     private String setNumber;
     private CardRarity rarity;
     private List<CardPriceDto> prices;
-    private String imageUrl;
+    private Set<CardImage> images;
 
     public static CardDto fromEntity(Card card) {
         return CardDto.builder()
@@ -32,7 +34,7 @@ public class CardDto {
                 .prices(card.getPrices().stream()
                         .map(CardPriceDto::new)
                         .collect(Collectors.toList()))
-                .imageUrl(card.getImageUrl())
+                .images(card.getImages())
                 .build();
     }
 

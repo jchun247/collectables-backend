@@ -22,4 +22,5 @@
     <include file="db/changelog/changes/015-rename-portfolio_id-columns.xml"/>
     <include file="db/changelog/changes/016-rename-isPublic-column.xml"/>
     <include file="db/changelog/changes/017-rename-numProducts-column.xml"/>
+    <include file="db/changelog/changes/018-add-additional-card-columns.xml"/>
 </databaseChangeLog>
