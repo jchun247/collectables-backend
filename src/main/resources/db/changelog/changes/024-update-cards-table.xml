@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="024" author="jchun247">
+        <!-- Drop old card_weakness and card_resistance tables -->
+        <dropTable tableName="card_weaknesses"/>
+        <dropTable tableName="card_resistances"/>
+
+        <!-- Add weakness and resistance columns directly to cards table -->
+        <addColumn tableName="cards" schemaName="collectables">
+            <column name="weakness_type" type="varchar(50)"/>
+            <column name="weakness_modifier" type="varchar(20)"/>
+            <column name="weakness_amount" type="int"/>
+
+            <column name="resistance_type" type="varchar(50)"/>
+            <column name="resistance_modifier" type="varchar(20)"/>
+            <column name="resistance_amount" type="int"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="025" author="jchun247">
+        <!-- Add card subtypes table -->
+        <createTable tableName="card_subtypes" schemaName="collectables">
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_subtypes_card" references="cards(id)"/>
+            </column>
+            <column name="subtype" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Add index to card_subtypes table for better query performance -->
+        <createIndex tableName="card_subtypes" schemaName="collectables" indexName="idx_card_subtypes_card_id">
+            <column name="card_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

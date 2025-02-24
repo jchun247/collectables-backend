@@ -92,26 +92,6 @@ public class CardServiceImpl implements CardService{
 
     }
 
-    /* Used for multiple sort orders, may use in the future */
-//    private List<Sort.Order> createSortOrders(String[] sort) {
-//        List<Sort.Order> orders = new ArrayList<>();
-//
-//        if (sort[0].contains(",")) {
-//            for (String sortOrder : sort) {
-//                String[] _sort = sortOrder.split(",");
-//                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
-//            }
-//        } else {
-//            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
-//        }
-//
-//        return orders;
-//    }
-
-//    private Sort.Direction getSortDirection(String direction) {
-//        return direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-//    }
-
     @Override
     @Transactional(readOnly = true)
     public Card getCardById(Long id) {

@@ -21,14 +21,19 @@ public class Card {
     private Long id;
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private CardGame game;
+    @ManyToOne
+    @JoinColumn(name = "parent_card_id")
+    private Card parentCard;
+
+    @OneToMany(mappedBy = "parentCard")
+    private List<Card> variants = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "set_id")
     private CardSet set;
 
-    private String setNumber;
+    @Enumerated(EnumType.STRING)
+    private CardGame game;
 
     @Enumerated(EnumType.STRING)
     private CardRarity rarity;
@@ -36,29 +41,36 @@ public class Card {
     @Enumerated(EnumType.STRING)
     private CardFinish finish;
 
+    @Enumerated(EnumType.STRING)
+    private CardType type;
+
     private String illustratorName;
-    private int hitPoints;
-    private String type;
     private String flavourText;
+    private String setNumber;
+    private int hitPoints;
     private int retreatCost;
 
-    @ElementCollection
-    @CollectionTable(name = "card_weaknesses", joinColumns = @JoinColumn(name = "card_id"))
-    private List<String> weaknesses = new ArrayList<>();
+    @Embedded
+    private CardWeakness weakness;
 
-    @ElementCollection
-    @CollectionTable(name = "card_resistances", joinColumns = @JoinColumn(name = "card_id"))
-    private List<String> resistances = new ArrayList<>();
+    @Embedded
+    private CardResistance resistance;
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardAttack> attacks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CardPrice> prices = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "card_abilities", joinColumns = @JoinColumn(name = "card_id"))
     private List<CardAbility> abilities;
 
-    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CardPrice> prices = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "card_subtypes", joinColumns = @JoinColumn(name = "card_id"))
+    @Column(name="subtype")
+    @Enumerated(EnumType.STRING)
+    private List<CardSubType> subTypes;
 
     @ElementCollection
     @CollectionTable(name = "card_images", joinColumns = @JoinColumn(name = "card_id"))
@@ -71,5 +83,18 @@ public class Card {
 
     public void addImage(CardImage image) {
         images.add(image);
+    }
+
+    public void addVariant(Card variant) {
+        variant.setParentCard(this);
+        variants.add(variant);
+    }
+
+    public boolean isVariant() {
+        return parentCard != null;
+    }
+
+    public boolean isBaseCard() {
+        return parentCard == null;
     }
 }

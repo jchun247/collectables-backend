@@ -1,0 +1,31 @@
+package io.github.jchun247.collectables.model.card;
+
+public enum CardSubType {
+    BASIC,
+    STAGE_1,
+    STAGE_2,
+    V,
+    V_MAX,
+    V_STAR,
+    DELTA_SPECIES,
+    EX,
+    GX,
+    STAR,
+    MEGA,
+    BREAK,
+    LEGEND,
+    LEVEL_X,
+    SP,
+    PRIME,
+    TAG_TEAM,
+    V_UNION,
+    RADIANT,
+    SUPPORTER,
+    ITEM,
+    TOOL,
+    STADIUM,
+    TECHNICAL_MACHINE,
+    ACE_SPEC,
+    SPECIAL,
+    OTHER
+}

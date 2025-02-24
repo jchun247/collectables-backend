@@ -25,4 +25,9 @@
     <include file="db/changelog/changes/018-add-additional-card-columns.xml"/>
     <include file="db/changelog/changes/019-update-cards-table.xml"/>
     <include file="db/changelog/changes/020-add-variant-column-cards-table.xml"/>
+    <include file="db/changelog/changes/021-update-cards-table.xml"/>
+    <include file="db/changelog/changes/022-add-card-variants.xml"/>
+    <include file="db/changelog/changes/023-update-resist-weakness-tables.xml"/>
+    <include file="db/changelog/changes/024-update-cards-table.xml"/>
+    <include file="db/changelog/changes/025-add-card-sub-types.xml"/>
 </databaseChangeLog>
