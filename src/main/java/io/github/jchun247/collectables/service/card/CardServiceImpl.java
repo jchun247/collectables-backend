@@ -35,13 +35,13 @@ public class CardServiceImpl implements CardService{
         CardSet cardSet = cardSetRepository.findByCode(cardRequest.getSetCode()).orElseThrow(() -> new ResourceNotFoundException("Invalid set code: " + cardRequest.getSetCode()));
 
         // set card attributes from request
+        // TODO: need to add new fields
         Card newCard = new Card();
         newCard.setName(cardRequest.getName());
         newCard.setGame(cardRequest.getGame());
         newCard.setSet(cardSet);
         newCard.setSetNumber(cardRequest.getSetNumber());
         newCard.setRarity(cardRequest.getRarity());
-//        newCard.setImageUrl(cardRequest.getImageUrl());
 
         for (CreateCardImageRequestDto imageRequest : cardRequest.getImages()) {
             CardImage cardImage = new CardImage();

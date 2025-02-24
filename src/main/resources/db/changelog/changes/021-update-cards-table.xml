@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="021" author="jchun247">
+        <!-- Modify the hit_points column to be an int -->
+        <modifyDataType tableName="cards" schemaName="collectables" columnName="hit_points" newDataType="int" />
+        <renameColumn tableName="cards" schemaName="collectables" oldColumnName="variant" newColumnName="finish"/>
+
+
+        <!-- Drop the old weakness and resistance columns -->
+        <dropColumn tableName="cards" schemaName="collectables" columnName="weakness" />
+        <dropColumn tableName="cards" columnName="resistance"/>
+
+        <!-- Add new weakness and resistance tables -->
+        <createTable tableName="card_weaknesses">
+            <column name="attack_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_attack_costs_attack" references="card_attacks(id)"/>
+            </column>
+            <column name="cost" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="card_resistances">
+            <column name="attack_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_attack_costs_attack" references="card_attacks(id)"/>
+            </column>
+            <column name="cost" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

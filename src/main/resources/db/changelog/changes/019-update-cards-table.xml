@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="019" author="jchun247">
+        <!-- Modify the hit_points column to be a varchar(50) -->
+        <modifyDataType tableName="cards" schemaName="collectables" columnName="hit_points" newDataType="varchar(50)" />
+
+        <!-- Drop the converted_energy_cost column -->
+        <dropColumn tableName="card_attacks" schemaName="collectables" columnName="converted_energy_cost" />
+
+        <!-- Remove the cost column from card_attacks table -->
+        <dropColumn tableName="card_attacks" columnName="cost"/>
+
+        <!-- Add ID column to card_attacks table -->
+        <addColumn tableName="card_attacks">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Add new cost column -->
+        <createTable tableName="card_attack_costs">
+            <column name="attack_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_attack_costs_attack" references="card_attacks(id)"/>
+            </column>
+            <column name="cost" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

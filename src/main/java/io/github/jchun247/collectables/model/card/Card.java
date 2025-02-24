@@ -34,17 +34,23 @@ public class Card {
     private CardRarity rarity;
 
     @Enumerated(EnumType.STRING)
-    private CardVariant variant;
+    private CardFinish finish;
 
     private String illustratorName;
-    private String hitPoints;
+    private int hitPoints;
     private String type;
     private String flavourText;
-    private String weakness;
-    private String resistance;
+    private int retreatCost;
 
     @ElementCollection
-    @CollectionTable(name = "card_attacks", joinColumns = @JoinColumn(name = "card_id"))
+    @CollectionTable(name = "card_weaknesses", joinColumns = @JoinColumn(name = "card_id"))
+    private List<String> weaknesses = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "card_resistances", joinColumns = @JoinColumn(name = "card_id"))
+    private List<String> resistances = new ArrayList<>();
+
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardAttack> attacks = new ArrayList<>();
 
     @ElementCollection
@@ -54,8 +60,9 @@ public class Card {
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardPrice> prices = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name = "card_images", joinColumns = @JoinColumn(name = "card_id"))
     private Set<CardImage> images = new HashSet<>();
-//    private String imageUrl;
 
     public void addPrice(CardPrice price) {
         prices.add(price);
