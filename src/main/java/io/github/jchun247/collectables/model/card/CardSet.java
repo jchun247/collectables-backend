@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name="sets")
@@ -23,4 +25,15 @@ public class CardSet {
 
     @Enumerated(EnumType.STRING)
     private CardGame game;
+
+    @Enumerated(EnumType.STRING)
+    private CardSeries series;
+
+    @ElementCollection
+    @CollectionTable(name = "set_legalities", joinColumns = @JoinColumn(name = "set_id"))
+    private Set<CardLegality> legalities;
+
+    @ElementCollection
+    @CollectionTable(name = "set_images", joinColumns = @JoinColumn(name = "set_id"))
+    private Set<CardSetImage> images = new HashSet<>();
 }
