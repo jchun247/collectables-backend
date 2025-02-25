@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -22,6 +23,7 @@ public class CardSet {
 
     private String name;
     private LocalDate releaseDate;
+    private LocalDateTime lastUpdated;
 
     @Enumerated(EnumType.STRING)
     private CardGame game;

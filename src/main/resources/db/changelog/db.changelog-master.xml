@@ -31,4 +31,7 @@
     <include file="db/changelog/changes/024-update-cards-table.xml"/>
     <include file="db/changelog/changes/025-add-card-sub-types.xml"/>
     <include file="db/changelog/changes/026-update-sets-table.xml"/>
+    <include file="db/changelog/changes/027-add-last-updated-time.xml"/>
+    <include file="db/changelog/changes/028-rename-last-updated-column.xml"/>
+    <include file="db/changelog/changes/029-add-set-table-constraints.xml"/>
 </databaseChangeLog>
