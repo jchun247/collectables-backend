@@ -15,8 +15,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 public class CardSet {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(unique = true)
     private String code;
@@ -24,6 +23,8 @@ public class CardSet {
     private String name;
     private LocalDate releaseDate;
     private LocalDateTime lastUpdated;
+    private int printedTotal;
+    private int total;
 
     @Enumerated(EnumType.STRING)
     private CardGame game;

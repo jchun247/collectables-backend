@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="031" author="jchun247">
+        <!-- drop fk constraints -->
+        <dropForeignKeyConstraint baseTableName="set_images" constraintName="fk_set_images_set"/>
+        <dropForeignKeyConstraint baseTableName="set_legalities" constraintName="fk_set_legalities_set"/>
+
+        <!-- drop identity property from id column in sets table -->
+        <sql>ALTER TABLE collectables.sets ALTER COLUMN id DROP IDENTITY IF EXISTS</sql>
+
+        <!-- change set_id in legalities and image tables to string -->
+        <modifyDataType tableName="set_images" schemaName="collectables" columnName="set_id" newDataType="varchar(255)" />
+        <modifyDataType tableName="set_legalities" schemaName="collectables" columnName="set_id" newDataType="varchar(255)" />
+
+        <!-- change set_id in sets table -->
+        <modifyDataType tableName="sets" schemaName="collectables" columnName="id" newDataType="varchar(255)" />
+
+        <!-- add fk constraints back -->
+        <addForeignKeyConstraint baseColumnNames="set_id" baseTableName="set_images" constraintName="fk_set_images_set" referencedColumnNames="id" referencedTableName="sets"/>
+        <addForeignKeyConstraint baseColumnNames="set_id" baseTableName="set_legalities" constraintName="fk_set_legalities_set" referencedColumnNames="id" referencedTableName="sets"/>
+    </changeSet>
+</databaseChangeLog>

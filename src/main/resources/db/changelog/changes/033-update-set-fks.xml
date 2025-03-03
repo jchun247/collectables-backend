@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="033" author="jchun247">
+        <dropForeignKeyConstraint
+                baseTableName="set_legalities"
+                baseTableSchemaName="collectables"
+                constraintName="fk_set_legalities_set"/>
+
+        <dropForeignKeyConstraint
+                baseTableName="set_images"
+                baseTableSchemaName="collectables"
+                constraintName="fk_set_images_set"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="set_id"
+                baseTableName="set_legalities"
+                baseTableSchemaName="collectables"
+                constraintName="fk_set_legalities_set"
+                referencedColumnNames="id"
+                referencedTableName="sets"
+                referencedTableSchemaName="collectables"
+                onDelete="CASCADE"
+                onUpdate="CASCADE"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="set_id"
+                baseTableName="set_images"
+                baseTableSchemaName="collectables"
+                constraintName="fk_set_images_set"
+                referencedColumnNames="id"
+                referencedTableName="sets"
+                referencedTableSchemaName="collectables"
+                onDelete="CASCADE"
+                onUpdate="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

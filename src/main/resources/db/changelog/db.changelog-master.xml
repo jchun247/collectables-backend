@@ -34,4 +34,9 @@
     <include file="db/changelog/changes/027-add-last-updated-time.xml"/>
     <include file="db/changelog/changes/028-rename-last-updated-column.xml"/>
     <include file="db/changelog/changes/029-add-set-table-constraints.xml"/>
+    <include file="db/changelog/changes/030-add-set-columns.xml"/>
+    <include file="db/changelog/changes/031-change-set-id-to-string.xml"/>
+    <include file="db/changelog/changes/032-modify-cards-table-set-id-col.xml"/>
+    <include file="db/changelog/changes/033-update-set-fks.xml"/>
+    <include file="db/changelog/changes/034-remove-fk-constraint.xml"/>
 </databaseChangeLog>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="030" author="jchun247">
+        <!-- Add printed_total and total columns to sets table -->
+        <addColumn tableName="sets">
+            <column name="printed_total" type="int" />
+            <column name="total" type="int" />
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
