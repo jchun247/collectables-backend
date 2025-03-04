@@ -38,9 +38,10 @@ public class CardController {
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(required = false) String query
     ){
-        PagedResponse<CardDto> response = cardService.getCards(page, size, games,
-                setCode, rarity, condition, sortOption, minPrice, maxPrice, query);
-        return ResponseEntity.ok(response);
+//        PagedResponse<CardDto> response = cardService.getCards(page, size, games,
+//                setCode, rarity, condition, sortOption, minPrice, maxPrice, query);
+//        return ResponseEntity.ok(response);
+        return null;
     }
 
     @GetMapping("/{id}")

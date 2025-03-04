@@ -22,11 +22,8 @@ public class Card {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "parent_card_id")
-    private Card parentCard;
-
-    @OneToMany(mappedBy = "parentCard")
-    private List<Card> variants = new ArrayList<>();
+    @JoinColumn(name="card_variant_group_id")
+    private CardVariantGroup variantGroup;
 
     @ManyToOne
     @JoinColumn(name = "set_id")
@@ -37,9 +34,6 @@ public class Card {
 
     @Enumerated(EnumType.STRING)
     private CardRarity rarity;
-
-    @Enumerated(EnumType.STRING)
-    private CardFinish finish;
 
     @Enumerated(EnumType.STRING)
     private CardType type;
@@ -76,25 +70,25 @@ public class Card {
     @CollectionTable(name = "card_images", joinColumns = @JoinColumn(name = "card_id"))
     private Set<CardImage> images = new HashSet<>();
 
-    public void addPrice(CardPrice price) {
-        prices.add(price);
-        price.setCard(this);
-    }
+//    public void addPrice(CardPrice price) {
+//        prices.add(price);
+//        price.setCard(this);
+//    }
 
-    public void addImage(CardImage image) {
-        images.add(image);
-    }
+//    public void addImage(CardImage image) {
+//        images.add(image);
+//    }
 
-    public void addVariant(Card variant) {
-        variant.setParentCard(this);
-        variants.add(variant);
-    }
+//    public void addVariant(Card variant) {
+//        variant.setParentCard(this);
+//        variants.add(variant);
+//    }
 
-    public boolean isVariant() {
-        return parentCard != null;
-    }
-
-    public boolean isBaseCard() {
-        return parentCard == null;
-    }
+//    public boolean isVariant() {
+//        return parentCard != null;
+//    }
+//
+//    public boolean isBaseCard() {
+//        return parentCard == null;
+//    }
 }

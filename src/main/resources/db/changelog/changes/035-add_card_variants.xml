@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="035" author="jchun247">
+        <!-- Drop FK constraints -->
+        <dropForeignKeyConstraint baseTableName="cards" constraintName="fk_card_parent" />
+        <dropForeignKeyConstraint baseTableName="card_price" constraintName="fk_card_prices_cards" />
+        <dropForeignKeyConstraint baseTableName="collection_cards" constraintName="fk_collectioncards_cards" />
+
+        <!-- Remove fields in cards table -->
+        <dropColumn tableName="cards" schemaName="collectables" columnName="finish" />
+        <dropColumn tableName="cards" schemaName="collectables" columnName="parent_card_id" />
+
+        <!-- Create card_variants table -->
+        <createTable tableName="card_variants" schemaName="collectables">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_variants_cards" referencedTableName="cards" referencedColumnNames="id"/>
+            </column>
+            <column name="finish" type="varchar(100)"/>
+        </createTable>
+
+        <!-- Update card_price table -->
+        <dropColumn tableName="card_price" schemaName="collectables" columnName="card_id" />
+        <addColumn tableName="card_price" schemaName="collectables">
+            <column name="card_variant_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_prices_card_variants" referencedTableName="card_variants" referencedColumnNames="id"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

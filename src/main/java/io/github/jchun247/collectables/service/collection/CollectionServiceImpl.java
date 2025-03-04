@@ -47,7 +47,7 @@ public class CollectionServiceImpl implements CollectionService {
 
                     CollectionCard newCollectionCard = new CollectionCard();
                     newCollectionCard.setCollection(collection);
-                    newCollectionCard.setCard(card);
+//                    newCollectionCard.setCard(card);
                     newCollectionCard.setCondition(condition);
                     newCollectionCard.setQuantity(0); // quantity will be updated below
                     return newCollectionCard;
@@ -94,10 +94,10 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void updateCollectionValue(Collection collection) {
-        BigDecimal currentValue = collection.calculateCurrentValue();
+//        BigDecimal currentValue = collection.calculateCurrentValue();
         CollectionValueHistory valueHistory = new CollectionValueHistory();
         valueHistory.setCollection(collection);
-        valueHistory.setValue(currentValue);
+//        valueHistory.setValue(currentValue);
         valueHistory.setTimestamp(LocalDateTime.now());
         collectionValueHistoryRepository.save(valueHistory);
     }

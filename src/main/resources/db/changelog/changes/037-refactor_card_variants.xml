@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="037" author="jchun247">
+        <!-- Drop FK constraints -->
+        <dropUniqueConstraint tableName="card_variants" schemaName="collectables" constraintName="fk_card_variants_cards"/>
+        <dropUniqueConstraint tableName="card_price" schemaName="collectables" constraintName="fk_card_prices_card_variants"/>
+        <dropUniqueConstraint tableName="collection_cards" schemaName="collectables" constraintName="fk_collectioncards_card_variants"/>
+
+        <!-- Drop old card_variants table -->
+        <dropTable tableName="card_variants" schemaName="collectables"/>
+
+        <!-- Add new card_variant_groups table -->
+        <createTable tableName="card_variant_groups" schemaName="collectables">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Add column to cards table -->
+        <addColumn tableName="cards" schemaName="collectables">
+            <column name="card_variant_group_id" type="bigint">
+                <constraints foreignKeyName="fk_cards_card_variant_groups" referencedTableName="card_variant_groups" referencedColumnNames="id"/>
+            </column>
+        </addColumn>
+
+        <!-- Modify card_price table -->
+        <dropColumn tableName="card_price" schemaName="collectables" columnName="card_variant_id"/>
+        <addColumn tableName="card_price" schemaName="collectables">
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_prices_cards" referencedTableName="cards" referencedColumnNames="id"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="card_price" schemaName="collectables">
+            <column name="finish" type="varchar(100)"/>
+        </addColumn>
+        <addColumn tableName="card_price" schemaName="collectables">
+            <column name="updated_at" type="timestamp" />
+        </addColumn>
+        
+        <!-- Modify collection_cards table -->
+        <dropColumn tableName="collection_cards" schemaName="collectables" columnName="card_variant_id"/>
+        <addColumn tableName="collection_cards" schemaName="collectables">
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_collectioncards_cards" referencedTableName="cards" referencedColumnNames="id"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

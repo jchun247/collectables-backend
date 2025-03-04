@@ -31,9 +31,9 @@ public class CardDto {
                 .setCode(card.getSet().getCode())
                 .setNumber(card.getSetNumber())
                 .rarity(card.getRarity())
-                .prices(card.getPrices().stream()
-                        .map(CardPriceDto::new)
-                        .collect(Collectors.toList()))
+//                .prices(card.getPrices().stream()
+//                        .map(CardPriceDto::new)
+//                        .collect(Collectors.toList()))
                 .images(card.getImages())
                 .build();
     }

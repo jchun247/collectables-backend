@@ -23,7 +23,7 @@ public class CollectionDto {
                 .description(collection.getDescription())
                 .isPublic(collection.isPublic())
                 .numProducts(collection.getNumProducts())
-                .currentValue(collection.calculateCurrentValue())
+//                .currentValue(collection.calculateCurrentValue())
                 .build();
     }
 }

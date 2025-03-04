@@ -47,14 +47,14 @@ public class CardServiceImpl implements CardService{
             CardImage cardImage = new CardImage();
             cardImage.setUrl(imageRequest.getUrl());
             cardImage.setResolution(imageRequest.getResolution());
-            newCard.addImage(cardImage);
+//            newCard.addImage(cardImage);
         }
 
         for (CreateCardPriceRequestDto priceRequest : cardRequest.getPrices()) {
             CardPrice cardPrice = new CardPrice();
             cardPrice.setCondition(priceRequest.getCondition());
             cardPrice.setPrice(priceRequest.getPrice());
-            newCard.addPrice(cardPrice);
+//            newCard.addPrice(cardPrice);
         }
 
         Card savedCard = cardRepository.save(newCard);
@@ -78,17 +78,19 @@ public class CardServiceImpl implements CardService{
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Card> cardPage = cardRepository.findByFilters(
-                games, setCode, rarity, condition, query,
-                minPrice == null ? 0.0 : minPrice,
-                maxPrice == null ? Double.MAX_VALUE : maxPrice,
-                pageable
-        );
+//        Page<Card> cardPage = cardRepository.findByFilters(
+//                games, setCode, rarity, condition, query,
+//                minPrice == null ? 0.0 : minPrice,
+//                maxPrice == null ? Double.MAX_VALUE : maxPrice,
+//                pageable
+//        );
 
-        List<CardDto> cardDTOs = cardPage.getContent().stream()
-                .map(CardDto::fromEntity).toList();
+//        List<CardDto> cardDTOs = cardPage.getContent().stream()
+//                .map(CardDto::fromEntity).toList();
+//
+//        return new PagedResponse<>(cardDTOs, cardPage);
 
-        return new PagedResponse<>(cardDTOs, cardPage);
+        return null;
 
     }
 
@@ -97,7 +99,7 @@ public class CardServiceImpl implements CardService{
     public Card getCardById(Long id) {
         Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id));
-        Hibernate.initialize(card.getPrices()); // Explicitly initialize the prices collection
+//        Hibernate.initialize(card.getPrices()); // Explicitly initialize the prices collection
         return card;
     }
 }
