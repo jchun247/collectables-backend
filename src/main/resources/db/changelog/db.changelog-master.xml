@@ -42,4 +42,5 @@
     <include file="db/changelog/changes/035-add_card_variants.xml"/>
     <include file="db/changelog/changes/036-update_collection-cards_table.xml"/>
     <include file="db/changelog/changes/037-refactor_card_variants.xml"/>
+    <include file="db/changelog/changes/038-add_external_id.xml"/>
 </databaseChangeLog>
