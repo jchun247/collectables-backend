@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -27,47 +28,47 @@ public class CardServiceImpl implements CardService{
     private final CardRepository cardRepository;
     private final CardSetRepository cardSetRepository;
 
-    @Override
-    @Transactional
-    public CardDto createCard(CreateCardRequestDto cardRequest) {
-        // Fetch the cardSet entity from the code
-        // TODO: ensure set code belongs to the specified game
-        CardSet cardSet = cardSetRepository.findByCode(cardRequest.getSetCode()).orElseThrow(() -> new ResourceNotFoundException("Invalid set code: " + cardRequest.getSetCode()));
-
-        // set card attributes from request
-        // TODO: need to add new fields
-        Card newCard = new Card();
-        newCard.setName(cardRequest.getName());
-        newCard.setGame(cardRequest.getGame());
-        newCard.setSet(cardSet);
-        newCard.setSetNumber(cardRequest.getSetNumber());
-        newCard.setRarity(cardRequest.getRarity());
-
-        for (CreateCardImageRequestDto imageRequest : cardRequest.getImages()) {
-            CardImage cardImage = new CardImage();
-            cardImage.setUrl(imageRequest.getUrl());
-            cardImage.setResolution(imageRequest.getResolution());
+    // No longer needed as python scripts imports cards, won't be creating cards through the API
+//    @Override
+//    @Transactional
+//    public CardDto createCard(CreateCardRequestDto cardRequest) {
+//        // Fetch the cardSet entity from the code
+//        // TODO: ensure set code belongs to the specified game
+//        CardSet cardSet = cardSetRepository.findByCode(cardRequest.getSetCode()).orElseThrow(() -> new ResourceNotFoundException("Invalid set code: " + cardRequest.getSetCode()));
+//
+//         set card attributes from request
+//        // TODO: need to add new fields
+//        Card newCard = new Card();
+//        newCard.setName(cardRequest.getName());
+//        newCard.setGame(cardRequest.getGame());
+//        newCard.setSet(cardSet);
+//        newCard.setSetNumber(cardRequest.getSetNumber());
+//        newCard.setRarity(cardRequest.getRarity());
+//
+//        for (CreateCardImageRequestDto imageRequest : cardRequest.getImages()) {
+//            CardImage cardImage = new CardImage();
+//            cardImage.setUrl(imageRequest.getUrl());
+//            cardImage.setResolution(imageRequest.getResolution());
 //            newCard.addImage(cardImage);
-        }
-
-        for (CreateCardPriceRequestDto priceRequest : cardRequest.getPrices()) {
-            CardPrice cardPrice = new CardPrice();
-            cardPrice.setCondition(priceRequest.getCondition());
-            cardPrice.setPrice(priceRequest.getPrice());
+//        }
+//
+//        for (CreateCardPriceRequestDto priceRequest : cardRequest.getPrices()) {
+//            CardPrice cardPrice = new CardPrice();
+//            cardPrice.setCondition(priceRequest.getCondition());
+//            cardPrice.setPrice(priceRequest.getPrice());
 //            newCard.addPrice(cardPrice);
-        }
-
-        Card savedCard = cardRepository.save(newCard);
-        return CardDto.fromEntity(savedCard);
-    }
+//        }
+//
+//        Card savedCard = cardRepository.save(newCard);
+//        return CardDto.fromEntity(savedCard);
+//    }
 
     @Override
     @Transactional(readOnly = true)
     public PagedResponse<CardDto> getCards(int page, int size, List<CardGame> games,
                                            String setCode, CardRarity rarity, CardCondition condition,
-                                           String sortOption, Double minPrice, Double maxPrice, String query) {
+                                           String sortOption, BigDecimal minPrice, BigDecimal maxPrice, String searchQuery) {
 
-//        List<Sort.Order> orders = createSortOrders(sort);
         Sort sort = switch (sortOption) {
             case "name" -> Sort.by(Sort.Direction.ASC, "c.name");
             case "name-desc" -> Sort.by(Sort.Direction.DESC, "c.name");
@@ -79,7 +80,7 @@ public class CardServiceImpl implements CardService{
         Pageable pageable = PageRequest.of(page, size, sort);
 
 //        Page<Card> cardPage = cardRepository.findByFilters(
-//                games, setCode, rarity, condition, query,
+//                games, setCode, rarity, condition, searchQuery,
 //                minPrice == null ? 0.0 : minPrice,
 //                maxPrice == null ? Double.MAX_VALUE : maxPrice,
 //                pageable

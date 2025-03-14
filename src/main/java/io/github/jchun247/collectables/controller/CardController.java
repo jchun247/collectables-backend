@@ -19,11 +19,11 @@ import java.util.List;
 public class CardController {
     private final CardService cardService;
 
-    @PostMapping("/create")
-    public ResponseEntity<CardDto> createCard(@RequestBody @Valid CreateCardRequestDto cardRequest) {
-        CardDto createdCard = cardService.createCard(cardRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<CardDto> createCard(@RequestBody @Valid CreateCardRequestDto cardRequest) {
+//        CardDto createdCard = cardService.createCard(cardRequest);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
+//    }
 
     @GetMapping
     public ResponseEntity<PagedResponse<CardDto>> getFilteredCards(
