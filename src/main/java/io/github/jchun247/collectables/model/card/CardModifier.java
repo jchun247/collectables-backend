@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CardModifier {
-    MULTIPLY("x"),
+    MULTIPLY("×"),
     ADD("+"),
     REDUCE("-"),
     PERCENTAGE("%");

@@ -1,5 +1,6 @@
 package io.github.jchun247.collectables.model.card;
 
+import io.github.jchun247.collectables.converter.CardRarityConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,11 +35,7 @@ public class Card {
     @Enumerated(EnumType.STRING)
     private CardGame game;
 
-    @Enumerated(EnumType.STRING)
     private CardRarity rarity;
-
-    @Enumerated(EnumType.STRING)
-    private CardType type;
 
     private String illustratorName;
     private String flavourText;
@@ -51,6 +48,9 @@ public class Card {
 
     @Embedded
     private CardResistance resistance;
+
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CardTypes> types = new ArrayList<>();
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardAttack> attacks = new ArrayList<>();

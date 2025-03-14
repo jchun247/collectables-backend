@@ -10,23 +10,23 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
-    @Query("SELECT DISTINCT c FROM Card c " +
+//    @Query("SELECT DISTINCT c FROM Card c " +
 //            "LEFT JOIN FETCH c.prices p " +
-            "WHERE (:games IS NULL OR c.game IN :games) " +
-            "AND (:setCode IS NULL OR c.set.code = :setCode) " +
-            "AND (:rarity IS NULL OR c.rarity = :rarity) " +
-            "AND (:condition IS NULL OR p.condition = :condition) " +
-            "AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) OR :query IS NULL OR c.set.code LIKE %:query% OR c.setNumber LIKE %:query%) "
+//            "WHERE (:games IS NULL OR c.game IN :games) " +
+//            "AND (:setCode IS NULL OR c.set.code = :setCode) " +
+//            "AND (:rarity IS NULL OR c.rarity = :rarity) " +
+//            "AND (:condition IS NULL OR p.condition = :condition) " +
+//            "AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) OR :query IS NULL OR c.set.code LIKE %:query% OR c.setNumber LIKE %:query%) "
 //            "AND p.price BETWEEN :minPrice AND :maxPrice")
-    )
-    Page<Card> findByFilters(
-            @Param("games") List<CardGame> games,
-            @Param("setCode") String setCode,
-            @Param("rarity") CardRarity rarity,
-            @Param("condition") CardCondition condition,
-            @Param("query") String query,
-            @Param("minPrice") Double minPrice,
-            @Param("maxPrice") Double maxPrice,
-            Pageable pageable
-    );
+//    )
+//    Page<Card> findByFilters(
+//            @Param("games") List<CardGame> games,
+//            @Param("setCode") String setCode,
+//            @Param("rarity") CardRarity rarity,
+//            @Param("condition") CardCondition condition,
+//            @Param("query") String query,
+//            @Param("minPrice") Double minPrice,
+//            @Param("maxPrice") Double maxPrice,
+//            Pageable pageable
+//    );
 }

@@ -47,4 +47,6 @@
     <include file="db/changelog/changes/040-modify_card_value_history_table.xml"/>
     <include file="db/changelog/changes/041-add_card_price_unique_constraint_key.xml"/>
     <include file="db/changelog/changes/042-update_ability_and_attack_text_size.xml"/>
+    <include file="db/changelog/changes/043-add_card_types_table.xml"/>
+    <include file="db/changelog/changes/044-remove_card_types_field.xml"/>
 </databaseChangeLog>
