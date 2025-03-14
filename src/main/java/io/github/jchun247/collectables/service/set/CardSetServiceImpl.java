@@ -23,7 +23,7 @@ public class CardSetServiceImpl implements CardSetService{
     }
 
     @Override
-    public List<CardSeries> getCardSeries() {
+    public List<CardSeries> getAllCardSeries() {
         return cardSetRepository.findAllSeries();
     }
 }

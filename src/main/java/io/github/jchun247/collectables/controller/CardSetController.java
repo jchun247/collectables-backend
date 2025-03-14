@@ -20,8 +20,8 @@ public class CardSetController {
     private final CardSetService cardSetService;
 
     @GetMapping("/series")
-    public ResponseEntity<List<CardSeries>> getCardSeries() {
-        return ResponseEntity.ok(cardSetService.getCardSeries());
+    public ResponseEntity<List<CardSeries>> getAllCardSeries() {
+        return ResponseEntity.ok(cardSetService.getAllCardSeries());
     }
 
     @GetMapping("/by-series")

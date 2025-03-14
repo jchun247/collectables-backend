@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface CardSetService {
     List<CardSet> getCardSetsBySeries(CardSeries series);
-    List<CardSeries> getCardSeries();
+    List<CardSeries> getAllCardSeries();
 }
