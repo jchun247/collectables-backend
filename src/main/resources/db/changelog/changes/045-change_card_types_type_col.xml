@@ -5,7 +5,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
-    <changeSet id="044" author="jchun247">
-        <dropColumn tableName="cards" columnName="type" schemaName="collectables"/>
+    <changeSet id="045" author="jchun247">
+        <!-- change set_id in legalities and image tables to string -->
+        <modifyDataType tableName="card_types" schemaName="collectables" columnName="type" newDataType="varchar(50)" />
     </changeSet>
 </databaseChangeLog>
