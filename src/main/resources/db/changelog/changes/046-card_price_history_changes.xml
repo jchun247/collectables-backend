@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="046" author="jchun247">
+        <!-- Drop existing table -->
+        <dropTable tableName="card_price_history"/>
+
+        <!-- Create new table with direct card_id reference -->
+        <createTable tableName="card_price_history">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_card_price_history_card" references="cards(id)"/>
+            </column>
+            <column name="finish" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="condition" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="decimal(19,2)"/>
+            <column name="timestamp" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create indexes for efficient querying -->
+        <createIndex tableName="card_price_history" indexName="idx_card_price_history_card_id">
+            <column name="card_id"/>
+        </createIndex>
+        <createIndex tableName="card_price_history" indexName="idx_card_price_history_timestamp">
+            <column name="timestamp"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

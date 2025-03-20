@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="card_price")
@@ -18,13 +19,16 @@ public class CardPrice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "card_id")
-    @JsonIgnore
     private Card card;
 
     @Enumerated(EnumType.STRING)
     private CardCondition condition;
 
+    @Enumerated(EnumType.STRING)
+    private CardFinish finish;
+
     private BigDecimal price;
+    private LocalDateTime updatedAt;
 }

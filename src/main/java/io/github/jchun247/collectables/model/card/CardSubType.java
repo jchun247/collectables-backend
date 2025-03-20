@@ -1,5 +1,8 @@
 package io.github.jchun247.collectables.model.card;
 
+import lombok.Getter;
+
+@Getter
 public enum CardSubType {
     TEAM_PLASMA("Team Plasma"),
     BREAK("BREAK"),
@@ -49,7 +52,12 @@ public enum CardSubType {
         this.databaseValue = databaseValue;
     }
 
-    public String getDatabaseValue() {
-        return databaseValue;
+    public static CardSubType fromDatabaseValue(String value) {
+        for (CardSubType subType : values()) {
+            if (subType.getDatabaseValue().equals(value)) {
+                return subType;
+            }
+        }
+        throw new IllegalArgumentException("No CardSubType found for database value: " + value);
     }
 }
