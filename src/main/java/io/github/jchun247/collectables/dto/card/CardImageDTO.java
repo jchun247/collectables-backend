@@ -4,7 +4,7 @@ import io.github.jchun247.collectables.model.card.CardImageResolution;
 import lombok.Data;
 
 @Data
-public class CreateCardImageRequestDto {
+public class CardImageDTO {
     private String url;
     private CardImageResolution resolution;
 }

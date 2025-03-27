@@ -9,9 +9,19 @@ public enum CardModifier {
     REDUCE("-"),
     PERCENTAGE("%");
 
-    private final String symbol;
+    private final String databaseValue;
 
-    CardModifier(String symbol) {
-        this.symbol = symbol;
+    CardModifier(String databaseValue) {
+        this.databaseValue = databaseValue;
+    }
+
+    public static CardModifier fromDatabaseValue(String value) {
+        if (value == null) return null;
+        for (CardModifier modifier : values()) {
+            if (modifier.getDatabaseValue().equals(value)) {
+                return modifier;
+            }
+        }
+        throw new IllegalArgumentException("No CardModifier found for value: " + value);
     }
 }

@@ -1,14 +1,17 @@
 package io.github.jchun247.collectables.model.card;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name="card_attacks")
-@Data
+@Getter
+@Setter
+@ToString(exclude = "card")
+@EqualsAndHashCode(of = "id")
 public class CardAttack {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +29,14 @@ public class CardAttack {
 
     private String damage;
     private String text;
+
+    public void setCard(Card card) {
+        if (this.card != null) {
+            this.card.getAttacks().remove(this);
+        }
+        this.card = card;
+        if (card != null) {
+            card.getAttacks().add(this);
+        }
+    }
 }
