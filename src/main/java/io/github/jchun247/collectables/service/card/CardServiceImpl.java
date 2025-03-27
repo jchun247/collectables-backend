@@ -68,10 +68,7 @@ public class CardServiceImpl implements CardService{
     @Override
     @Transactional(readOnly = true)
     public CardDTO getCardWithAllData(Long id) {
-//        return cardMapper.toCardDTO(cardRepository.findWithAllDataById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id)));
-        Card card = cardRepository.findWithAllDataById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id));
-        return cardMapper.toCardDTO(card);
+        return cardMapper.toCardDTO(cardRepository.findWithAllDataById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id)));
     }
 }

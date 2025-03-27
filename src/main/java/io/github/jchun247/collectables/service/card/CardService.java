@@ -12,7 +12,6 @@ public interface CardService {
 //    PagedResponse<CardDto> getCards(int page, int size, List<CardGame> games,
 //                                    String setCode, CardRarity rarity, CardCondition condition,
 //                                    String sortOption, BigDecimal minPrice, BigDecimal maxPrice, String searchQuery);
-//    Card getCardById(Long id);
     BasicCardDTO getCardWithBasicData(Long id);
 
     CardDTO getCardWithAllData(Long id);

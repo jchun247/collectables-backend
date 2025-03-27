@@ -43,11 +43,6 @@ public class CardController {
 //        return null;
 //    }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Card> getCardById(@PathVariable Long id) {
-//        return ResponseEntity.ok(cardService.getCardById(id));
-//    }
-
     @GetMapping("/{id}/basic")
     public ResponseEntity<BasicCardDTO> getCardWithBasicData(@PathVariable Long id) {
         return ResponseEntity.ok(cardService.getCardWithBasicData(id));
