@@ -6,7 +6,9 @@ import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.mapper.CardMapper;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.repository.card.CardRepository;
+import jakarta.persistence.Basic;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -56,8 +59,19 @@ public class CardServiceImpl implements CardService{
 //    }
 
     @Override
+    @Transactional(readOnly = true)
     public BasicCardDTO getCardWithBasicData(Long id) {
         return cardMapper.toBasicDTO(cardRepository.findWithBasicDataById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CardDTO getCardWithAllData(Long id) {
+//        return cardMapper.toCardDTO(cardRepository.findWithAllDataById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id)));
+        Card card = cardRepository.findWithAllDataById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id));
+        return cardMapper.toCardDTO(card);
     }
 }

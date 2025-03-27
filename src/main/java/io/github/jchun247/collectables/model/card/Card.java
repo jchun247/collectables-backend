@@ -1,9 +1,7 @@
 package io.github.jchun247.collectables.model.card;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
@@ -13,7 +11,10 @@ import java.util.Set;
 
 @Entity
 @Table(name = "cards")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"variantGroup", "set", "types", "attacks", "prices", "priceHistory"})
+@EqualsAndHashCode(of = {"id", "externalId"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Card {
@@ -58,6 +59,9 @@ public class Card {
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CardPrice> prices = new HashSet<>();
 
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CardPriceHistory> priceHistory = new HashSet<>();
+
     @ElementCollection
     @CollectionTable(name = "card_abilities", joinColumns = @JoinColumn(name = "card_id"))
     private Set<CardAbility> abilities = new HashSet<>();
@@ -65,7 +69,6 @@ public class Card {
     @ElementCollection
     @CollectionTable(name = "card_subtypes", joinColumns = @JoinColumn(name = "card_id"))
     @Column(name="subtype")
-    @Enumerated(EnumType.STRING)
     private Set<CardSubType> subTypes = new HashSet<>();
 
     @ElementCollection

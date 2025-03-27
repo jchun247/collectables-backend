@@ -3,6 +3,7 @@ package io.github.jchun247.collectables.controller;
 import io.github.jchun247.collectables.dto.card.BasicCardDTO;
 //import io.github.jchun247.collectables.dto.card.CardDto;
 import io.github.jchun247.collectables.dto.PagedResponse;
+import io.github.jchun247.collectables.dto.card.CardDTO;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.service.card.CardService;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,11 @@ public class CardController {
     @GetMapping("/{id}/basic")
     public ResponseEntity<BasicCardDTO> getCardWithBasicData(@PathVariable Long id) {
         return ResponseEntity.ok(cardService.getCardWithBasicData(id));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CardDTO> getCardWithAllData(@PathVariable Long id) {
+        return ResponseEntity.ok(cardService.getCardWithAllData(id));
     }
 
 }

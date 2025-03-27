@@ -1,17 +1,17 @@
 package io.github.jchun247.collectables.model.card;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name="card_price")
-@Data
+@Getter
+@Setter
+@ToString(exclude = "card")
+@EqualsAndHashCode(of = {"id", "condition", "finish"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardPrice {
@@ -31,4 +31,14 @@ public class CardPrice {
 
     private BigDecimal price;
     private LocalDateTime updatedAt;
+
+    public void setCard(Card card) {
+        if (this.card != null) {
+            this.card.getPrices().remove(this);
+        }
+        this.card = card;
+        if (card != null) {
+            card.getPrices().add(this);
+        }
+    }
 }
