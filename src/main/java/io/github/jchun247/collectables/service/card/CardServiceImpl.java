@@ -9,6 +9,7 @@ import io.github.jchun247.collectables.repository.card.CardRepository;
 import jakarta.persistence.Basic;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,37 +27,37 @@ public class CardServiceImpl implements CardService{
     private final CardRepository cardRepository;
     private final CardMapper cardMapper;
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public PagedResponse<CardDto> getCards(int page, int size, List<CardGame> games,
-//                                           String setCode, CardRarity rarity, CardCondition condition,
-//                                           String sortOption, BigDecimal minPrice, BigDecimal maxPrice, String searchQuery) {
-//
-//        Sort sort = switch (sortOption) {
-//            case "name" -> Sort.by(Sort.Direction.ASC, "c.name");
-//            case "name-desc" -> Sort.by(Sort.Direction.DESC, "c.name");
-//            case "price-asc" -> Sort.by(Sort.Direction.ASC, "p.price");
-//            case "price-desc" -> Sort.by(Sort.Direction.DESC, "p.price");
-//            default -> Sort.unsorted();
-//        };
-//
-//        Pageable pageable = PageRequest.of(page, size, sort);
+    private static final BigDecimal MAX_PRICE = new BigDecimal("9999999.99");
 
-//        Page<Card> cardPage = cardRepository.findByFilters(
-//                games, setCode, rarity, condition, searchQuery,
-//                minPrice == null ? 0.0 : minPrice,
-//                maxPrice == null ? Double.MAX_VALUE : maxPrice,
-//                pageable
-//        );
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponse<BasicCardDTO> getCards(int page, int size, List<CardGame> games,
+                                           String setId, CardRarity rarity, CardCondition condition,
+                                           String sortOption, BigDecimal minPrice, BigDecimal maxPrice, String searchQuery) {
 
-//        List<CardDto> cardDTOs = cardPage.getContent().stream()
-//                .map(CardDto::fromEntity).toList();
-//
-//        return new PagedResponse<>(cardDTOs, cardPage);
-//
-//        return null;
-//
-//    }
+        Sort sort = switch (sortOption) {
+            case "name" -> Sort.by(Sort.Direction.ASC, "c.name");
+            case "name-desc" -> Sort.by(Sort.Direction.DESC, "c.name");
+            case "price-asc" -> Sort.by(Sort.Direction.ASC, "p.price");
+            case "price-desc" -> Sort.by(Sort.Direction.DESC, "p.price");
+            default -> Sort.unsorted();
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Card> cardPage = cardRepository.findByFilters(
+                games, setId, rarity, condition, searchQuery,
+                minPrice == null ? BigDecimal.ZERO : minPrice,
+                maxPrice == null ? MAX_PRICE : maxPrice,
+                pageable
+        );
+
+        List<BasicCardDTO> cardDTOs = cardPage.getContent().stream()
+                .map(cardMapper::toBasicDTO)
+                .toList();
+
+        return new PagedResponse<>(cardDTOs, cardPage);
+    }
 
     @Override
     @Transactional(readOnly = true)

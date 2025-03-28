@@ -20,6 +20,7 @@ public class Card {
     private Long id;
 
     private String externalId;
+
     private String name;
 
     @ManyToOne
@@ -38,8 +39,8 @@ public class Card {
     private String illustratorName;
     private String flavourText;
     private String setNumber;
-    private int hitPoints;
-    private int retreatCost;
+    private Integer hitPoints;
+    private Integer retreatCost;
 
     @Embedded
     private CardWeakness weakness;

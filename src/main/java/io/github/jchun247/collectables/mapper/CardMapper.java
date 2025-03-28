@@ -25,16 +25,6 @@ public interface CardMapper {
     @Mapping(source = "priceHistory", target = "priceHistory", qualifiedByName = "mapPriceHistory")
     CardDTO toCardDTO(Card card);
 
-    // Custom mappings for collections and complex fields
-//    default List<String> typesToTypeNames(List<CardTypes> types) {
-//        if (types == null) {
-//            return Collections.emptyList();
-//        }
-//        return types.stream()
-//                .map(CardTypes::getTypeName)
-//                .collect(Collectors.toList());
-//    }
-
     @Named("mapTypes")
     default Set<CardTypesDTO> mapTypes(Set<CardTypes> types) {
         if (types == null) {

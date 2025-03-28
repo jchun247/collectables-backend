@@ -8,6 +8,7 @@ import java.util.Set;
 
 @Data
 public class BasicCardDTO {
+    private Long id;
     private String name;
     private String setName;
     private String setNumber;

@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CardRarity {
-    HYPER_RARE("HyperRare"),
+    HYPER_RARE("Hyper Rare"),
     RARE("Rare"),
     RARE_HOLO_LVX("Rare Holo LV.X"),
     SPECIAL_ILLUSTRATION_RARE("Special Illustration Rare"),
