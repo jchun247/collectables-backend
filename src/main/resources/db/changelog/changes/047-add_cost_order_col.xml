@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="add-cost-order-to-card-attack-costs" author="jchun247">
+        <addColumn tableName="card_attack_costs">
+            <column name="cost_order" type="integer"/>
+        </addColumn>
+
+        <!-- Initialize cost_order based on existing rows -->
+        <sql>
+            WITH indexed_costs AS (
+            SELECT attack_id, cost, ROW_NUMBER() OVER (PARTITION BY attack_id ORDER BY ctid) - 1 as idx
+            FROM card_attack_costs
+            )
+            UPDATE card_attack_costs
+            SET cost_order = indexed_costs.idx
+            FROM indexed_costs
+            WHERE card_attack_costs.attack_id = indexed_costs.attack_id
+            AND card_attack_costs.cost = indexed_costs.cost;
+        </sql>
+
+        <!-- Add not-null constraint after initializing cost_order -->
+        <addNotNullConstraint tableName="card_attack_costs" columnName="cost_order" />
+    </changeSet>
+
+</databaseChangeLog>

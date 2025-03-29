@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="fix-cost-order-values" author="jchun247">
+        <!-- changes to card_attack_costs table -->
+        <!-- Add ID column -->
+        <addColumn tableName="card_attack_costs">
+            <column name="id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Create sequence -->
+        <createSequence sequenceName="card_attack_costs_id_seq"/>
+
+        <!-- Populate ID column -->
+        <sql>
+            UPDATE card_attack_costs
+            SET id = nextval('card_attack_costs_id_seq');
+        </sql>
+
+        <!-- Make ID not null -->
+        <addNotNullConstraint tableName="card_attack_costs" columnName="id"/>
+
+        <!-- Add primary key -->
+        <addPrimaryKey tableName="card_attack_costs" columnNames="id"/>
+
+        <!-- Set ID as identity column -->
+        <sql>
+            ALTER TABLE card_attack_costs
+            ALTER COLUMN id
+            SET DEFAULT nextval('card_attack_costs_id_seq');
+        </sql>
+
+        <sql>
+            WITH indexed_costs AS (
+            SELECT id, attack_id, ROW_NUMBER() OVER (PARTITION BY attack_id ORDER BY ctid) - 1 as idx
+            FROM card_attack_costs
+            )
+            UPDATE card_attack_costs
+            SET cost_order = indexed_costs.idx
+            FROM indexed_costs
+            WHERE card_attack_costs.id = indexed_costs.id;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

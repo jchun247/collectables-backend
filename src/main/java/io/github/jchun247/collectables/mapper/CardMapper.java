@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,9 +22,12 @@ public interface CardMapper {
     @Mapping(source = "set.name", target = "setName")
     @Mapping(source = "types", target = "types", qualifiedByName = "mapTypes")
     @Mapping(source = "attacks", target = "attacks", qualifiedByName = "mapAttacks")
-    @Mapping(source = "prices", target= "prices", qualifiedByName = "mapPrices")
+    @Mapping(source = "prices", target = "prices", qualifiedByName = "mapPrices")
     @Mapping(source = "priceHistory", target = "priceHistory", qualifiedByName = "mapPriceHistory")
     CardDTO toCardDTO(Card card);
+
+    @Mapping(source = "cost", target = "cost", qualifiedByName = "mapAttackCosts")
+    CardAttackDTO toCardAttackDTO(CardAttack attack);
 
     @Named("mapTypes")
     default Set<CardTypesDTO> mapTypes(Set<CardTypes> types) {
@@ -65,7 +69,16 @@ public interface CardMapper {
                 .collect(Collectors.toSet());
     }
 
-    CardAttackDTO toCardAttackDTO(CardAttack attack);
+    @Named("mapAttackCosts")
+    default List<CardEnergy> mapAttackCosts(List<CardAttackCost> costs) {
+        if (costs == null) {
+            return Collections.emptyList();
+        }
+        return costs.stream()
+                .sorted(Comparator.comparing(CardAttackCost::getCostOrder))
+                .map(CardAttackCost::getCost)
+                .collect(Collectors.toList());
+    }
 
     CardTypesDTO toCardTypesDTO(CardTypes type);
 

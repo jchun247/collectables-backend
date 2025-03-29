@@ -23,9 +23,9 @@ public class CardAttack {
 
     private String name;
 
-    @ElementCollection
-    @CollectionTable(name = "card_attack_costs", joinColumns = @JoinColumn(name = "attack_id"))
-    private List<String> cost = new ArrayList<>();
+    @OneToMany(mappedBy = "attack", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderBy("costOrder ASC")
+    private List<CardAttackCost> cost = new ArrayList<>();
 
     private String damage;
     private String text;

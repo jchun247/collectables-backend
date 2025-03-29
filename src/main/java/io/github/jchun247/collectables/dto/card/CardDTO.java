@@ -6,7 +6,6 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
-//@Builder
 public class CardDTO {
     private Long id;
     private String name;
@@ -28,21 +27,4 @@ public class CardDTO {
     private Set<CardAbility> abilities;
     private Set<CardSubType> subTypes;
     private Set<CardImage> images;
-//    private Set<CardImageDTO> images;
-
-//    public static CardDto fromEntity(Card card) {
-//        return CardDto.builder()
-//                .id(card.getId())
-//                .name(card.getName())
-//                .game(card.getGame())
-//                .setCode(card.getSet().getCode())
-//                .setNumber(card.getSetNumber())
-//                .rarity(card.getRarity())
-//                .prices(card.getPrices().stream()
-//                        .map(CardPriceDTO::new)
-//                        .collect(Collectors.toList()))
-//                .images(card.getImages())
-//                .build();
-//    }
-
 }

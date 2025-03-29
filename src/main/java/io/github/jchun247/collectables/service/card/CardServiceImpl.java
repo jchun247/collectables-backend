@@ -9,14 +9,12 @@ import io.github.jchun247.collectables.repository.card.CardRepository;
 import jakarta.persistence.Basic;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -45,18 +43,32 @@ public class CardServiceImpl implements CardService{
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Card> cardPage = cardRepository.findByFilters(
+        Page<Long> cardIdPage = cardRepository.findCardIdsByFilters(
                 games, setId, rarity, condition, searchQuery,
                 minPrice == null ? BigDecimal.ZERO : minPrice,
                 maxPrice == null ? MAX_PRICE : maxPrice,
                 pageable
         );
 
-        List<BasicCardDTO> cardDTOs = cardPage.getContent().stream()
+        List<Long> cardIds = cardIdPage.getContent();
+
+        if (cardIds.isEmpty()) {
+            return new PagedResponse<>(Collections.emptyList(), Page.empty());
+        }
+
+        List<Card> cards = cardRepository.findCardsWithCollectionsByIds(cardIds);
+
+        List<BasicCardDTO> basicCardDTOs = cards.stream()
                 .map(cardMapper::toBasicDTO)
                 .toList();
 
-        return new PagedResponse<>(cardDTOs, cardPage);
+        Page<Card> cardPage = new PageImpl<>(
+                cards,
+                pageable,
+                cardIdPage.getTotalElements()
+        );
+
+        return new PagedResponse<>(basicCardDTOs, cardPage);
     }
 
     @Override

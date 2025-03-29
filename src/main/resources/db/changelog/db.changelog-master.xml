@@ -51,4 +51,6 @@
     <include file="db/changelog/changes/044-remove_card_types_field.xml"/>
     <include file="db/changelog/changes/045-change_card_types_type_col.xml"/>
     <include file="db/changelog/changes/046-card_price_history_changes.xml"/>
+    <include file="db/changelog/changes/047-add_cost_order_col.xml"/>
+    <include file="db/changelog/changes/048-fix_cost_order_values.xml"/>
 </databaseChangeLog>
