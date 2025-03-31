@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="049" author="jchun247">
+        <addColumn tableName="collections" schemaName="collectables">
+            <column name="current_value" type="decimal(19,2)"/>
+        </addColumn>
+        <!-- Modify the size of the description column -->
+        <modifyDataType tableName="collections" columnName="description" newDataType="varchar(1000)" schemaName="collectables"/>
+    </changeSet>
+</databaseChangeLog>

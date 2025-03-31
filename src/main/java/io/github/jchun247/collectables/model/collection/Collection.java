@@ -8,7 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "collections")
@@ -26,11 +28,21 @@ public class Collection {
 
     @Column(name="is_public")
     private boolean isPublic;
+
+    @Column(name="is_favourite")
+    private boolean isFavourite;
+
     @Column(name="num_products")
     private int numProducts;
 
+    @Column(name="created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name="current_value")
+    private BigDecimal currentValue = BigDecimal.ZERO;
+
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CollectionValueHistory> valueHistory;
+    private Set<CollectionValueHistory> valueHistory;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CollectionCard> cards;

@@ -6,7 +6,6 @@ import io.github.jchun247.collectables.dto.collection.CollectionDto;
 import io.github.jchun247.collectables.model.card.CardCondition;
 import io.github.jchun247.collectables.model.collection.Collection;
 import io.github.jchun247.collectables.model.collection.CollectionValueHistory;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -18,4 +17,5 @@ public interface CollectionService {
     void updateCollectionValue(Collection collection);
     void updateAllCollections();
     CollectionDto createCollection(CreateCollectionDto createCollectionDto);
+    List<CollectionDto> getAllCollectionsInfoById(Long userId);
 }

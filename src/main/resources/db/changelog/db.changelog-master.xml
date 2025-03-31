@@ -53,4 +53,5 @@
     <include file="db/changelog/changes/046-card_price_history_changes.xml"/>
     <include file="db/changelog/changes/047-add_cost_order_col.xml"/>
     <include file="db/changelog/changes/048-fix_cost_order_values.xml"/>
+    <include file="db/changelog/changes/049-collection_changes.xml"/>
 </databaseChangeLog>

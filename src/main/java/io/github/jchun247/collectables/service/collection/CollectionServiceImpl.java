@@ -4,6 +4,7 @@ import io.github.jchun247.collectables.dto.collection.CollectionCardDto;
 import io.github.jchun247.collectables.dto.collection.CreateCollectionDto;
 import io.github.jchun247.collectables.dto.collection.CollectionDto;
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
+import io.github.jchun247.collectables.mapper.CollectionMapper;
 import io.github.jchun247.collectables.model.card.Card;
 import io.github.jchun247.collectables.model.card.CardCondition;
 import io.github.jchun247.collectables.model.user.UserEntity;
@@ -21,8 +22,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,7 +34,7 @@ public class CollectionServiceImpl implements CollectionService {
     private final CollectionValueHistoryRepository collectionValueHistoryRepository;
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
-
+    private final CollectionMapper collectionMapper;
 
     @Override
     @Transactional
@@ -47,7 +48,7 @@ public class CollectionServiceImpl implements CollectionService {
 
                     CollectionCard newCollectionCard = new CollectionCard();
                     newCollectionCard.setCollection(collection);
-//                    newCollectionCard.setCard(card);
+                    newCollectionCard.setCard(card);
                     newCollectionCard.setCondition(condition);
                     newCollectionCard.setQuantity(0); // quantity will be updated below
                     return newCollectionCard;
@@ -57,7 +58,7 @@ public class CollectionServiceImpl implements CollectionService {
         collectionCard.setQuantity(collectionCard.getQuantity() + quantity);
 
         CollectionCard savedCard = collectionCardRepository.save(collectionCard);
-        return CollectionCardDto.fromEntity(savedCard);
+        return collectionMapper.toCollectionCardDto(savedCard);
     }
 
     @Override
@@ -89,7 +90,7 @@ public class CollectionServiceImpl implements CollectionService {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
         collection.setNumProducts(collectionCardRepository.sumQuantityByCollectionId(collectionId));
-        return CollectionDto.fromEntity(collection);
+        return collectionMapper.toCollectionDto(collection);
     }
 
     @Override
@@ -121,11 +122,29 @@ public class CollectionServiceImpl implements CollectionService {
                 .name(createCollectionDto.getName() != null ? createCollectionDto.getName() : "New Collection")
                 .description(createCollectionDto.getDescription() != null ? createCollectionDto.getDescription() : "")
                 .isPublic(createCollectionDto.isPublic())
+                .isFavourite(false)
                 .numProducts(0)
+                .createdAt(LocalDateTime.now())
                 .user(user)
                 .build();
 
         collectionRepository.save(collection);
-        return CollectionDto.fromEntity(collection);
+        return collectionMapper.toCollectionDto(collection);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CollectionDto> getAllCollectionsInfoById(Long userId) {
+        List<Collection> collections = collectionRepository.findAllByUserId(userId);
+        if (collections.isEmpty()) {
+            throw new ResourceNotFoundException("No collections found for user with id: " + userId);
+        }
+        List<CollectionDto> collectionDTOs = new ArrayList<>();
+        // Map each collection to collectionInfoDTO
+        for (Collection collection : collections) {
+            CollectionDto dto = collectionMapper.toCollectionDto(collection);
+            collectionDTOs.add(dto);
+        }
+        return collectionDTOs;
     }
 }

@@ -51,4 +51,9 @@ public class CollectionController {
         CollectionValueHistoryResponse response = new CollectionValueHistoryResponse(history);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{userId}/all")
+    public List<CollectionDto> getAllCollectionsInfoById(@PathVariable Long userId) {
+        return collectionService.getAllCollectionsInfoById(userId);
+    }
 }

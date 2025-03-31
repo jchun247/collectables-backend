@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface CardService {
-//    CardDto createCard(CreateCardRequestDto cardRequest);
     PagedResponse<BasicCardDTO> getCards(int page, int size, List<CardGame> games,
                                          String setId, CardRarity rarity, CardCondition condition,
                                          String sortOption, BigDecimal minPrice, BigDecimal maxPrice, String searchQuery);
