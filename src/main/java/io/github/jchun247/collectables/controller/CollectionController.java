@@ -18,12 +18,12 @@ public class CollectionController {
     private final CollectionService collectionService;
 
     @PostMapping("/create")
-    public CollectionDto createCollection(@RequestBody CreateCollectionDto createCollectionDto) {
+    public CollectionDTO createCollection(@RequestBody CreateCollectionDTO createCollectionDto) {
         return collectionService.createCollection(createCollectionDto);
     }
 
     @PostMapping("/addCard")
-    public CollectionCardDto addCardToCollection(@RequestBody @Valid AddCardRequestDto request) {
+    public CollectionCardDTO addCardToCollection(@RequestBody @Valid AddCardRequestDTO request) {
         return collectionService.addCardToCollection(
                 request.getCollectionId(),
                 request.getCardId(),
@@ -36,12 +36,12 @@ public class CollectionController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeCardsFromCollection(@PathVariable Long collectionId,
                                           @PathVariable Long cardId,
-                                          @RequestBody @Valid RemoveCardRequestDto request) {
+                                          @RequestBody @Valid RemoveCardRequestDTO request) {
         collectionService.deleteCardFromCollection(collectionId, cardId, request.getCondition(), request.getQuantity());
     }
 
     @GetMapping("/{collectionId}/details")
-    public CollectionDto getCollectionDetails(@PathVariable Long collectionId) {
+    public CollectionDTO getCollectionDetails(@PathVariable Long collectionId) {
         return collectionService.getCollectionDetails(collectionId);
     }
 
@@ -53,7 +53,7 @@ public class CollectionController {
     }
 
     @GetMapping("/{userId}/all")
-    public List<CollectionDto> getAllCollectionsInfoById(@PathVariable Long userId) {
+    public List<CollectionDTO> getAllCollectionsInfoById(@PathVariable Long userId) {
         return collectionService.getAllCollectionsInfoById(userId);
     }
 }

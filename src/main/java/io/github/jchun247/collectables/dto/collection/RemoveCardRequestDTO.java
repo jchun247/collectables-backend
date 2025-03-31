@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Valid
-public class RemoveCardRequestDto {
+public class RemoveCardRequestDTO {
     @NotNull(message = "Card condition is required")
     private CardCondition condition;
 

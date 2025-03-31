@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CollectionCardDto {
+public class CollectionCardDTO {
     private Long id;
     private Long cardId;
     private Long collectionId;

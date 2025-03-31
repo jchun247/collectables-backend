@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Data
 @Builder
-public class CardSetDto {
+public class CardSetDTO {
     private String code;
     private String name;
     private CardGame game;
@@ -20,8 +20,8 @@ public class CardSetDto {
     private Set<CardLegality> legalities;
     private Set<CardSetImage> images;
 
-    public static CardSetDto fromEntity(CardSet cardSet) {
-        return CardSetDto.builder()
+    public static CardSetDTO fromEntity(CardSet cardSet) {
+        return CardSetDTO.builder()
                 .code(cardSet.getCode())
                 .name(cardSet.getName())
                 .game(cardSet.getGame())

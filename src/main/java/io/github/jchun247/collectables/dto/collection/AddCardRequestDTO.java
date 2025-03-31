@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class AddCardRequestDto {
+public class AddCardRequestDTO {
     @NotNull
     private Long collectionId;
     @NotNull

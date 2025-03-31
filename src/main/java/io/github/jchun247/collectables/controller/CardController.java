@@ -45,5 +45,4 @@ public class CardController {
     public ResponseEntity<CardDTO> getCardWithAllData(@PathVariable Long id) {
         return ResponseEntity.ok(cardService.getCardWithAllData(id));
     }
-
 }

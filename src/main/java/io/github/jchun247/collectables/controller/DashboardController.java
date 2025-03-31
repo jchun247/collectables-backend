@@ -1,6 +1,6 @@
 package io.github.jchun247.collectables.controller;
 
-import io.github.jchun247.collectables.dto.UserDashboardDto;
+import io.github.jchun247.collectables.dto.UserDashboardDTO;
 import io.github.jchun247.collectables.service.dashboard.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +14,11 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<UserDashboardDto> getUserDashboard(
+    public ResponseEntity<UserDashboardDTO> getUserDashboard(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "30") int days
     ) {
-        UserDashboardDto dashboardData = dashboardService.generateUserDashboard(userId, days);
+        UserDashboardDTO dashboardData = dashboardService.generateUserDashboard(userId, days);
         return ResponseEntity.ok(dashboardData);
     }
 }

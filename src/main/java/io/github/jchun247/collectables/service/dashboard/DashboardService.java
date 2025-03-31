@@ -1,10 +1,10 @@
 package io.github.jchun247.collectables.service.dashboard;
 
-import io.github.jchun247.collectables.dto.UserDashboardDto;
+import io.github.jchun247.collectables.dto.UserDashboardDTO;
 
 public interface DashboardService {
 
-    UserDashboardDto generateUserDashboard(Long userId, int days);
+    UserDashboardDTO generateUserDashboard(Long userId, int days);
 
 }
 

@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
-public class CollectionValueHistoryDto {
+public class CollectionValueHistoryDTO {
     private Long id;
     private BigDecimal value;
     private LocalDateTime timestamp;
 
-    public static CollectionValueHistoryDto fromEntity(CollectionValueHistory history) {
-        return CollectionValueHistoryDto.builder()
+    public static CollectionValueHistoryDTO fromEntity(CollectionValueHistory history) {
+        return CollectionValueHistoryDTO.builder()
                 .id(history.getId())
                 .value(history.getValue())
                 .timestamp(history.getTimestamp())

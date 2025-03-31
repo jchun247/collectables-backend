@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDashboardDto {
+public class UserDashboardDTO {
     private int numCards;
     private BigDecimal collectionValue;
     private BigDecimal highestValueCard;

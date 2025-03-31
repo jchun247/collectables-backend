@@ -1,6 +1,6 @@
 package io.github.jchun247.collectables.service.dashboard;
 
-import io.github.jchun247.collectables.dto.UserDashboardDto;
+import io.github.jchun247.collectables.dto.UserDashboardDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
     @Override
-    public UserDashboardDto generateUserDashboard(Long userId, int days) {
-        UserDashboardDto dashboardDTO = new UserDashboardDto();
+    public UserDashboardDTO generateUserDashboard(Long userId, int days) {
+        UserDashboardDTO dashboardDTO = new UserDashboardDTO();
 
         return dashboardDTO;
     }
