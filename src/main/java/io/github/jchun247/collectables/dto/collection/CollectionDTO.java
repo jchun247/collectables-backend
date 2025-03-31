@@ -2,6 +2,7 @@ package io.github.jchun247.collectables.dto.collection;
 
 import lombok.Data;
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Data
 public class CollectionDTO {
@@ -12,4 +13,5 @@ public class CollectionDTO {
     private boolean isFavourite;
     private int numProducts;
     private BigDecimal currentValue;
+    private Set<CollectionValueHistoryDTO> valueHistory;
 }

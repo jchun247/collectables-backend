@@ -51,13 +51,13 @@ public class Collection {
     @JoinColumn(name= "user_id")
     private UserEntity user;
 
-//    public BigDecimal calculateCurrentValue() {
-//        return cards.stream()
-//                .map(collectionCard -> collectionCard.getCard().getPrices().stream()
-//                        .filter(price -> price.getCondition() == collectionCard.getCondition())
-//                        .findFirst()
-//                        .map(price -> price.getPrice().multiply(BigDecimal.valueOf(collectionCard.getQuantity())))
-//                        .orElse(BigDecimal.ZERO))
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//    }
+    public BigDecimal calculateCurrentValue() {
+        return cards.stream()
+                .map(collectionCard -> collectionCard.getCard().getPrices().stream()
+                        .filter(price -> price.getCondition() == collectionCard.getCondition())
+                        .findFirst()
+                        .map(price -> price.getPrice().multiply(BigDecimal.valueOf(collectionCard.getQuantity())))
+                        .orElse(BigDecimal.ZERO))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }
