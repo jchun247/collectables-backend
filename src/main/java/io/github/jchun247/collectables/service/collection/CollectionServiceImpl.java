@@ -81,12 +81,6 @@ public class CollectionServiceImpl implements CollectionService {
         }
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<CollectionValueHistory> getCollectionValueHistory(Long collectionId) {
-//        return collectionValueHistoryRepository.findAllByCollectionId(collectionId);
-//    }
-
     @Override
     @Transactional(readOnly = true)
     public CollectionDTO getCollectionDetails(Long collectionId) {
@@ -147,19 +141,11 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CollectionDTO> getAllCollectionsInfoById(Long userId) {
-        List<Collection> collections = collectionRepository.findAllByUserId(userId);
+    public List<CollectionDTO> getCollectionsByUserId(Long targetUserId, Long requestingUserId) {
+        boolean isOwner = targetUserId.equals(requestingUserId);
+        List<Collection> collections = collectionRepository.findCollectionsByUserIdAndVisibility(targetUserId, isOwner);
         return collections.stream()
                 .map(collectionMapper::toCollectionDto)
                 .toList();
     }
-
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<CollectionDTO> getAllPublicCollections(Long userId) {
-//        List<Collection> collections = collectionRepository.findAllByUserIdAndIsPublic(userId, true);
-//        return collections.stream()
-//                .map(collectionMapper::toCollectionDto)
-//                .toList();
-//    }
 }

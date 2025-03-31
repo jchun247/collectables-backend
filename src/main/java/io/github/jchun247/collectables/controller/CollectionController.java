@@ -45,15 +45,11 @@ public class CollectionController {
         return collectionService.getCollectionDetails(collectionId);
     }
 
-//    @GetMapping("/{collectionId}/details/history")
-//    public ResponseEntity<CollectionValueHistoryResponse> getCollectionValueHistory(@PathVariable Long collectionId) {
-//        List<CollectionValueHistory> history = collectionService.getCollectionValueHistory(collectionId);
-//        CollectionValueHistoryResponse response = new CollectionValueHistoryResponse(history);
-//        return ResponseEntity.ok(response);
-//    }
-
-//    @GetMapping("/{userId}/all")
-//    public ResponseEntity<List<CollectionDTO>> getAllCollectionsInfoById(@PathVariable Long userId) {
-//        return collectionService.getAllCollectionsInfoById(userId);
-//    }
+    @GetMapping("/{userId}/all")
+    public ResponseEntity<List<CollectionDTO>> getAllCollectionsInfoById(
+            @PathVariable Long userId,
+            @RequestParam(required = false) Long requestingUserId) {
+        List<CollectionDTO> collections = collectionService.getCollectionsByUserId(userId, requestingUserId);
+        return ResponseEntity.ok(collections);
+    }
 }

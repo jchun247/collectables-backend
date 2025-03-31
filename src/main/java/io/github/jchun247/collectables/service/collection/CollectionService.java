@@ -12,10 +12,9 @@ import java.util.List;
 public interface CollectionService {
     CollectionCardDTO addCardToCollection(Long collectionId, Long cardId, CardCondition condition, int quantity);
     void deleteCardFromCollection(Long collectionId, Long cardId, CardCondition condition, int quantity);
-//    List<CollectionValueHistory> getCollectionValueHistory(Long collectionId);
     CollectionDTO getCollectionDetails(Long collectionId);
     void updateCollectionValue(Collection collection);
     void updateAllCollections();
     CollectionDTO createCollection(CreateCollectionDTO createCollectionDto);
-    List<CollectionDTO> getAllCollectionsInfoById(Long userId);
+    List<CollectionDTO> getCollectionsByUserId(Long targetUserId, Long requestingUserId);
 }

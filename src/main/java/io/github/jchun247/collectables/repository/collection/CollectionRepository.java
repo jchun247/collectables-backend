@@ -15,6 +15,14 @@ public interface CollectionRepository extends JpaRepository<Collection, Long>{
             "LEFT JOIN FETCH c.valueHistory " +
             "WHERE c.id = :collectionId")
     Optional<Collection> findByIdWithCards(@Param("collectionId") Long collectionId);
-    List<Collection> findAllByUserId(Long userId);
-    List<Collection> findAllByUserIdAndIsPublic(Long userId, boolean isPublic);
+
+    @Query("SELECT DISTINCT c FROM Collection c " +
+            "LEFT JOIN FETCH c.cards " +
+            "LEFT JOIN FETCH c.valueHistory " +
+            "WHERE c.user.id = :targetUserId " +
+            "AND (:isOwner = true OR c.isPublic = true)")
+    List<Collection> findCollectionsByUserIdAndVisibility(
+            @Param("targetUserId") Long targetUserId,
+            @Param("isOwner") boolean isOwner
+    );
 }
