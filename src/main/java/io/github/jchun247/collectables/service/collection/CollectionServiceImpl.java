@@ -42,10 +42,15 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     @Transactional
     public CollectionCardDTO addCardToCollection(Long collectionId, Long cardId, CardCondition condition, int quantity) {
+       if (quantity <= 0) {
+           throw new IllegalArgumentException("Quantity must be positive");
+       }
+
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
+
         CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndCondition(collectionId, cardId, condition)
                 .orElseGet(() -> {
-                    Collection collection = collectionRepository.findById(collectionId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
                     Card card = cardRepository.findById(cardId)
                             .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
 
@@ -60,6 +65,11 @@ public class CollectionServiceImpl implements CollectionService {
         // Update quantity
         collectionCard.setQuantity(collectionCard.getQuantity() + quantity);
 
+        // Update collection's number of products and value
+        collection.setNumProducts(collection.getNumProducts() + quantity);
+        collection.setCurrentValue(collection.calculateCurrentValue());
+        collectionRepository.save(collection);
+
         CollectionCard savedCard = collectionCardRepository.save(collectionCard);
         return collectionMapper.toCollectionCardDto(savedCard);
     }
@@ -68,6 +78,8 @@ public class CollectionServiceImpl implements CollectionService {
     @Transactional
     @VerifyCollectionCardAccess
     public void deleteCardFromCollection(Long collectionId, Long cardId, CardCondition condition, int quantity) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
         CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndCondition(collectionId, cardId, condition)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found in collection"));
         int newCardQuantity = collectionCard.getQuantity() - quantity;
@@ -79,6 +91,11 @@ public class CollectionServiceImpl implements CollectionService {
             collectionCard.setQuantity(newCardQuantity);
             collectionCardRepository.save(collectionCard);
         }
+
+        // Update collection's number of products and value
+        collection.setNumProducts(collection.getNumProducts() - quantity);
+        collection.setCurrentValue(collection.calculateCurrentValue());
+        collectionRepository.save(collection);
     }
 
     @Override
