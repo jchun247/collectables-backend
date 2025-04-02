@@ -31,7 +31,8 @@ public class CardServiceImpl implements CardService{
     @Transactional(readOnly = true)
     public PagedResponse<BasicCardDTO> getCards(int page, int size, List<CardGame> games,
                                            String setId, CardRarity rarity, CardCondition condition,
-                                           String sortOption, BigDecimal minPrice, BigDecimal maxPrice, String searchQuery) {
+                                           String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
+                                                String searchQuery, CardFinish finish) {
 
         Sort sort = switch (sortOption) {
             case "name" -> Sort.by(Sort.Direction.ASC, "c.name");
@@ -44,7 +45,10 @@ public class CardServiceImpl implements CardService{
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<Long> cardIdPage = cardRepository.findCardIdsByFilters(
-                games, setId, rarity, condition, searchQuery,
+                games, setId, rarity,
+                condition == null ? CardCondition.NEAR_MINT : condition,
+                finish,
+                searchQuery,
                 minPrice == null ? BigDecimal.ZERO : minPrice,
                 maxPrice == null ? MAX_PRICE : maxPrice,
                 pageable
@@ -56,7 +60,7 @@ public class CardServiceImpl implements CardService{
             return new PagedResponse<>(Collections.emptyList(), Page.empty());
         }
 
-        List<Card> cards = cardRepository.findCardsWithCollectionsByIds(cardIds);
+        List<Card> cards = cardRepository.findCardsByIds(cardIds);
 
         List<BasicCardDTO> basicCardDTOs = cards.stream()
                 .map(cardMapper::toBasicDTO)
