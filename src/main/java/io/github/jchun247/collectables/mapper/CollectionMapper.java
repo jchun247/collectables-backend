@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 public interface CollectionMapper {
     @Mapping(source = "valueHistory", target = "valueHistory", qualifiedByName = "mapValueHistory")
     CollectionDTO toCollectionDto(Collection collection);
+
+    @Mapping(source = "card.id", target= "cardId")
+    @Mapping(source = "collection.id", target="collectionId")
     CollectionCardDTO toCollectionCardDto(CollectionCard collectionCard);
 
     @Named("mapValueHistory")

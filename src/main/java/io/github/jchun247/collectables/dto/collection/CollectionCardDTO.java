@@ -13,6 +13,6 @@ public class CollectionCardDTO {
     private CardCondition condition;
     private int quantity;
     // Denormalized data to avoid additional queries
-    private String cardName;
-    private String collectionName;
+//    private String cardName;
+//    private String collectionName;
 }
