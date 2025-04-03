@@ -34,45 +34,62 @@ public class CardServiceImpl implements CardService{
                                            String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
                                                 String searchQuery, CardFinish finish) {
 
-        Sort sort = switch (sortOption) {
-            case "name" -> Sort.by(Sort.Direction.ASC, "c.name");
-            case "name-desc" -> Sort.by(Sort.Direction.DESC, "c.name");
-            case "price-asc" -> Sort.by(Sort.Direction.ASC, "p.price");
-            case "price-desc" -> Sort.by(Sort.Direction.DESC, "p.price");
-            default -> Sort.unsorted();
-        };
-
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<Long> cardIdPage = cardRepository.findCardIdsByFilters(
+        List<Long> allMatchingIds = cardRepository.findMatchingCardIds(
                 games, setId, rarity,
                 condition == null ? CardCondition.NEAR_MINT : condition,
-                finish,
-                searchQuery,
+                finish, searchQuery,
                 minPrice == null ? BigDecimal.ZERO : minPrice,
-                maxPrice == null ? MAX_PRICE : maxPrice,
-                pageable
+                maxPrice == null ? MAX_PRICE : maxPrice
         );
 
-        List<Long> cardIds = cardIdPage.getContent();
-
-        if (cardIds.isEmpty()) {
+        if (allMatchingIds.isEmpty()) {
             return new PagedResponse<>(Collections.emptyList(), Page.empty());
         }
 
-        List<Card> cards = cardRepository.findCardsByIds(cardIds);
+        // Count total matches for pagination
+        long totalElements = cardRepository.countMatchingCardIds(
+                games, setId, rarity,
+                condition == null ? CardCondition.NEAR_MINT : condition,
+                finish, searchQuery,
+                minPrice == null ? BigDecimal.ZERO : minPrice,
+                maxPrice == null ? MAX_PRICE : maxPrice
+        );
 
-        List<BasicCardDTO> basicCardDTOs = cards.stream()
+        // Apply sorting and pagination
+        List<Card> sortedCards;
+        if (sortOption != null && (sortOption.equals("price-asc") || sortOption.equals("price-desc"))) {
+            Sort priceSort = Sort.by(sortOption.equals("price-asc") ?
+                    Sort.Direction.ASC : Sort.Direction.DESC, "p.price");
+            sortedCards = cardRepository.findCardsByIdsSortedByPrice(
+                    allMatchingIds,
+                    condition == null ? CardCondition.NEAR_MINT : condition,
+                    finish,
+                    priceSort
+            );
+        } else {
+            Sort nameSort = Sort.by("name-desc".equals(sortOption) ?
+                    Sort.Direction.DESC : Sort.Direction.ASC, "name");
+            sortedCards = cardRepository.findCardsByIdsSortedByName(allMatchingIds, nameSort);
+        }
+
+        // Apply pagination manually (after sorting)
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, sortedCards.size());
+
+        // Ensure fromIndex is within bounds
+        if (fromIndex >= sortedCards.size()) {
+            return new PagedResponse<>(Collections.emptyList(), Page.empty());
+        }
+
+        List<Card> pageOfCards = sortedCards.subList(fromIndex, toIndex);
+
+        List<BasicCardDTO> basicCardDTOs = pageOfCards.stream()
                 .map(cardMapper::toBasicDTO)
                 .toList();
 
-        Page<Card> cardPage = new PageImpl<>(
-                cards,
-                pageable,
-                cardIdPage.getTotalElements()
-        );
-
-        return new PagedResponse<>(basicCardDTOs, cardPage);
+        Pageable pageable = PageRequest.of(page, size);
+        return new PagedResponse<>(basicCardDTOs,
+                new PageImpl<>(pageOfCards, pageable, totalElements));
     }
 
     @Override
