@@ -21,7 +21,7 @@ public class CardController {
     @GetMapping
     public ResponseEntity<PagedResponse<BasicCardDTO>> getFilteredCards(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "15") int size,
             @RequestParam(defaultValue = "name") String sortOption,
             @RequestParam(required = false) List<CardGame> games,
             @RequestParam(required = false) String setId,
