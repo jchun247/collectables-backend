@@ -14,14 +14,14 @@ import java.util.Optional;
 public interface CardRepository extends JpaRepository<Card, Long> {
 
     @Query("SELECT DISTINCT c.id FROM Card c " +
-            "LEFT JOIN c.set cs " +
-            "JOIN CardPrice p ON p.card = c " +
+            "JOIN c.set cs " +
+            "JOIN c.prices p " +
             "WHERE (:games IS NULL OR c.game IN :games) " +
             "AND (:setId IS NULL OR cs.id = :setId) " +
             "AND (:rarity IS NULL OR c.rarity = :rarity) " +
             "AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) OR :query IS NULL OR cs.id LIKE %:query% OR c.setNumber LIKE %:query%) " +
             "AND (:condition IS NULL OR p.condition = :condition) " +
-            "AND (:finish IS NULL AND p.finish IN ('NORMAL', 'HOLOFOIL', 'REVERSE_HOLO', 'STAMP') OR p.finish = :finish) " +
+            "AND (:finish IS NULL OR p.finish = :finish) " +
             "AND p.price BETWEEN :minPrice AND :maxPrice")
     List<Long> findMatchingCardIds(
             @Param("games") List<CardGame> games,
@@ -36,14 +36,14 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     // Count total matching cards for pagination
     @Query("SELECT COUNT(DISTINCT c.id) FROM Card c " +
-            "LEFT JOIN c.set cs " +
-            "JOIN CardPrice p ON p.card = c " +
+            "JOIN c.set cs " +
+            "JOIN c.prices p " +
             "WHERE (:games IS NULL OR c.game IN :games) " +
             "AND (:setId IS NULL OR cs.id = :setId) " +
             "AND (:rarity IS NULL OR c.rarity = :rarity) " +
             "AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) OR :query IS NULL OR cs.id LIKE %:query% OR c.setNumber LIKE %:query%) " +
             "AND (:condition IS NULL OR p.condition = :condition) " +
-            "AND (:finish IS NULL AND p.finish IN ('NORMAL', 'HOLOFOIL', 'REVERSE_HOLO', 'STAMP') OR p.finish = :finish) " +
+            "AND (:finish IS NULL OR p.finish = :finish) " +
             "AND p.price BETWEEN :minPrice AND :maxPrice")
     long countMatchingCardIds(
             @Param("games") List<CardGame> games,
@@ -56,20 +56,25 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             @Param("maxPrice") BigDecimal maxPrice
     );
 
-    @Query("SELECT c FROM Card c " +
-            "LEFT JOIN FETCH c.prices " +
-            "LEFT JOIN FETCH c.images " +
-            "LEFT JOIN FETCH c.set " +
-            "WHERE c.id IN :ids")
+//    @Query("SELECT c FROM Card c " +
+//            "LEFT JOIN FETCH c.prices " +
+//            "LEFT JOIN FETCH c.images " +
+//            "LEFT JOIN FETCH c.set " +
+//            "WHERE c.id IN :ids")
+//    List<Card> findCardsByIdsSortedByName(
+//            @Param("ids") List<Long> ids,
+//            Sort sort
+//    );
+    @EntityGraph(attributePaths = {"images", "set", "prices", "pokemonDetails"})
+    @Query("SELECT c FROM Card c WHERE c.id IN :ids")
     List<Card> findCardsByIdsSortedByName(
             @Param("ids") List<Long> ids,
             Sort sort
     );
 
+    @EntityGraph(attributePaths = {"images", "set", "prices", "pokemonDetails"})
     @Query("SELECT c FROM Card c " +
-            "LEFT JOIN FETCH c.images " +
-            "LEFT JOIN FETCH c.set " +
-            "JOIN CardPrice p ON p.card = c " +
+            "JOIN c.prices p " +
             "WHERE c.id IN :ids " +
             "AND (:condition IS NULL OR p.condition = :condition) " +
             "AND (:finish IS NOT NULL AND p.finish = :finish " +
@@ -89,7 +94,10 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("SELECT c FROM Card c WHERE c.id = :id")
     Optional<Card> findWithBasicDataById(@Param("id") Long id);
 
-    @EntityGraph(attributePaths = {"types", "attacks", "prices", "priceHistory", "abilities", "subTypes", "images", "variantGroup", "set"})
+    @EntityGraph(attributePaths = {
+            "pokemonDetails", "rules",
+            "prices", "priceHistory",
+            "subTypes", "images", "variantGroup", "set"})
     @Query("SELECT c FROM Card c WHERE c.id = :id")
     Optional<Card> findWithAllDataById(Long id);
 }

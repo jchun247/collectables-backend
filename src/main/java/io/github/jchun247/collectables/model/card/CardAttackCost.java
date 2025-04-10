@@ -19,7 +19,4 @@ public class CardAttackCost {
 
     @Column(name = "cost")
     private CardEnergy cost;
-
-    @Column(name="cost_order")
-    private Integer costOrder;
 }
