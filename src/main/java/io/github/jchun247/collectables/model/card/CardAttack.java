@@ -25,8 +25,6 @@ public class CardAttack {
     @JoinColumn(name = "card_pokemon_details_id")
     private CardPokemonDetails pokemonDetails;
 
-//    @ElementCollection
-//    @CollectionTable(name = "card_attack_costs", joinColumns = @JoinColumn(name = "attack_id"))
     @OneToMany(mappedBy = "attack", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CardAttackCost> cost = new LinkedHashSet<>();
 

@@ -11,5 +11,5 @@ public class CardAttackDTO {
     private String name;
     private String text;
     private String damage;
-    private Set<CardEnergy> cost = new LinkedHashSet<>();
+    private Set<CardAttackCostDTO> cost = new LinkedHashSet<>();
 }

@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class CardResistance {
     private CardType resistanceType;
     private CardModifier resistanceModifier;
-    private int resistanceValue;
+    private Integer resistanceValue;
 }

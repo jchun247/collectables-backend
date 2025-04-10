@@ -11,13 +11,13 @@ public class CardDTO {
     private Long id;
     private String name;
     private CardGame game;
-    private CardVariantGroup variantGroup;
+    private CardVariantGroupDTO variantGroup;
     private String setName;
     private String setNumber;
     private CardRarity rarity;
     private String illustratorName;
     private CardPokemonDetailsDTO pokemonDetails;
-    private Set<CardRule> rules = new LinkedHashSet<>();
+    private Set<CardRuleDTO> rules = new LinkedHashSet<>();
     private Set<CardPriceDTO> prices;
     private Set<CardPriceHistoryDTO> priceHistory;
     private Set<CardSubType> subTypes;

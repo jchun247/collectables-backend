@@ -89,11 +89,11 @@ public interface CardMapper {
 //                .collect(Collectors.toList());
 //    }
 
-    CardTypesDTO toCardTypesDTO(CardTypes type);
+//    CardTypesDTO toCardTypesDTO(CardTypes type);
 
-    CardAttackDTO toCardAttackDTO(CardAttack attack);
+//    CardAttackDTO toCardAttackDTO(CardAttack attack);
 
-    CardAbilityDTO toCardAbilityDTO(CardAbility ability);
+//    CardAbilityDTO toCardAbilityDTO(CardAbility ability);
 
 //    CardVariantGroupDTO toCardVariantGroupDTO(CardVariantGroup variantGroup);
 
