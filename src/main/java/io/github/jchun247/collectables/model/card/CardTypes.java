@@ -21,14 +21,4 @@ public class CardTypes {
     private CardPokemonDetails pokemonDetails;
 
     private CardType type;
-
-//    public void setPokemonDetails(CardPokemonDetails pokemonDetails) {
-//        if (this.pokemonDetails != null) {
-//            this.pokemonDetails.getTypes().remove(this);
-//        }
-//        this.pokemonDetails = pokemonDetails;
-//        if (pokemonDetails != null) {
-//            pokemonDetails.getTypes().add(this);
-//        }
-//    }
 }

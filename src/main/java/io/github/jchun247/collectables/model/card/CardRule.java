@@ -22,14 +22,4 @@ public class CardRule {
     private Card card;
 
     private String text;
-
-//    public void setCard(Card card) {
-//        if (this.card != null) {
-//            this.card.getRules().remove(this);
-//        }
-//        this.card = card;
-//        if (card != null) {
-//            card.getRules().add(this);
-//        }
-//    }
 }

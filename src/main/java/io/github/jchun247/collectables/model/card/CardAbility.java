@@ -21,14 +21,4 @@ public class CardAbility {
     @ManyToOne
     @JoinColumn(name = "card_pokemon_details_id")
     private CardPokemonDetails pokemonDetails;
-
-//    public void setPokemonDetails(CardPokemonDetails pokemonDetails) {
-//        if (this.pokemonDetails != null) {
-//            this.pokemonDetails.getAbilities().remove(this);
-//        }
-//        this.pokemonDetails = pokemonDetails;
-//        if (pokemonDetails != null) {
-//            pokemonDetails.getAbilities().add(this);
-//        }
-//    }
 }

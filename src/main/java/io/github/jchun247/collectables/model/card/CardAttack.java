@@ -27,14 +27,4 @@ public class CardAttack {
 
     @OneToMany(mappedBy = "attack", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CardAttackCost> cost = new LinkedHashSet<>();
-
-//    public void setPokemonDetails(CardPokemonDetails pokemonDetails) {
-//        if (this.pokemonDetails != null) {
-//            this.pokemonDetails.getAttacks().remove(this);
-//        }
-//        this.pokemonDetails = pokemonDetails;
-//        if (pokemonDetails != null) {
-//            pokemonDetails.getAttacks().add(this);
-//        }
-//    }
 }
