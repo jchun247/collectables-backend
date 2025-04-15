@@ -6,9 +6,7 @@ import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.mapper.CardMapper;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.repository.card.CardRepository;
-import jakarta.persistence.Basic;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

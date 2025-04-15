@@ -20,34 +20,36 @@ public interface CardMapper {
     BasicCardDTO toBasicDTO(Card card);
 
     @Mapping(source = "set.name", target = "setName")
-    @Mapping(source = "types", target = "types", qualifiedByName = "mapTypes")
-    @Mapping(source = "attacks", target = "attacks", qualifiedByName = "mapAttacks")
     @Mapping(source = "prices", target = "prices", qualifiedByName = "mapPrices")
     @Mapping(source = "priceHistory", target = "priceHistory", qualifiedByName = "mapPriceHistory")
+    @Mapping(source = "pokemonDetails", target = "pokemonDetails", qualifiedByName = "mapPokemonDetails")
+    @Mapping(source = "pokemonDetails.types", target = "pokemonDetails.types")
+    @Mapping(source = "pokemonDetails.attacks", target = "pokemonDetails.attacks")
+    @Mapping(source = "pokemonDetails.abilities", target = "pokemonDetails.abilities")
     CardDTO toCardDTO(Card card);
 
-    @Mapping(source = "cost", target = "cost", qualifiedByName = "mapAttackCosts")
-    CardAttackDTO toCardAttackDTO(CardAttack attack);
+//    @Mapping(source = "cost", target = "cost", qualifiedByName = "mapAttackCosts")
+//    CardAttackDTO toCardAttackDTO(CardAttack attack);
 
-    @Named("mapTypes")
-    default Set<CardTypesDTO> mapTypes(Set<CardTypes> types) {
-        if (types == null) {
-            return Collections.emptySet();
-        }
-        return types.stream()
-                .map(this::toCardTypesDTO)
-                .collect(Collectors.toSet());
-    }
+//    @Named("mapTypes")
+//    default Set<CardTypesDTO> mapTypes(Set<CardTypes> types) {
+//        if (types == null) {
+//            return Collections.emptySet();
+//        }
+//        return types.stream()
+//                .map(this::toCardTypesDTO)
+//                .collect(Collectors.toSet());
+//    }
 
-    @Named("mapAttacks")
-    default Set<CardAttackDTO> mapAttacks(Set<CardAttack> attacks) {
-        if (attacks == null) {
-            return Collections.emptySet();
-        }
-        return attacks.stream()
-                .map(this::toCardAttackDTO)
-                .collect(Collectors.toSet());
-    }
+//    @Named("mapAttacks")
+//    default Set<CardAttackDTO> mapAttacks(Set<CardAttack> attacks) {
+//        if (attacks == null) {
+//            return Collections.emptySet();
+//        }
+//        return attacks.stream()
+//                .map(this::toCardAttackDTO)
+//                .collect(Collectors.toSet());
+//    }
 
     @Named("mapPrices")
     default Set<CardPriceDTO> mapPrices(Set<CardPrice> prices) {
@@ -69,18 +71,29 @@ public interface CardMapper {
                 .collect(Collectors.toSet());
     }
 
-    @Named("mapAttackCosts")
-    default List<CardEnergy> mapAttackCosts(List<CardAttackCost> costs) {
-        if (costs == null) {
-            return Collections.emptyList();
+    @Named("mapPokemonDetails")
+    default CardPokemonDetailsDTO mapPokemonDetails(CardPokemonDetails cardPokemonDetails) {
+        if (cardPokemonDetails == null) {
+            return null;
         }
-        return costs.stream()
-                .sorted(Comparator.comparing(CardAttackCost::getCostOrder))
-                .map(CardAttackCost::getCost)
-                .collect(Collectors.toList());
+        return toCardPokemonDetailsDTO(cardPokemonDetails);
     }
 
-    CardTypesDTO toCardTypesDTO(CardTypes type);
+//    @Named("mapAttackCosts")
+//    default List<CardEnergy> mapAttackCosts(List<CardAttackCost> costs) {
+//        if (costs == null) {
+//            return Collections.emptyList();
+//        }
+//        return costs.stream()
+//                .map(CardAttackCost::getCost)
+//                .collect(Collectors.toList());
+//    }
+
+//    CardTypesDTO toCardTypesDTO(CardTypes type);
+
+//    CardAttackDTO toCardAttackDTO(CardAttack attack);
+
+//    CardAbilityDTO toCardAbilityDTO(CardAbility ability);
 
 //    CardVariantGroupDTO toCardVariantGroupDTO(CardVariantGroup variantGroup);
 
@@ -88,4 +101,5 @@ public interface CardMapper {
 
     CardPriceHistoryDTO toCardPriceHistoryDTO(CardPriceHistory priceHistory);
 
+    CardPokemonDetailsDTO toCardPokemonDetailsDTO(CardPokemonDetails cardPokemonDetails);
 }

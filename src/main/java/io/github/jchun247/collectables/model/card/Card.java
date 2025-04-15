@@ -3,14 +3,13 @@ package io.github.jchun247.collectables.model.card;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "cards")
 @Getter
 @Setter
-@ToString(exclude = {"variantGroup", "set", "types", "attacks", "prices", "priceHistory"})
+@ToString(exclude = {"variantGroup", "set", "prices", "priceHistory", "rules", "pokemonDetails"})
 @EqualsAndHashCode(of = {"id", "externalId"})
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +19,6 @@ public class Card {
     private Long id;
 
     private String externalId;
-
     private String name;
 
     @ManyToOne
@@ -36,33 +34,23 @@ public class Card {
 
     private CardRarity rarity;
 
+    @Column(name="supertype")
+    private CardSuperType superType;
+
     private String illustratorName;
-    private String flavourText;
     private String setNumber;
-    private Integer hitPoints;
-    private Integer retreatCost;
 
-    @Embedded
-    private CardWeakness weakness;
-
-    @Embedded
-    private CardResistance resistance;
+    @OneToOne(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private CardPokemonDetails pokemonDetails;
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CardTypes> types = new HashSet<>();
-
-    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CardAttack> attacks = new HashSet<>();
+    private Set<CardRule> rules = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CardPrice> prices = new HashSet<>();
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CardPriceHistory> priceHistory = new HashSet<>();
-
-    @ElementCollection
-    @CollectionTable(name = "card_abilities", joinColumns = @JoinColumn(name = "card_id"))
-    private Set<CardAbility> abilities = new HashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "card_subtypes", joinColumns = @JoinColumn(name = "card_id"))

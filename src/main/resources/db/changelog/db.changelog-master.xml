@@ -55,4 +55,11 @@
     <include file="db/changelog/changes/048-fix_cost_order_values.xml"/>
     <include file="db/changelog/changes/049-collection_changes.xml"/>
     <include file="db/changelog/changes/050-additional_collection_changes.xml"/>
+    <include file="db/changelog/changes/051-add_new_tables.xml"/>
+    <include file="db/changelog/changes/052-add_supertype_column.xml"/>
+    <include file="db/changelog/changes/053-refactor_tables.xml"/>
+    <include file="db/changelog/changes/054-rename_weaknessAmount.xml"/>
+    <include file="db/changelog/changes/055-add_id_column_to_card_ability.xml"/>
+    <include file="db/changelog/changes/056-remove_cost_order_from_card_attack_costs.xml"/>
+    <include file="db/changelog/changes/057-remove_order_col.xml"/>
 </databaseChangeLog>

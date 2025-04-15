@@ -1,22 +1,25 @@
 package io.github.jchun247.collectables.model.card;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Table(name="card_attack_costs")
+@Table(name="card_rules")
 @Getter
 @Setter
-public class CardAttackCost {
+@ToString(exclude = "card")
+@EqualsAndHashCode(of = "id")
+public class CardRule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "attack_id")
-    private CardAttack attack;
+    @JoinColumn(name = "card_id")
+    private Card card;
 
-    @Column(name = "cost")
-    private CardEnergy cost;
+    private String text;
 }

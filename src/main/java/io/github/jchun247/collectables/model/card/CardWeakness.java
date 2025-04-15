@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class CardWeakness {
     private CardType weaknessType;
     private CardModifier weaknessModifier;
-    private int weaknessAmount;
+    private Integer weaknessValue;
 }

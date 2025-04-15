@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="drop columns in cards table" author="jchun247">
+        <dropColumn tableName="cards" schemaName="collectables">
+            <column name="hit_points"/>
+            <column name="flavour_text"/>
+            <column name="retreat_cost"/>
+            <column name="weakness_type"/>
+            <column name="weakness_modifier"/>
+            <column name="weakness_amount"/>
+            <column name="resistance_type"/>
+            <column name="resistance_modifier"/>
+            <column name="resistance_amount"/>
+        </dropColumn>
+    </changeSet>
+
+    <changeSet id="drop constraints, rename columns and add new constraints" author="jchun247">
+        <!-- Drop existing foreign key constraints -->
+        <dropForeignKeyConstraint baseTableName="card_attacks" constraintName="fk_card_attacks_card"/>
+        <dropForeignKeyConstraint baseTableName="card_abilities" constraintName="fk_card_abilities_card"/>
+        <dropForeignKeyConstraint baseTableName="card_types" constraintName="fk_card_value_history_card"/>
+
+        <!-- Rename columns -->
+        <renameColumn tableName="card_attacks"
+                      oldColumnName="card_id"
+                      newColumnName="card_pokemon_details_id"/>
+        <renameColumn tableName="card_abilities"
+                      oldColumnName="card_id"
+                      newColumnName="card_pokemon_details_id"/>
+        <renameColumn tableName="card_types"
+                      oldColumnName="card_id"
+                      newColumnName="card_pokemon_details_id"/>
+
+        <addColumn tableName="card_pokemon_details" schemaName="collectables">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Add new foreign key constraints -->
+        <addForeignKeyConstraint baseTableName="card_attacks"
+                                 baseColumnNames="card_pokemon_details_id"
+                                 constraintName="fk_card_attacks_pokemon_details"
+                                 referencedTableName="card_pokemon_details"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="card_abilities"
+                                 baseColumnNames="card_pokemon_details_id"
+                                 constraintName="fk_card_abilities_pokemon_details"
+                                 referencedTableName="card_pokemon_details"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="card_types"
+                                 baseColumnNames="card_pokemon_details_id"
+                                 constraintName="fk_card_types_pokemon_details"
+                                 referencedTableName="card_pokemon_details"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -7,7 +7,7 @@ import lombok.*;
 @Table(name="card_types")
 @Getter
 @Setter
-@ToString(exclude = "card")
+@ToString(exclude = "pokemonDetails")
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,18 +17,8 @@ public class CardTypes {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "card_id")
-    private Card card;
+    @JoinColumn(name = "card_pokemon_details_id")
+    private CardPokemonDetails pokemonDetails;
 
     private CardType type;
-
-    public void setCard(Card card) {
-        if (this.card != null) {
-            this.card.getTypes().remove(this);
-        }
-        this.card = card;
-        if (card != null) {
-            card.getTypes().add(this);
-        }
-    }
 }

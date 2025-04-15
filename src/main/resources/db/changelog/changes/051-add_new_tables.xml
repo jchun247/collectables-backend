@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="051" author="jchun247">
+        <createTable tableName="card_rules">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="card_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="fk_card_rules_card"
+                             references="cards(id)"/>
+            </column>
+            <column name="text" type="varchar(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order" type="int"/>
+        </createTable>
+        <createTable tableName="card_pokemon_details">
+            <column name="card_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="fk_card_pokemon_details_card"
+                             references="cards(id)"/>
+            </column>
+            <column name="hit_points" type="int"/>
+            <column name="retreat_cost" type="int"/>
+            <column name="flavour_text" type="varchar(1000)"/>
+            <column name="weakness_type" type="varchar(50)"/>
+            <column name="weakness_modifier" type="varchar(20)"/>
+            <column name="weakness_amount" type="int"/>
+            <column name="resistance_type" type="varchar(50)"/>
+            <column name="resistance_modifier" type="varchar(20)"/>
+            <column name="resistance_value" type="int"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
