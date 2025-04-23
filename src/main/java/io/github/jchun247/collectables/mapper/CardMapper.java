@@ -28,6 +28,8 @@ public interface CardMapper {
     @Mapping(source = "pokemonDetails.abilities", target = "pokemonDetails.abilities")
     CardDTO toCardDTO(Card card);
 
+    BasicCardSetDTO toBasicCardSetDTO(CardSet cardSet);
+
 //    @Mapping(source = "cost", target = "cost", qualifiedByName = "mapAttackCosts")
 //    CardAttackDTO toCardAttackDTO(CardAttack attack);
 

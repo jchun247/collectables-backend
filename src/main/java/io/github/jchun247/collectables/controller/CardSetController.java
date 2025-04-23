@@ -1,5 +1,6 @@
 package io.github.jchun247.collectables.controller;
 
+import io.github.jchun247.collectables.dto.card.BasicCardSetDTO;
 import io.github.jchun247.collectables.model.card.CardSeries;
 import io.github.jchun247.collectables.model.card.CardSet;
 import io.github.jchun247.collectables.service.set.CardSetService;
@@ -24,7 +25,7 @@ public class CardSetController {
     }
 
     @GetMapping("/by-series")
-    public ResponseEntity<List<CardSet>> getCardSetsBySeries(@RequestParam CardSeries series) {
+    public ResponseEntity<List<BasicCardSetDTO>> getCardSetsBySeries(@RequestParam CardSeries series) {
         return ResponseEntity.ok(cardSetService.getCardSetsBySeries(series));
     }
 }

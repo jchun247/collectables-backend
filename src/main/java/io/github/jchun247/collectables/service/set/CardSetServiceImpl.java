@@ -1,5 +1,7 @@
 package io.github.jchun247.collectables.service.set;
 
+import io.github.jchun247.collectables.dto.card.BasicCardSetDTO;
+import io.github.jchun247.collectables.mapper.CardMapper;
 import io.github.jchun247.collectables.model.card.CardSeries;
 import io.github.jchun247.collectables.model.card.CardSet;
 import io.github.jchun247.collectables.repository.card.CardSetRepository;
@@ -14,11 +16,15 @@ import java.util.List;
 public class CardSetServiceImpl implements CardSetService{
 
     private final CardSetRepository cardSetRepository;
+    private final CardMapper cardMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public List<CardSet> getCardSetsBySeries(CardSeries series) {
-        return cardSetRepository.findAllBySeriesWithCollections(series);
+    public List<BasicCardSetDTO> getCardSetsBySeries(CardSeries series) {
+        return cardSetRepository.findAllBySeriesWithCollections(series)
+                .stream()
+                .map(cardMapper::toBasicCardSetDTO)
+                .toList();
     }
 
     @Override
