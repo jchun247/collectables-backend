@@ -17,6 +17,5 @@ public interface CardService {
                                          String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
                                          String searchQuery, CardFinish finish);
     BasicCardDTO getCardWithBasicData(Long id);
-
     CardDTO getCardWithAllData(Long id);
 }

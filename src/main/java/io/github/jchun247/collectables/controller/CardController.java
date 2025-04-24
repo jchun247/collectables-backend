@@ -5,6 +5,7 @@ import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.dto.card.CardDTO;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.service.card.CardService;
+import jakarta.persistence.Basic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,5 +46,22 @@ public class CardController {
     @GetMapping("/{id}")
     public ResponseEntity<CardDTO> getCardWithAllData(@PathVariable Long id) {
         return ResponseEntity.ok(cardService.getCardWithAllData(id));
+    }
+
+    @GetMapping("/set/{setId}")
+    public ResponseEntity<PagedResponse<BasicCardDTO>> getCardsBySetId(
+            @PathVariable String setId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "name") String sortOption,
+            @RequestParam(required = false) CardRarity rarity,
+            @RequestParam(defaultValue = "NEAR_MINT") CardCondition condition,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) CardFinish finish){
+        PagedResponse<BasicCardDTO> response = cardService.getCards(page, size, null,
+                setId, rarity, condition, sortOption, minPrice, maxPrice, query, finish);
+        return ResponseEntity.ok(response);
     }
 }
