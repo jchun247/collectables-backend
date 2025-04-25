@@ -11,6 +11,8 @@ public class BasicCardSetDTO {
     private String id;
     private String name;
     private CardGame game;
+    private int printedTotal;
+    private int total;
     private LocalDate releaseDate;
     private CardSeries series;
     private Set<CardSetImage> images;
