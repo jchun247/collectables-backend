@@ -12,6 +12,7 @@ public class CardDTO {
     private String name;
     private CardGame game;
     private CardVariantGroupDTO variantGroup;
+    private String setId;
     private String setName;
     private String setNumber;
     private CardRarity rarity;

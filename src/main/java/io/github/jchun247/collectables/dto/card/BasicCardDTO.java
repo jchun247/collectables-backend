@@ -10,6 +10,7 @@ import java.util.Set;
 public class BasicCardDTO {
     private Long id;
     private String name;
+    private String setId;
     private String setName;
     private String setNumber;
     private CardRarity rarity;

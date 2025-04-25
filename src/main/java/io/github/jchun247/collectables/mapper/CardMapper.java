@@ -16,10 +16,12 @@ import java.util.stream.Collectors;
 public interface CardMapper {
 
     @Mapping(source = "set.name", target = "setName")
+    @Mapping(source = "set.id", target = "setId")
     @Mapping(source = "prices", target = "prices", qualifiedByName = "mapPrices")
     BasicCardDTO toBasicDTO(Card card);
 
     @Mapping(source = "set.name", target = "setName")
+    @Mapping(source = "set.id", target = "setId")
     @Mapping(source = "prices", target = "prices", qualifiedByName = "mapPrices")
     @Mapping(source = "priceHistory", target = "priceHistory", qualifiedByName = "mapPriceHistory")
     @Mapping(source = "pokemonDetails", target = "pokemonDetails", qualifiedByName = "mapPokemonDetails")
