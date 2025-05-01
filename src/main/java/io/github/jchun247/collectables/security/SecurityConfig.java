@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,6 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/cards/**").permitAll()
                         .requestMatchers("/api/sets/**").permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/users/provision", "POST")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -42,10 +44,12 @@ public class SecurityConfig {
                         )
                         .authenticationEntryPoint((request, response, authException) -> {
                             // Don't send an error 401 for permitAll paths
-                            if (request.getRequestURI().startsWith("/api/cards") ||
-                            request.getRequestURI().startsWith("api/sets")) {
-                                response.setStatus(HttpServletResponse.SC_OK);
-                                return;
+                            String requestURI = request.getRequestURI();
+                            if (requestURI.startsWith("/api/cards") ||
+                                requestURI.startsWith("/api/sets") ||
+                                requestURI.startsWith("/api/users/provision")) {
+                                    response.setStatus(HttpServletResponse.SC_OK);
+                                    return;
                             }
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                         })
@@ -60,7 +64,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOrigins(allowedOrigins);
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
 

@@ -24,7 +24,7 @@ public class UserProfileController {
     private final UserService userService;
 
     @PatchMapping("/me")
-    public ResponseEntity<?> updateMyProfile(@AuthenticationPrincipal Jwt jwt, @RequestBody UpdateProfileRequest updates) {
+    public ResponseEntity<?> updateMyProfile(@AuthenticationPrincipal Jwt jwt, @RequestBody UpdateProfileRequest updateProfileRequest) {
         if (jwt == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
@@ -32,11 +32,11 @@ public class UserProfileController {
 
         try {
             // --- Update Auth0 ---
-            if (updates.getEmail() != null && !updates.getEmail().isEmpty()) {
-                auth0ManagementService.updateUserEmail(auth0UserId, updates.getEmail());
+            if (updateProfileRequest.getEmail() != null && !updateProfileRequest.getEmail().isEmpty()) {
+                auth0ManagementService.updateUserEmail(auth0UserId, updateProfileRequest.getEmail());
             }
-            if (updates.getNickname() != null && !updates.getNickname().isEmpty()) {
-                auth0ManagementService.updateUserNickname(auth0UserId, updates.getNickname());
+            if (updateProfileRequest.getNickname() != null && !updateProfileRequest.getNickname().isEmpty()) {
+                auth0ManagementService.updateUserNickname(auth0UserId, updateProfileRequest.getNickname());
             }
 
             // --- Optional: Update Local DB ---
