@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @Value("${auth0.action.secret")
+    @Value("${auth0.action.secret}")
     private String auth0ActionSecret;
 
     @GetMapping("/me")
@@ -62,7 +62,8 @@ public class UserController {
                     request.getUsername()
             );
             // Consider returning just 200 OK or 204 No Content if the user data isn't needed by Auth0 Action
-            return ResponseEntity.ok(user);
+            // Return 204 No Content since user data isn't needed
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             log.error("Failed to provision user {} via Auth0 Action", request.getAuth0Id(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to provision user");
