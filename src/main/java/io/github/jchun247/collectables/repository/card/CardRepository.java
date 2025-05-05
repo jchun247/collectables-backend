@@ -56,15 +56,6 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             @Param("maxPrice") BigDecimal maxPrice
     );
 
-//    @Query("SELECT c FROM Card c " +
-//            "LEFT JOIN FETCH c.prices " +
-//            "LEFT JOIN FETCH c.images " +
-//            "LEFT JOIN FETCH c.set " +
-//            "WHERE c.id IN :ids")
-//    List<Card> findCardsByIdsSortedByName(
-//            @Param("ids") List<Long> ids,
-//            Sort sort
-//    );
     @EntityGraph(attributePaths = {"images", "set", "prices", "pokemonDetails"})
     @Query("SELECT c FROM Card c WHERE c.id IN :ids")
     List<Card> findCardsByIdsSortedByName(
@@ -94,10 +85,21 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("SELECT c FROM Card c WHERE c.id = :id")
     Optional<Card> findWithBasicDataById(@Param("id") Long id);
 
+    // TODO: retrieving price history should be a separate query
     @EntityGraph(attributePaths = {
-            "pokemonDetails", "rules",
-            "prices", "priceHistory",
-            "subTypes", "images", "variantGroup", "set"})
+            "prices",
+            "priceHistory",
+            "rules",
+            "subTypes",
+            "images",
+            "variantGroup",
+            "set",
+            "pokemonDetails",
+            "pokemonDetails.types",
+            "pokemonDetails.abilities",
+            "pokemonDetails.attacks",
+            "pokemonDetails.attacks.cost"
+    })
     @Query("SELECT c FROM Card c WHERE c.id = :id")
     Optional<Card> findWithAllDataById(Long id);
 }
