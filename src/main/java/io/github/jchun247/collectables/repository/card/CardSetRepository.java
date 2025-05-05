@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CardSetRepository extends JpaRepository<CardSet, Long> {
-    Optional<CardSet> findByCode(String setCode);
+//    Optional<CardSet> findByCode(String setCode);
     @Query("SELECT cs FROM CardSet cs LEFT JOIN FETCH cs.legalities LEFT JOIN FETCH cs.images WHERE cs.series = :series")
     List<CardSet> findAllBySeriesWithCollections(@Param("series") CardSeries series);
     @Query("SELECT DISTINCT cs.series FROM CardSet cs")

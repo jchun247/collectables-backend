@@ -32,29 +32,6 @@ public interface CardMapper {
 
     BasicCardSetDTO toBasicCardSetDTO(CardSet cardSet);
 
-//    @Mapping(source = "cost", target = "cost", qualifiedByName = "mapAttackCosts")
-//    CardAttackDTO toCardAttackDTO(CardAttack attack);
-
-//    @Named("mapTypes")
-//    default Set<CardTypesDTO> mapTypes(Set<CardTypes> types) {
-//        if (types == null) {
-//            return Collections.emptySet();
-//        }
-//        return types.stream()
-//                .map(this::toCardTypesDTO)
-//                .collect(Collectors.toSet());
-//    }
-
-//    @Named("mapAttacks")
-//    default Set<CardAttackDTO> mapAttacks(Set<CardAttack> attacks) {
-//        if (attacks == null) {
-//            return Collections.emptySet();
-//        }
-//        return attacks.stream()
-//                .map(this::toCardAttackDTO)
-//                .collect(Collectors.toSet());
-//    }
-
     @Named("mapPrices")
     default Set<CardPriceDTO> mapPrices(Set<CardPrice> prices) {
         if (prices == null) {
@@ -82,22 +59,6 @@ public interface CardMapper {
         }
         return toCardPokemonDetailsDTO(cardPokemonDetails);
     }
-
-//    @Named("mapAttackCosts")
-//    default List<CardEnergy> mapAttackCosts(List<CardAttackCost> costs) {
-//        if (costs == null) {
-//            return Collections.emptyList();
-//        }
-//        return costs.stream()
-//                .map(CardAttackCost::getCost)
-//                .collect(Collectors.toList());
-//    }
-
-//    CardTypesDTO toCardTypesDTO(CardTypes type);
-
-//    CardAttackDTO toCardAttackDTO(CardAttack attack);
-
-//    CardAbilityDTO toCardAbilityDTO(CardAbility ability);
 
 //    CardVariantGroupDTO toCardVariantGroupDTO(CardVariantGroup variantGroup);
 
