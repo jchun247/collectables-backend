@@ -30,22 +30,23 @@ public class CardController {
             @RequestParam(defaultValue = "NEAR_MINT") CardCondition condition,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String searchText,
             @RequestParam(required = false) CardFinish finish
     ){
         PagedResponse<BasicCardDTO> response = cardService.getCards(page, size, games,
-                setId, rarity, condition, sortOption, minPrice, maxPrice, query, finish);
+                setId, rarity, condition, sortOption, minPrice, maxPrice, searchText, finish);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}/basic")
-    public ResponseEntity<BasicCardDTO> getCardWithBasicData(@PathVariable Long id) {
-        return ResponseEntity.ok(cardService.getCardWithBasicData(id));
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<CardDTO> getCardWithAllData(@PathVariable Long id) {
-        return ResponseEntity.ok(cardService.getCardWithAllData(id));
+    public ResponseEntity<?> getCardById(
+            @PathVariable Long id,
+            @RequestParam(name="view", defaultValue = "FULL") CardView view) {
+        if (view == CardView.BASIC) {
+            return ResponseEntity.ok(cardService.getCardWithBasicData(id));
+        } else {
+            return ResponseEntity.ok(cardService.getCardWithAllData(id));
+        }
     }
 
     @GetMapping("/set/{setId}")
