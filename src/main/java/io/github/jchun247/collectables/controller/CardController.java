@@ -30,11 +30,11 @@ public class CardController {
             @RequestParam(defaultValue = "NEAR_MINT") CardCondition condition,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) String searchText,
+            @RequestParam(required = false) String searchQuery,
             @RequestParam(required = false) CardFinish finish
     ){
         PagedResponse<BasicCardDTO> response = cardService.getCards(page, size, games,
-                setId, rarity, condition, sortOption, minPrice, maxPrice, searchText, finish);
+                setId, rarity, condition, sortOption, minPrice, maxPrice, searchQuery, finish);
         return ResponseEntity.ok(response);
     }
 
@@ -59,10 +59,10 @@ public class CardController {
             @RequestParam(defaultValue = "NEAR_MINT") CardCondition condition,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String searchQuery,
             @RequestParam(required = false) CardFinish finish){
         PagedResponse<BasicCardDTO> response = cardService.getCards(page, size, null,
-                setId, rarity, condition, sortOption, minPrice, maxPrice, query, finish);
+                setId, rarity, condition, sortOption, minPrice, maxPrice, searchQuery, finish);
         return ResponseEntity.ok(response);
     }
 }

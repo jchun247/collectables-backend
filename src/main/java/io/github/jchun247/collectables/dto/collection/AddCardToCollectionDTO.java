@@ -5,14 +5,18 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Data
-public class AddCardRequestDTO {
-    @NotNull
-    private Long collectionId;
+public class AddCardToCollectionDTO {
     @NotNull
     private Long cardId;
     @NotNull
     private CardCondition condition;
     @Min(1)
     private int quantity;
+    private LocalDate purchaseDate;
+    private BigDecimal costBasis;
 }
+

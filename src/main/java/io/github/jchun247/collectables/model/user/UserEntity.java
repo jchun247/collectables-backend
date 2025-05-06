@@ -31,5 +31,5 @@ public class UserEntity {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Collection> collections = new ArrayList<>();
+    private final List<Collection> collections = new ArrayList<>();
 }

@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 // Custom annotation for ownership verification
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-@PreAuthorize("@collectionSecurityUtil.validateCollectionOwnership(#collectionId, auth0Id)")
-public @interface VerifyCollectionCardAccess {
+@PreAuthorize("@collectionSecurityUtil.validateCollectionOwnership(#collectionId, authentication.name)")
+public @interface VerifyCollectionAccess {
 }

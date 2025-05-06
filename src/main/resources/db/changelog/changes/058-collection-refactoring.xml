@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="058" author="jchun247">
+        <!-- Collections table changes -->
+        <addColumn tableName="collections" schemaName="collectables">
+            <column name="updated_at" type="timestamp" />
+        </addColumn>
+        <addColumn tableName="collections" schemaName="collectables">
+            <column name="collection_type" type="varchar(50)" />
+        </addColumn>
+        
+        <!-- Portfolio value history table changes -->
+        <renameTable oldTableName="collection_value_history" newTableName="portfolio_value_history" schemaName="collectables"/>
+        <dropForeignKeyConstraint baseTableName="portfolio_value_history"
+                                  baseTableSchemaName="collectables"
+                                  constraintName="fk_valuehistory_collections"/>
+        <renameColumn tableName="portfolio_value_history" oldColumnName="collection_id" newColumnName="portfolio_id" />
+        <addForeignKeyConstraint baseTableName="portfolio_value_history"
+                                 baseColumnNames="portfolio_id"
+                                 constraintName="fk_valuehistory_portfolios"
+                                 referencedTableName="collections"
+                                 referencedColumnNames="id" />
+    </changeSet>
+</databaseChangeLog>

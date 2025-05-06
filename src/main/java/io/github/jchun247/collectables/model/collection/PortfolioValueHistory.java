@@ -8,17 +8,17 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "collection_value_history")
+@Table(name="portfolio_value_history")
 @Data
 @NoArgsConstructor
-public class CollectionValueHistory {
+public class PortfolioValueHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "collection_id", nullable = false)
-    private Collection collection;
+    @JoinColumn(name = "portfolio_id", nullable = false)
+    private Portfolio portfolio;
 
     private BigDecimal value;
     private LocalDateTime timestamp;

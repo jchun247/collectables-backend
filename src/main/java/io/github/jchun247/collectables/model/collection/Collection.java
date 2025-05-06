@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,8 +18,10 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Collection {
+@SuperBuilder
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "collection_type")
+public abstract class Collection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,11 +41,11 @@ public class Collection {
     @Column(name="created_at")
     private LocalDateTime createdAt;
 
-    @Column(name="current_value")
-    private BigDecimal currentValue = BigDecimal.ZERO;
+    @Column(name="updated_at")
+    private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CollectionValueHistory> valueHistory;
+    @Column(name="current_value")
+    private BigDecimal currentValue;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CollectionCard> cards;
@@ -51,13 +54,6 @@ public class Collection {
     @JoinColumn(name= "user_id")
     private UserEntity user;
 
-    public BigDecimal calculateCurrentValue() {
-        return cards.stream()
-                .map(collectionCard -> collectionCard.getCard().getPrices().stream()
-                        .filter(price -> price.getCondition() == collectionCard.getCondition())
-                        .findFirst()
-                        .map(price -> price.getPrice().multiply(BigDecimal.valueOf(collectionCard.getQuantity())))
-                        .orElse(BigDecimal.ZERO))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+    @Transient
+    public abstract CollectionType getCollectionType();
 }

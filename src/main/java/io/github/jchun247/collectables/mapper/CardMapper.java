@@ -6,10 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -17,6 +15,7 @@ public interface CardMapper {
 
     @Mapping(source = "set.name", target = "setName")
     @Mapping(source = "set.id", target = "setId")
+    @Mapping(source = "images", target="imageUrl", qualifiedByName = "mapImageUrl")
     @Mapping(source = "prices", target = "prices", qualifiedByName = "mapPrices")
     BasicCardDTO toBasicDTO(Card card);
 
@@ -31,6 +30,18 @@ public interface CardMapper {
     CardDTO toCardDTO(Card card);
 
     BasicCardSetDTO toBasicCardSetDTO(CardSet cardSet);
+
+    @Named("mapImageUrl")
+    default String mapImageUrl(Set<CardImage> images) {
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
+        return images.stream()
+                .filter(image -> image.getResolution() == CardImageResolution.LOW_RES)
+                .findFirst()
+                .map(CardImage::getUrl)
+                .orElse(null);
+    }
 
     @Named("mapPrices")
     default Set<CardPriceDTO> mapPrices(Set<CardPrice> prices) {

@@ -29,7 +29,7 @@ public class CardServiceImpl implements CardService{
     public PagedResponse<BasicCardDTO> getCards(int page, int size, List<CardGame> games,
                                            String setId, CardRarity rarity, CardCondition condition,
                                            String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
-                                                String searchQuery, CardFinish finish) {
+                                                String searchQuery, final CardFinish finish) {
 
         List<Long> allMatchingIds = cardRepository.findMatchingCardIds(
                 games, setId, rarity,
@@ -40,7 +40,7 @@ public class CardServiceImpl implements CardService{
         );
 
         if (allMatchingIds.isEmpty()) {
-            return new PagedResponse<>(Collections.emptyList(), Page.empty());
+            return new PagedResponse<>(Page.empty());
         }
 
         // Count total matches for pagination
@@ -75,7 +75,7 @@ public class CardServiceImpl implements CardService{
 
         // Ensure fromIndex is within bounds
         if (fromIndex >= sortedCards.size()) {
-            return new PagedResponse<>(Collections.emptyList(), Page.empty());
+            return new PagedResponse<>(Page.empty());
         }
 
         List<Card> pageOfCards = sortedCards.subList(fromIndex, toIndex);
@@ -85,8 +85,8 @@ public class CardServiceImpl implements CardService{
                 .toList();
 
         Pageable pageable = PageRequest.of(page, size);
-        return new PagedResponse<>(basicCardDTOs,
-                new PageImpl<>(pageOfCards, pageable, totalElements));
+        Page<BasicCardDTO> pageOfBasicCardDTOs = new PageImpl<>(basicCardDTOs, pageable, totalElements);
+        return new PagedResponse<>(pageOfBasicCardDTOs);
     }
 
     @Override

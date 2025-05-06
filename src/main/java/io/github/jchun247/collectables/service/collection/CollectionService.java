@@ -1,20 +1,18 @@
 package io.github.jchun247.collectables.service.collection;
 
-import io.github.jchun247.collectables.dto.collection.CollectionCardDTO;
-import io.github.jchun247.collectables.dto.collection.CollectionDTO;
-import io.github.jchun247.collectables.dto.collection.CreateCollectionDTO;
-import io.github.jchun247.collectables.model.card.CardCondition;
-import io.github.jchun247.collectables.model.collection.Collection;
-import io.github.jchun247.collectables.model.collection.CollectionValueHistory;
-
-import java.util.List;
+import io.github.jchun247.collectables.dto.collection.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CollectionService {
-    CollectionCardDTO addCardToCollection(Long collectionId, Long cardId, CardCondition condition, int quantity);
-    void deleteCardFromCollection(Long collectionId, Long cardId, CardCondition condition, int quantity);
+    CollectionListDTO createCollectionList(CreateCollectionListDTO createCollectionListDTO);
+    PortfolioDTO createPortfolio(CreatePortfolioDTO createPortfolioDTO);
+    void deleteCollection(Long collectionId);
+    CollectionCardDTO addCardToCollection(Long collectionId, AddCardToCollectionDTO addCardToCollectionDTO);
+    void deleteCardFromCollection(Long collectionId, Long collectionCardId, int quantity);
     CollectionDTO getCollectionDetails(Long collectionId);
-    void updateCollectionValue(Collection collection);
+    Page<CollectionCardDTO> getCollectionCards(Long collectionId, Pageable pageable);
+    Page<PortfolioValueHistoryDTO> getPortfolioValueHistory(Long portfolioId, Pageable pageable);
+    Page<CollectionDTO> getCollectionsByUserId(String targetUserAuth0Id, Pageable pageable);
     void updateAllCollections();
-    CollectionDTO createCollection(CreateCollectionDTO createCollectionDto);
-    List<CollectionDTO> getCollectionsByUserId(Long targetUserId, Long requestingUserId);
 }

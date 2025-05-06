@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-public class CollectionValueHistoryDTO {
+public class PortfolioValueHistoryDTO {
     private Long id;
     private BigDecimal value;
     private LocalDateTime timestamp;
