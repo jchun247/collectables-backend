@@ -93,3 +93,7 @@ cors.allowed-origins=<your-frontend-url>
 ```
 
 Additional application configuration may be required for database connection and Auth0 settings.
+
+### License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
