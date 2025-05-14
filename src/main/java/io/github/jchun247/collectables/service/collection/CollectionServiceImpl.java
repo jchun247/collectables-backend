@@ -179,7 +179,8 @@ public class CollectionServiceImpl implements CollectionService {
     @VerifyCollectionViewAccess
     public Page<CollectionCardDTO> getCollectionCards(Long collectionId, Pageable pageable) {
         log.debug("Fetching cards for collection ID: {}", collectionId);
-        return collectionCardRepository.findAsDtoByCollectionId(collectionId, pageable);
+        Page<CollectionCard> collectionCardsPage = collectionCardRepository.findDetailedByCollectionId(collectionId, pageable);
+        return collectionCardsPage.map(collectionMapper::toCollectionCardDto);
     }
 
     @Override

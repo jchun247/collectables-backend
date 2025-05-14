@@ -17,12 +17,11 @@ public interface CollectionCardRepository extends JpaRepository<CollectionCard, 
     Optional<CollectionCard> findByCollectionIdAndCardIdAndConditionAndCostBasisAndPurchaseDate(Long collectionId, Long cardId, CardCondition condition, BigDecimal costBasis, LocalDate purchaseDate);
     Page<CollectionCard> findByCollectionId(Long collectionId, Pageable pageable);
 
-    @Query("SELECT new io.github.jchun247.collectables.dto.collection.CollectionCardDTO(" +
-    "cc.id, cc.collection.id, cc.card.id, cc.condition, cc.quantity, cc.purchaseDate, cc.costBasis " +
-    ") " +
-    "FROM CollectionCard cc " +
-    "JOIN cc.collection col " +
-    "JOIN cc.card c " +
-    "WHERE col.id = :collectionId")
-    Page<CollectionCardDTO> findAsDtoByCollectionId(@Param("collectionId") Long collectionId, Pageable pageable);
+    @Query("SELECT cc FROM CollectionCard cc " +
+            "LEFT JOIN FETCH cc.card c " +               // Fetch the Card entity
+            "LEFT JOIN FETCH c.set cs " +          // Fetch CardSet associated with Card
+            "LEFT JOIN FETCH c.images img " +          // Fetch images associated with Card
+            "LEFT JOIN FETCH c.prices p " +            // Fetch prices associated with Card
+            "WHERE cc.collection.id = :collectionId")
+    Page<CollectionCard> findDetailedByCollectionId(@Param("collectionId") Long collectionId, Pageable pageable);
 }
