@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -194,15 +195,25 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<CollectionDTO> getCollectionsByUserId(String targetUserAuth0Id, Pageable pageable) {
+    public Page<CollectionDTO> getCollectionsByUserId(String targetUserAuth0Id, @Nullable CollectionType collectionType, Pageable pageable) {
         String requestingUserAuth0Id = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
             requestingUserAuth0Id = authentication.getName();
         }
+
+        Class<? extends Collection> entityClassFilter = null; // Use the base class Collection
+        if (collectionType != null) {
+            entityClassFilter = switch (collectionType) {
+                case PORTFOLIO -> Portfolio.class;
+                case LIST -> CollectionList.class;
+            };
+        }
+
         Page<Collection> collectionsPage = collectionRepository.findVisibleCollectionsByUserId(
                 targetUserAuth0Id,
                 requestingUserAuth0Id,
+                entityClassFilter,
                 pageable);
         return collectionsPage.map(collectionMapper::toCollectionDto);
     }

@@ -1,6 +1,7 @@
 package io.github.jchun247.collectables.repository.collection;
 
 import io.github.jchun247.collectables.model.collection.Collection;
+import io.github.jchun247.collectables.model.collection.CollectionType;
 import io.micrometer.common.lang.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,10 +36,12 @@ public interface CollectionRepository extends JpaRepository<Collection, Long>{
     // --- Used for getting all collections for a specific user ---
     @Query("SELECT c FROM Collection c " +
             "WHERE c.user.auth0Id = :targetUserAuth0Id " +
-            "AND (c.isPublic = true OR c.user.auth0Id = :requestingUserAuth0Id)")
+            "AND (c.isPublic = true OR c.user.auth0Id = :requestingUserAuth0Id) " +
+            "AND (:entityClassFilter IS NULL OR TYPE(c) = :entityClassFilter)")
     Page<Collection> findVisibleCollectionsByUserId(
             @Param("targetUserAuth0Id") String targetUserAuth0Id,
-            @Param("requestingUserAuth0Id") @Nullable String requestingUserAuth0Id, // Indicate nullability
+            @Param("requestingUserAuth0Id") @Nullable String requestingUserAuth0Id,
+            @Param("entityClassFilter") @Nullable Class<? extends Collection> entityClassFilter,
             Pageable pageable);
 
     // --- Used for updating all collection values in scheduled job ---

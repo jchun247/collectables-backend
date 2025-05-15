@@ -2,6 +2,7 @@ package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.dto.collection.*;
+import io.github.jchun247.collectables.model.collection.CollectionType;
 import io.github.jchun247.collectables.service.collection.CollectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -78,8 +79,9 @@ public class CollectionController {
     @GetMapping("/users/{auth0UserId}")
     public PagedResponse<CollectionDTO> getCollectionsByUserId(
             @PathVariable String auth0UserId,
+            @RequestParam(name = "type", required = false) CollectionType collectionType,
             Pageable pageable) {
-        Page<CollectionDTO> page = collectionService.getCollectionsByUserId(auth0UserId, pageable);
+        Page<CollectionDTO> page = collectionService.getCollectionsByUserId(auth0UserId, collectionType, pageable);
         return new PagedResponse<>(page);
     }
 }
