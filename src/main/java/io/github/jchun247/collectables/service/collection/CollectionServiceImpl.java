@@ -102,10 +102,11 @@ public class CollectionServiceImpl implements CollectionService {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
 
-        CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndConditionAndCostBasisAndPurchaseDate(
+        CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndConditionAndFinishAndCostBasisAndPurchaseDate(
                     collectionId,
                     addCardToCollectionDTO.getCardId(),
                     addCardToCollectionDTO.getCondition(),
+                    addCardToCollectionDTO.getFinish(),
                     addCardToCollectionDTO.getCostBasis(),
                     addCardToCollectionDTO.getPurchaseDate())
                 .orElseGet(() -> {
@@ -116,6 +117,7 @@ public class CollectionServiceImpl implements CollectionService {
                         .collection(collection)
                         .card(card)
                         .condition(addCardToCollectionDTO.getCondition())
+                        .finish(addCardToCollectionDTO.getFinish())
                         .costBasis(addCardToCollectionDTO.getCostBasis())
                         .purchaseDate(addCardToCollectionDTO.getPurchaseDate())
                         .quantity(0)

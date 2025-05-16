@@ -2,6 +2,7 @@ package io.github.jchun247.collectables.model.collection;
 
 import io.github.jchun247.collectables.model.card.Card;
 import io.github.jchun247.collectables.model.card.CardCondition;
+import io.github.jchun247.collectables.model.card.CardFinish;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,9 @@ public class CollectionCard {
 
     @Enumerated(EnumType.STRING)
     private CardCondition condition;
+
+    @Enumerated(EnumType.STRING)
+    private CardFinish finish;
 
     private int quantity;
     private LocalDate purchaseDate;
