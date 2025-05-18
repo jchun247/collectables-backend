@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 public interface CollectionService {
     CollectionListDTO createCollectionList(CreateCollectionListDTO createCollectionListDTO);
     PortfolioDTO createPortfolio(CreatePortfolioDTO createPortfolioDTO);
+    CollectionDTO updateCollectionDetails(Long collectionId, UpdateCollectionDTO updateCollectionDTO);
     void deleteCollection(Long collectionId);
     CollectionCardDTO addCardToCollection(Long collectionId, AddCardToCollectionDTO addCardToCollectionDTO);
     void deleteCardFromCollection(Long collectionId, Long collectionCardId, int quantity);

@@ -33,6 +33,13 @@ public class CollectionController {
                 .body(collectionService.createPortfolio(createPortfolioDTO));
     }
 
+    @PatchMapping("/{collectionId}")
+    public ResponseEntity<CollectionDTO> updateCollectionDetails(
+            @PathVariable Long collectionId,
+            @RequestBody @Valid UpdateCollectionDTO updateCollectionDTO) {
+        return ResponseEntity.ok(collectionService.updateCollectionDetails(collectionId, updateCollectionDTO));
+    }
+
     @DeleteMapping("/{collectionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCollection(@PathVariable Long collectionId) {

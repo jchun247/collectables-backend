@@ -28,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +82,27 @@ public class CollectionServiceImpl implements CollectionService {
 
         collectionRepository.save(portfolio);
         return collectionMapper.toPortfolioDto(portfolio);
+    }
+
+    @Override
+    @Transactional
+    @VerifyCollectionAccess
+    public CollectionDTO updateCollectionDetails(Long collectionId, UpdateCollectionDTO updateCollectionDTO) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
+
+        // Update fields
+        if (updateCollectionDTO.getName() != null) {
+            collection.setName(updateCollectionDTO.getName());
+        }
+        if (updateCollectionDTO.getDescription() != null) {
+            collection.setDescription(updateCollectionDTO.getDescription());
+        }
+        collection.setPublic(updateCollectionDTO.isPublic());
+        collection.setFavourite(updateCollectionDTO.isFavourite());
+
+        Collection updatedCollection = collectionRepository.save(collection);
+        return collectionMapper.toCollectionDto(updatedCollection);
     }
 
     @Override
