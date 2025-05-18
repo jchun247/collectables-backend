@@ -19,7 +19,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 // SpEL: Calls canViewCollection with collectionId and the principal's name (or null if anonymous)
 // Uses safe navigation (?.) to avoid NPE if 'authentication' is null.
-// Assumes the parameter holding the ID is named 'collectionId'. Adjust if different (e.g., #portfolioId).
 @PreAuthorize("@collectionSecurityUtil.canViewCollection(#collectionId, authentication?.name)")
 public @interface VerifyCollectionViewAccess {
 }
