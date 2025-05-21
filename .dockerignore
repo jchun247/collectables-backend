@@ -1,0 +1,28 @@
+# Git files
+.git
+.gitignore
+
+# Build directories (JAR is copied explicitly)
+build/
+
+# IDE files
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# Log files
+*.log
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Other build outputs/temp files
+**/mvnw
+**/mvnw.cmd
+**/.mvn/
+**/gradlew
+**/gradlew.bat
+**/.gradle/
