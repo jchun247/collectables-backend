@@ -26,7 +26,7 @@ public interface CollectionMapper {
     @Mapping(source = "condition", target="condition")
     @Mapping(source = "finish", target="finish")
     @Mapping(source = "quantity", target="quantity")
-    @Mapping(source = "transactionHistories", target="transactionHistories")
+//    @Mapping(source = "transactionHistories", target="transactionHistories")
     CollectionCardDTO toCollectionCardDto(CollectionCard collectionCard);
 
     CollectionCardTransactionHistoryDTO toCollectionCardTransactionHistoryDto(CollectionCardTransactionHistory transactionHistory);

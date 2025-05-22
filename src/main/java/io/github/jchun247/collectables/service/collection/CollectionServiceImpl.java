@@ -261,6 +261,19 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    @Transactional
+    @VerifyCollectionViewAccess
+    public Page<CollectionCardTransactionHistoryDTO> getCollectionCardTransactionHistory(
+            Long collectionId,
+            Long collectionCardId,
+            Pageable pageable) {
+        log.debug("Fetching transaction history for CollectionCard ID: {}", collectionCardId);
+        Page<CollectionCardTransactionHistory> transactionHistoryPage = collectionCardTransactionHistoryRepository
+                .findTransactionHistoriesByCollectionCardId(collectionCardId, pageable);
+        return transactionHistoryPage.map(collectionMapper::toCollectionCardTransactionHistoryDto);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<CollectionDTO> getCollectionsByUserId(String targetUserAuth0Id, @Nullable CollectionType collectionType, Pageable pageable) {
         String requestingUserAuth0Id = null;

@@ -23,5 +23,5 @@ public class CollectionCardDTO {
     private CardFinish finish;
     private int quantity;
     private BasicCardDTO card;
-    private List<CollectionCardTransactionHistoryDTO> transactionHistories;
+//    private List<CollectionCardTransactionHistoryDTO> transactionHistories;
 }

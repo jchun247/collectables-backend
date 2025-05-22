@@ -83,6 +83,16 @@ public class CollectionController {
         return new PagedResponse<>(page);
     }
 
+    @GetMapping("/{collectionId}/cards/{collectionCardId}/transaction-history")
+    public PagedResponse<CollectionCardTransactionHistoryDTO> getCollectionCardTransactionHistory(
+            @PathVariable Long collectionId,
+            @PathVariable Long collectionCardId,
+            Pageable pageable) {
+        Page<CollectionCardTransactionHistoryDTO> page = collectionService.getCollectionCardTransactionHistory(
+                collectionId, collectionCardId, pageable);
+        return new PagedResponse<>(page);
+    }
+
     @GetMapping("/users/{auth0UserId}")
     public PagedResponse<CollectionDTO> getCollectionsByUserId(
             @PathVariable String auth0UserId,
