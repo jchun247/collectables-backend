@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "collection_cards")
@@ -38,6 +40,17 @@ public class CollectionCard {
     private CardFinish finish;
 
     private int quantity;
-    private LocalDate purchaseDate;
-    private BigDecimal costBasis;
+
+    @OneToMany(mappedBy = "collectionCard", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
+    private List<CollectionCardTransactionHistory> transactionHistories = new ArrayList<>();
+
+    public void addTransactionHistory(CollectionCardTransactionHistory transaction) {
+        transactionHistories.add(transaction);
+        transaction.setCollectionCard(this);
+    }
+
+    public void removeTransactionHistory(CollectionCardTransactionHistory transaction) {
+        transactionHistories.remove(transaction);
+        transaction.setCollectionCard(null);
+    }
 }

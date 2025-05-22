@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="062" author="jchun247">
+        <!-- Remove columns from collection card table -->
+        <dropColumn tableName="collection_cards" schemaName="collectables" columnName="purchase_date"/>
+        <dropColumn tableName="collection_cards" schemaName="collectables" columnName="cost_basis"/>
+
+        <!-- Create new collection card transaction history table -->
+        <createTable tableName="collection_card_transaction_history" schemaName="collectables">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="collection_card_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_collection_card_transaction_history_collection_card" references="collection_cards(id)"/>
+            </column>
+            <column name="condition" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="finish" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="purchase_date" type="date"/>
+            <column name="cost_basis" type="decimal(19,2)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add_auto_increment" author="jchun247">
+        <addAutoIncrement
+                columnName="id"
+                columnDataType="bigint"
+                tableName="collection_card_transaction_history"
+                incrementBy="1"
+                startWith="1"
+                schemaName="collectables"/>
+    </changeSet>
+</databaseChangeLog>

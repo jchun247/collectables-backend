@@ -23,7 +23,13 @@ public interface CollectionMapper {
 //    @Mapping(source = "card.id", target="cardId")
     @Mapping(source = "collection.id", target="collectionId")
     @Mapping(source = "card", target="card")
+    @Mapping(source = "condition", target="condition")
+    @Mapping(source = "finish", target="finish")
+    @Mapping(source = "quantity", target="quantity")
+    @Mapping(source = "transactionHistories", target="transactionHistories")
     CollectionCardDTO toCollectionCardDto(CollectionCard collectionCard);
+
+    CollectionCardTransactionHistoryDTO toCollectionCardTransactionHistoryDto(CollectionCardTransactionHistory transactionHistory);
 
     @Mapping(source = "set.code", target = "setId")
     @Mapping(source = "set.name", target = "setName")

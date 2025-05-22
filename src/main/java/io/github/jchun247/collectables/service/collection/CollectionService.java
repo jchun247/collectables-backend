@@ -11,7 +11,7 @@ public interface CollectionService {
     CollectionDTO updateCollectionDetails(Long collectionId, UpdateCollectionDTO updateCollectionDTO);
     void deleteCollection(Long collectionId);
     CollectionCardDTO addCardToCollection(Long collectionId, AddCardToCollectionDTO addCardToCollectionDTO);
-    void deleteCardFromCollection(Long collectionId, Long collectionCardId, int quantity);
+    void deleteCardFromCollection(Long collectionId, Long collectionCardId, int quantityToRemove);
     CollectionDTO getCollectionDetails(Long collectionId);
     Page<CollectionCardDTO> getCollectionCards(Long collectionId, Pageable pageable);
     Page<PortfolioValueHistoryDTO> getPortfolioValueHistory(Long portfolioId, Pageable pageable);

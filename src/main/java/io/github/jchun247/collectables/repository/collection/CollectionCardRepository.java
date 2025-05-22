@@ -1,6 +1,5 @@
 package io.github.jchun247.collectables.repository.collection;
 
-import io.github.jchun247.collectables.dto.collection.CollectionCardDTO;
 import io.github.jchun247.collectables.model.card.CardCondition;
 import io.github.jchun247.collectables.model.card.CardFinish;
 import io.github.jchun247.collectables.model.collection.CollectionCard;
@@ -10,18 +9,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Optional;
 
 public interface CollectionCardRepository extends JpaRepository<CollectionCard, Long> {
-    Optional<CollectionCard> findByCollectionIdAndCardIdAndConditionAndFinishAndCostBasisAndPurchaseDate(
+    Optional<CollectionCard> findByCollectionIdAndCardIdAndConditionAndFinish(
             Long collectionId,
             Long cardId,
             CardCondition condition,
-            CardFinish finish,
-            BigDecimal costBasis,
-            LocalDate purchaseDate);
+            CardFinish finish
+    );
+
     Page<CollectionCard> findByCollectionId(Long collectionId, Pageable pageable);
 
     @Query("SELECT cc FROM CollectionCard cc " +

@@ -8,6 +8,7 @@ import io.github.jchun247.collectables.model.collection.*;
 import io.github.jchun247.collectables.model.user.UserEntity;
 import io.github.jchun247.collectables.repository.card.CardRepository;
 import io.github.jchun247.collectables.repository.collection.CollectionCardRepository;
+import io.github.jchun247.collectables.repository.collection.CollectionCardTransactionHistoryRepository;
 import io.github.jchun247.collectables.repository.collection.CollectionRepository;
 import io.github.jchun247.collectables.repository.collection.PortfolioValueHistoryRepository;
 import io.github.jchun247.collectables.repository.user.UserRepository;
@@ -35,6 +36,7 @@ import java.time.LocalDateTime;
 public class CollectionServiceImpl implements CollectionService {
     private final CollectionRepository collectionRepository;
     private final CollectionCardRepository collectionCardRepository;
+    private final CollectionCardTransactionHistoryRepository collectionCardTransactionHistoryRepository;
     private final PortfolioValueHistoryRepository portfolioValueHistoryRepository;
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
@@ -118,61 +120,105 @@ public class CollectionServiceImpl implements CollectionService {
     @Transactional
     @VerifyCollectionAccess
     public CollectionCardDTO addCardToCollection(Long collectionId, AddCardToCollectionDTO addCardToCollectionDTO) {
+        // Check if collection and card exist
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
 
-        CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndConditionAndFinishAndCostBasisAndPurchaseDate(
+        Card card = cardRepository.findById(addCardToCollectionDTO.getCardId())
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + addCardToCollectionDTO.getCardId()));
+
+        CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndConditionAndFinish(
                     collectionId,
                     addCardToCollectionDTO.getCardId(),
                     addCardToCollectionDTO.getCondition(),
-                    addCardToCollectionDTO.getFinish(),
-                    addCardToCollectionDTO.getCostBasis(),
-                    addCardToCollectionDTO.getPurchaseDate())
-                .orElseGet(() -> {
-                    Card card = cardRepository.findById(addCardToCollectionDTO.getCardId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + addCardToCollectionDTO.getCardId()));
+                    addCardToCollectionDTO.getFinish())
+                .orElse(null);
 
-                    return CollectionCard.builder()
-                        .collection(collection)
-                        .card(card)
-                        .condition(addCardToCollectionDTO.getCondition())
-                        .finish(addCardToCollectionDTO.getFinish())
-                        .costBasis(addCardToCollectionDTO.getCostBasis())
-                        .purchaseDate(addCardToCollectionDTO.getPurchaseDate())
-                        .quantity(0)
-                        .build();
-                });
+        if (collectionCard == null) {
+            // If the CollectionCard variant doesn't exist in the collection, create a new one.
+            collectionCard = CollectionCard.builder()
+                    .collection(collection)
+                    .card(card)
+                    .condition(addCardToCollectionDTO.getCondition())
+                    .finish(addCardToCollectionDTO.getFinish())
+                    .quantity(0)
+                    .build();
+            // Save the newly created CollectionCard to ensure it has an ID before proceeding
+            collectionCard = collectionCardRepository.save(collectionCard);
+        }
 
-        // Update quantity
+        // Update quantity of card in collection
         collectionCard.setQuantity(collectionCard.getQuantity() + addCardToCollectionDTO.getQuantity());
+        CollectionCard savedCollectionCard = collectionCardRepository.save(collectionCard);
 
-        collectionRepository.save(collection);
-        CollectionCard savedCard = collectionCardRepository.save(collectionCard);
+        // If collection is a portfolio, transaction history record needs to be created
+        if (collection instanceof Portfolio) {
+            // Ensure the savedCollectionCard has an ID. This should always be true now.
+            if (savedCollectionCard.getId() == null) {
+                log.error("Critical error: CollectionCard ID is null after save for cardId: {}. Cannot create transaction history.", addCardToCollectionDTO.getCardId());
+                throw new IllegalStateException("Failed to obtain ID for CollectionCard, transaction cannot be logged.");
+            }
+
+            CollectionCardTransactionHistory newTransaction = CollectionCardTransactionHistory.builder()
+                            .collectionCard(savedCollectionCard)
+                            .condition(addCardToCollectionDTO.getCondition())
+                            .finish(addCardToCollectionDTO.getFinish())
+                            .quantity(addCardToCollectionDTO.getQuantity())
+                            .purchaseDate(addCardToCollectionDTO.getPurchaseDate())
+                            .costBasis(addCardToCollectionDTO.getCostBasis())
+                            .build();
+
+            collectionCardTransactionHistoryRepository.save(newTransaction);
+        }
 
         triggerCollectionUpdate(collection.getId());
-        log.info("Added/updated card {} to collection {} and triggered value update.", savedCard.getCard().getId(), collection.getId());
-        return collectionMapper.toCollectionCardDto(savedCard);
+        log.info("Added/updated card {} (CollectionCard ID: {}) in collection {} and triggered value update.",
+                savedCollectionCard.getCard().getId(), savedCollectionCard.getId(), collection.getId());
+        return collectionMapper.toCollectionCardDto(savedCollectionCard);
     }
 
     @Override
     @Transactional
     @VerifyCollectionAccess
-    public void deleteCardFromCollection(Long collectionId, Long collectionCardId, int quantity) {
+    public void deleteCardFromCollection(Long collectionId, Long collectionCardId, int quantityToRemove) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
         CollectionCard collectionCard = collectionCardRepository.findById(collectionCardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection card not found with id: " + collectionCardId));
-        int newCardQuantity = collectionCard.getQuantity() - quantity;
-        if (newCardQuantity < 0) {
-            throw new IllegalArgumentException("Cannot remove more cards than are in the collection");
-        } else if (newCardQuantity == 0) {
-            collectionCardRepository.delete(collectionCard);
-        } else {
-            collectionCard.setQuantity(newCardQuantity);
-            collectionCardRepository.save(collectionCard);
+
+        // Ensure the card belongs to the specified collection
+        if (!collectionCard.getCollection().getId().equals(collectionId)) {
+            throw new IllegalArgumentException("CollectionCard with id " + collectionCardId +
+                    " does not belong to collection with id " + collectionId);
         }
 
-        collectionRepository.save(collection);
+        int newCardQuantity = collectionCard.getQuantity() - quantityToRemove;
+        if (newCardQuantity < 0) {
+            throw new IllegalArgumentException("Cannot remove more cards (" + quantityToRemove +
+                    ") than are in the collection (" + collectionCard.getQuantity() + ")");
+        } else if (newCardQuantity == 0) {
+            // If the quantity becomes zero, the CollectionCard itself is deleted.
+            // If this collection is a Portfolio, its transaction history should also be removed.
+            if (collection instanceof Portfolio) {
+                // Ensure collectionCard.getId() is not null before attempting to delete history
+                if (collectionCard.getId() != null) {
+                    collectionCardTransactionHistoryRepository.deleteByCollectionCardId(collectionCard.getId());
+                    log.info("Deleted transaction history for CollectionCard ID: {}", collectionCard.getId());
+                } else {
+                    // This case should ideally not be reached if the collectionCard was properly managed.
+                    log.warn("CollectionCard ID is null for collectionCardId {} being deleted. Cannot delete associated transaction history.", collectionCardId);
+                }
+            }
+            collectionCardRepository.delete(collectionCard);
+            log.info("Deleted CollectionCard ID: {} from collection ID: {}", collectionCardId, collectionId);
+        } else {
+            // Otherwise, just update the quantity.
+            collectionCard.setQuantity(newCardQuantity);
+            collectionCardRepository.save(collectionCard);
+            log.info("Updated quantity for CollectionCard ID: {} in collection ID: {}. New quantity: {}",
+                    collectionCardId, collectionId, newCardQuantity);
+        }
+
         triggerCollectionUpdate(collection.getId());
     }
 

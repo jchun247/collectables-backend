@@ -27,9 +27,10 @@ public interface CollectionRepository extends JpaRepository<Collection, Long>{
             "WHERE c.id = :collectionId")
     int calculateCollectionSize(@Param("collectionId") Long collectionId);
 
-    @Query("SELECT COALESCE(SUM(cc.costBasis * cc.quantity), 0.0) " +
+    @Query("SELECT COALESCE(SUM(ccth.costBasis * ccth.quantity), 0.0) " +
             "FROM Portfolio p " + // Query specifically from Portfolio
             "JOIN p.cards cc " +
+            "JOIN cc.transactionHistories ccth " +
             "WHERE p.id = :portfolioId")
     BigDecimal calculateCollectionTotalCostBasis(@Param("portfolioId") Long portfolioId);
 

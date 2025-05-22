@@ -66,4 +66,5 @@
     <include file="db/changelog/changes/059-add-collection_card-fields.xml"/>
     <include file="db/changelog/changes/060-change_purchase_date_col.xml"/>
     <include file="db/changelog/changes/061-add_finish_field.xml"/>
+    <include file="db/changelog/changes/062-add_collection_card_transaction_history_table.xml"/>
 </databaseChangeLog>

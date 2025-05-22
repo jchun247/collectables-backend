@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -47,7 +48,8 @@ public abstract class Collection {
     @Column(name="current_value")
     private BigDecimal currentValue;
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size=20)
     private List<CollectionCard> cards;
 
     @ManyToOne(fetch = FetchType.LAZY)
