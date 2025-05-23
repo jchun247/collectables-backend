@@ -16,6 +16,8 @@ public interface CollectionService {
     Page<CollectionCardDTO> getCollectionCards(Long collectionId, Pageable pageable);
     Page<PortfolioValueHistoryDTO> getPortfolioValueHistory(Long portfolioId, Pageable pageable);
     Page<CollectionCardTransactionHistoryDTO> getCollectionCardTransactionHistory(Long collectionId, Long collectionCardId, Pageable pageable);
+    CollectionCardTransactionHistoryDTO updateTransactionDetails(Long collectionId, Long transactionId, UpdateTransactionDTO updateTransactionDTO);
+    void deleteTransaction(Long collectionId, Long transactionId);
     Page<CollectionDTO> getCollectionsByUserId(String targetUserAuth0Id, CollectionType type, Pageable pageable);
     void updateAllCollections();
 }

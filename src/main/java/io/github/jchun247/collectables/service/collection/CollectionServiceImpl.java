@@ -274,6 +274,37 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    @Transactional
+    // add verification
+    public CollectionCardTransactionHistoryDTO updateTransactionDetails(Long collectionId, Long transactionId, UpdateTransactionDTO updateTransactionDTO) {
+        CollectionCardTransactionHistory transactionHistory = collectionCardTransactionHistoryRepository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction history not found with id: " + transactionId));
+
+        if (updateTransactionDTO.getQuantity() > 0) {
+            transactionHistory.setQuantity(updateTransactionDTO.getQuantity());
+        }
+        if (updateTransactionDTO.getCostBasis() != null) {
+            transactionHistory.setCostBasis(updateTransactionDTO.getCostBasis());
+        }
+        if (updateTransactionDTO.getPurchaseDate() != null) {
+            transactionHistory.setPurchaseDate(updateTransactionDTO.getPurchaseDate());
+        }
+        CollectionCardTransactionHistory updatedTransaction = collectionCardTransactionHistoryRepository.save(transactionHistory);
+        triggerCollectionUpdate(collectionId);
+        return collectionMapper.toCollectionCardTransactionHistoryDto(updatedTransaction);
+    }
+
+    @Override
+    @Transactional
+    // add verification
+    public void deleteTransaction(Long collectionId, Long transactionId) {
+        CollectionCardTransactionHistory collectionCardTransactionHistory = collectionCardTransactionHistoryRepository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection card transaction not found with id: " + transactionId));
+        collectionCardTransactionHistoryRepository.delete(collectionCardTransactionHistory);
+        triggerCollectionUpdate(collectionId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<CollectionDTO> getCollectionsByUserId(String targetUserAuth0Id, @Nullable CollectionType collectionType, Pageable pageable) {
         String requestingUserAuth0Id = null;

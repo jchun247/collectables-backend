@@ -93,6 +93,22 @@ public class CollectionController {
         return new PagedResponse<>(page);
     }
 
+    @PatchMapping("/{collectionId}/transactions/{transactionId}")
+    public ResponseEntity<CollectionCardTransactionHistoryDTO> updateTransaction(
+            @PathVariable Long collectionId,
+            @PathVariable Long transactionId,
+            @RequestBody @Valid UpdateTransactionDTO transactionDTO) {
+        return ResponseEntity.ok(collectionService.updateTransactionDetails(collectionId, transactionId, transactionDTO));
+    }
+
+    @DeleteMapping("/{collectionId}/transactions/{transactionId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTransaction(
+            @PathVariable Long collectionId,
+            @PathVariable Long transactionId) {
+        collectionService.deleteTransaction(collectionId, transactionId);
+    }
+
     @GetMapping("/users/{auth0UserId}")
     public PagedResponse<CollectionDTO> getCollectionsByUserId(
             @PathVariable String auth0UserId,
