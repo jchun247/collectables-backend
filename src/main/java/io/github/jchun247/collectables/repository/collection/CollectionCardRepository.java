@@ -1,5 +1,6 @@
 package io.github.jchun247.collectables.repository.collection;
 
+import io.github.jchun247.collectables.dto.collection.CollectionCardDTO;
 import io.github.jchun247.collectables.model.card.CardCondition;
 import io.github.jchun247.collectables.model.card.CardFinish;
 import io.github.jchun247.collectables.model.collection.CollectionCard;
@@ -19,13 +20,17 @@ public interface CollectionCardRepository extends JpaRepository<CollectionCard, 
             CardFinish finish
     );
 
-    Page<CollectionCard> findByCollectionId(Long collectionId, Pageable pageable);
-
-    @Query("SELECT cc FROM CollectionCard cc " +
-            "LEFT JOIN FETCH cc.card c " +               // Fetch the Card entity
-            "LEFT JOIN FETCH c.set cs " +          // Fetch CardSet associated with Card
-            "LEFT JOIN FETCH c.images img " +          // Fetch images associated with Card
-            "LEFT JOIN FETCH c.prices p " +            // Fetch prices associated with Card
-            "WHERE cc.collection.id = :collectionId")
-    Page<CollectionCard> findDetailedByCollectionId(@Param("collectionId") Long collectionId, Pageable pageable);
+    /**
+     * Finds a page of CollectionCards for a collection and eagerly fetches all ToOne relationships.
+     * This avoids N+1 issues for Card, Set, and Collection details.
+     */
+    @Query("""
+        SELECT cc FROM CollectionCard cc
+        LEFT JOIN FETCH cc.collection
+        LEFT JOIN FETCH cc.card c
+        LEFT JOIN FETCH c.set
+        LEFT JOIN FETCH c.pokemonDetails
+        WHERE cc.collection.id = :collectionId
+    """)
+    Page<CollectionCard> findPageByCollectionId(@Param("collectionId") Long collectionId, Pageable pageable);
 }

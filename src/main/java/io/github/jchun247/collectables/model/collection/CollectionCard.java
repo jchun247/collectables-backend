@@ -9,8 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +36,6 @@ public class CollectionCard {
 
     @Enumerated(EnumType.STRING)
     private CardFinish finish;
-
-    private int quantity;
 
     @OneToMany(mappedBy = "collectionCard", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
     private List<CollectionCardTransactionHistory> transactionHistories = new ArrayList<>();

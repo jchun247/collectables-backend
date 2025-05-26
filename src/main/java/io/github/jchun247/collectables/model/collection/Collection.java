@@ -36,17 +36,11 @@ public abstract class Collection {
     @Column(name="is_favourite")
     private boolean isFavourite;
 
-    @Column(name="num_products")
-    private int numProducts;
-
     @Column(name="created_at")
     private LocalDateTime createdAt;
 
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name="current_value")
-    private BigDecimal currentValue;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
     @BatchSize(size=20)

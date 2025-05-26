@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
 
@@ -102,4 +103,16 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     })
     @Query("SELECT c FROM Card c WHERE c.id = :id")
     Optional<Card> findWithAllDataById(Long id);
+
+    /**
+     * Fetches a list of Cards by their IDs and eagerly loads their associated
+     * collections of prices and images
+     */
+    @Query("""
+        SELECT DISTINCT c FROM Card c
+        LEFT JOIN FETCH c.prices
+        LEFT JOIN FETCH c.images
+        WHERE c.id IN :cardIds
+    """)
+    Set<Card> findCardsWithDetailsByIds(@Param("cardIds") List<Long> cardIds);
 }

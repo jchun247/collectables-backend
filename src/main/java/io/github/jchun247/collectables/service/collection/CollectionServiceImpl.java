@@ -28,7 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,8 +56,6 @@ public class CollectionServiceImpl implements CollectionService {
                 .description(createCollectionListDTO.getDescription() != null ? createCollectionListDTO.getDescription() : "")
                 .isPublic(createCollectionListDTO.isPublic())
                 .isFavourite(false)
-                .numProducts(0)
-                .currentValue(BigDecimal.ZERO)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .user(user)
@@ -61,7 +63,11 @@ public class CollectionServiceImpl implements CollectionService {
                 .build();
 
         collectionRepository.save(collectionList);
-        return collectionMapper.toCollectionListDto(collectionList);
+        // Set numProducts and currentValue to zero for new collection lists
+        CollectionListDTO dto = collectionMapper.toCollectionListDto(collectionList);
+        dto.setNumProducts(0);
+        dto.setCurrentValue(BigDecimal.ZERO);
+        return dto;
     }
 
     @Override
@@ -74,16 +80,18 @@ public class CollectionServiceImpl implements CollectionService {
                 .description(createPortfolioDto.getDescription() != null ? createPortfolioDto.getDescription() : "")
                 .isPublic(createPortfolioDto.isPublic())
                 .isFavourite(false)
-                .numProducts(0)
-                .currentValue(BigDecimal.ZERO)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .user(user)
-                .totalCostBasis(createPortfolioDto.getTotalCostBasis())
                 .build();
 
         collectionRepository.save(portfolio);
-        return collectionMapper.toPortfolioDto(portfolio);
+        // Set numProducts, currentValue, total cost basis to zero for new portfolios
+        PortfolioDTO dto = collectionMapper.toPortfolioDto(portfolio);
+        dto.setNumProducts(0);
+        dto.setCurrentValue(BigDecimal.ZERO);
+        dto.setTotalCostBasis(BigDecimal.ZERO);
+        return dto;
     }
 
     @Override
@@ -104,7 +112,8 @@ public class CollectionServiceImpl implements CollectionService {
         collection.setFavourite(updateCollectionDTO.isFavourite());
 
         Collection updatedCollection = collectionRepository.save(collection);
-        return collectionMapper.toCollectionDto(updatedCollection);
+
+        return populateCollectionDto(updatedCollection);
     }
 
     @Override
@@ -127,60 +136,51 @@ public class CollectionServiceImpl implements CollectionService {
         Card card = cardRepository.findById(addCardToCollectionDTO.getCardId())
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + addCardToCollectionDTO.getCardId()));
 
+        // Create collectionCard if it doesn't exist
         CollectionCard collectionCard = collectionCardRepository.findByCollectionIdAndCardIdAndConditionAndFinish(
                     collectionId,
                     addCardToCollectionDTO.getCardId(),
                     addCardToCollectionDTO.getCondition(),
                     addCardToCollectionDTO.getFinish())
-                .orElse(null);
-
-        if (collectionCard == null) {
-            // If the CollectionCard variant doesn't exist in the collection, create a new one.
-            collectionCard = CollectionCard.builder()
-                    .collection(collection)
-                    .card(card)
-                    .condition(addCardToCollectionDTO.getCondition())
-                    .finish(addCardToCollectionDTO.getFinish())
-                    .quantity(0)
-                    .build();
-            // Save the newly created CollectionCard to ensure it has an ID before proceeding
-            collectionCard = collectionCardRepository.save(collectionCard);
-        }
-
-        // Update quantity of card in collection
-        collectionCard.setQuantity(collectionCard.getQuantity() + addCardToCollectionDTO.getQuantity());
-        CollectionCard savedCollectionCard = collectionCardRepository.save(collectionCard);
-
-        // If collection is a portfolio, transaction history record needs to be created
-        if (collection instanceof Portfolio) {
-            // Ensure the savedCollectionCard has an ID. This should always be true now.
-            if (savedCollectionCard.getId() == null) {
-                log.error("Critical error: CollectionCard ID is null after save for cardId: {}. Cannot create transaction history.", addCardToCollectionDTO.getCardId());
-                throw new IllegalStateException("Failed to obtain ID for CollectionCard, transaction cannot be logged.");
-            }
-
-            CollectionCardTransactionHistory newTransaction = CollectionCardTransactionHistory.builder()
-                            .collectionCard(savedCollectionCard)
+                .orElseGet(() -> {
+                    CollectionCard newCollectionCard = CollectionCard.builder()
+                            .collection(collection)
+                            .card(card)
                             .condition(addCardToCollectionDTO.getCondition())
                             .finish(addCardToCollectionDTO.getFinish())
-                            .quantity(addCardToCollectionDTO.getQuantity())
-                            .purchaseDate(addCardToCollectionDTO.getPurchaseDate())
-                            .costBasis(addCardToCollectionDTO.getCostBasis())
                             .build();
+                    return collectionCardRepository.save(newCollectionCard);
+                });
 
-            collectionCardTransactionHistoryRepository.save(newTransaction);
-        }
+        // Add a new transaction history record and save it
+        CollectionCardTransactionHistory newTransaction = CollectionCardTransactionHistory.builder()
+                .collectionCard(collectionCard)
+                .condition(addCardToCollectionDTO.getCondition())
+                .finish(addCardToCollectionDTO.getFinish())
+                .quantity(addCardToCollectionDTO.getQuantity())
+                .purchaseDate(addCardToCollectionDTO.getPurchaseDate())
+                .costBasis(addCardToCollectionDTO.getCostBasis() != null ? addCardToCollectionDTO.getCostBasis() : BigDecimal.ZERO)
+                .build();
 
-        triggerCollectionUpdate(collection.getId());
-        log.info("Added/updated card {} (CollectionCard ID: {}) in collection {} and triggered value update.",
-                savedCollectionCard.getCard().getId(), savedCollectionCard.getId(), collection.getId());
-        return collectionMapper.toCollectionCardDto(savedCollectionCard);
+        collectionCardTransactionHistoryRepository.save(newTransaction);
+        log.info("Added/updated card {} (CollectionCard ID: {}) to collection {}.",
+                collectionCard.getCard().getId(), collectionCard.getId(), collection.getId());
+
+        CollectionCardDTO dto = collectionMapper.toCollectionCardDto(collectionCard);
+        dto.setQuantity(collectionRepository.calculateCollectionSize(collectionId));
+        return dto;
     }
 
     @Override
     @Transactional
     @VerifyCollectionAccess
-    public void deleteCardFromCollection(Long collectionId, Long collectionCardId, int quantityToRemove) {
+    public void deleteCardFromCollection(Long collectionId, Long collectionCardId, DeleteCardFromCollectionDTO deleteCardFromCollectionDTO) {
+        if (deleteCardFromCollectionDTO.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Quantity to remove must be positive.");
+        }
+        int quantityToRemove = deleteCardFromCollectionDTO.getQuantity();
+
+        // Check if collection and collectionCard exist
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
         CollectionCard collectionCard = collectionCardRepository.findById(collectionCardId)
@@ -192,34 +192,33 @@ public class CollectionServiceImpl implements CollectionService {
                     " does not belong to collection with id " + collectionId);
         }
 
-        int newCardQuantity = collectionCard.getQuantity() - quantityToRemove;
-        if (newCardQuantity < 0) {
+        int currentQuantity = collectionCardTransactionHistoryRepository.sumQuantityByCollectionCardId(collectionCardId);
+
+        if (quantityToRemove > currentQuantity) {
             throw new IllegalArgumentException("Cannot remove more cards (" + quantityToRemove +
-                    ") than are in the collection (" + collectionCard.getQuantity() + ")");
-        } else if (newCardQuantity == 0) {
-            // If the quantity becomes zero, the CollectionCard itself is deleted.
-            // If this collection is a Portfolio, its transaction history should also be removed.
-            if (collection instanceof Portfolio) {
-                // Ensure collectionCard.getId() is not null before attempting to delete history
-                if (collectionCard.getId() != null) {
-                    collectionCardTransactionHistoryRepository.deleteByCollectionCardId(collectionCard.getId());
-                    log.info("Deleted transaction history for CollectionCard ID: {}", collectionCard.getId());
-                } else {
-                    // This case should ideally not be reached if the collectionCard was properly managed.
-                    log.warn("CollectionCard ID is null for collectionCardId {} being deleted. Cannot delete associated transaction history.", collectionCardId);
-                }
-            }
-            collectionCardRepository.delete(collectionCard);
-            log.info("Deleted CollectionCard ID: {} from collection ID: {}", collectionCardId, collectionId);
-        } else {
-            // Otherwise, just update the quantity.
-            collectionCard.setQuantity(newCardQuantity);
-            collectionCardRepository.save(collectionCard);
-            log.info("Updated quantity for CollectionCard ID: {} in collection ID: {}. New quantity: {}",
-                    collectionCardId, collectionId, newCardQuantity);
+                    ") than are in the collection (" + currentQuantity + ")");
         }
 
-        triggerCollectionUpdate(collection.getId());
+        if (quantityToRemove == currentQuantity) {
+            // If the final quantity will be zero, remove the card and all its history.
+            collectionCardRepository.delete(collectionCard);
+            log.info("Deleted CollectionCard ID: {} and its history from collection ID: {} as quantity became zero.",
+                    collectionCardId, collectionId);
+        } else {
+            // If there's remaining quantity, record the removal as a negative transaction.
+            CollectionCardTransactionHistory removalTransaction = CollectionCardTransactionHistory.builder()
+                    .collectionCard(collectionCard)
+                    .condition(collectionCard.getCondition())
+                    .finish(collectionCard.getFinish())
+                    .quantity(-quantityToRemove)
+                    .purchaseDate(LocalDate.now())
+                    .costBasis(deleteCardFromCollectionDTO.getCostBasis())
+                    .build();
+
+            collectionCardTransactionHistoryRepository.save(removalTransaction);
+            log.info("Recorded removal of {} item(s) for CollectionCard ID: {}. New calculated quantity: {}",
+                    quantityToRemove, collectionCardId, (currentQuantity - quantityToRemove));
+        }
     }
 
     @Override
@@ -230,16 +229,7 @@ public class CollectionServiceImpl implements CollectionService {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
 
-        // Type check and specific mappings
-        if (collection instanceof Portfolio) {
-            return collectionMapper.toPortfolioDto((Portfolio) collection);
-        } else if (collection instanceof CollectionList) {
-            return collectionMapper.toCollectionListDto((CollectionList) collection);
-        } else {
-            // Should ideally not reach here if the data is consistent
-            log.error("Unknown collection type found for ID: {}", collectionId);
-            throw new IllegalArgumentException("Unknown collection type found for ID: " + collectionId);
-        }
+        return populateCollectionDto(collection);
     }
 
     @Override
@@ -247,8 +237,38 @@ public class CollectionServiceImpl implements CollectionService {
     @VerifyCollectionViewAccess
     public Page<CollectionCardDTO> getCollectionCards(Long collectionId, Pageable pageable) {
         log.debug("Fetching cards for collection ID: {}", collectionId);
-        Page<CollectionCard> collectionCardsPage = collectionCardRepository.findDetailedByCollectionId(collectionId, pageable);
-        return collectionCardsPage.map(collectionMapper::toCollectionCardDto);
+
+        Page<CollectionCard> collectionCardsPage = collectionCardRepository.findPageByCollectionId(collectionId, pageable);
+
+        if (!collectionCardsPage.hasContent()) {
+            return Page.empty(pageable);
+        }
+
+        List<Long> collectionCardIds = collectionCardsPage.stream().map(CollectionCard::getId).toList();
+        List<Long> cardIds = collectionCardsPage.stream().map(cc -> cc.getCard().getId()).toList();
+
+        Map<Long, Integer> quantityMap = collectionCardTransactionHistoryRepository.sumQuantitiesByCollectionCardIds(collectionCardIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        CollectionCardQuantity::collectionCardId,
+                        stats -> stats.totalQuantity().intValue()
+                ));
+
+        Map<Long, Card> cardDetailsMap = cardRepository.findCardsWithDetailsByIds(cardIds)
+                .stream()
+                .collect(Collectors.toMap(Card::getId, card -> card));
+
+        return collectionCardsPage.map(collectionCard -> {
+            // Replace the potentially lazy Card object with our fully loaded one.
+            collectionCard.setCard(cardDetailsMap.get(collectionCard.getCard().getId()));
+
+            // The mapper can now access all details (prices, images) without triggering lazy loads.
+            CollectionCardDTO dto = collectionMapper.toCollectionCardDto(collectionCard);
+
+            // Set the correct quantity from our map.
+            dto.setQuantity(quantityMap.getOrDefault(collectionCard.getId(), 0));
+            return dto;
+        });
     }
 
     @Override
@@ -275,14 +295,28 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     @Transactional
-    // add verification
+    @VerifyCollectionAccess
     public CollectionCardTransactionHistoryDTO updateTransactionDetails(Long collectionId, Long transactionId, UpdateTransactionDTO updateTransactionDTO) {
         CollectionCardTransactionHistory transactionHistory = collectionCardTransactionHistoryRepository.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction history not found with id: " + transactionId));
-
-        if (updateTransactionDTO.getQuantity() > 0) {
-            transactionHistory.setQuantity(updateTransactionDTO.getQuantity());
+        if (!transactionHistory.getCollectionCard().getCollection().getId().equals(collectionId)) {
+            throw new IllegalArgumentException("Transaction " + transactionId + " does not belong to collection " + collectionId);
         }
+
+        int newQuantity = updateTransactionDTO.getQuantity();
+
+        if (newQuantity == 0) {
+            throw new IllegalArgumentException("Updating quantity to zero is not allowed. Please use the delete transaction endpoint instead.");
+        }
+
+        // Prevent changing the transaction type (buy vs. sell)
+        // This check fails if one quantity is positive and the other is negative.
+        if ((long) transactionHistory.getQuantity() * newQuantity < 0) {
+            throw new IllegalArgumentException("Cannot change the transaction from a purchase to a sale (or vice-versa). Please create a new transaction to record a sale.");
+        }
+
+        transactionHistory.setQuantity(newQuantity);
+
         if (updateTransactionDTO.getCostBasis() != null) {
             transactionHistory.setCostBasis(updateTransactionDTO.getCostBasis());
         }
@@ -290,18 +324,32 @@ public class CollectionServiceImpl implements CollectionService {
             transactionHistory.setPurchaseDate(updateTransactionDTO.getPurchaseDate());
         }
         CollectionCardTransactionHistory updatedTransaction = collectionCardTransactionHistoryRepository.save(transactionHistory);
-        triggerCollectionUpdate(collectionId);
         return collectionMapper.toCollectionCardTransactionHistoryDto(updatedTransaction);
     }
 
     @Override
     @Transactional
-    // add verification
+    @VerifyCollectionAccess
     public void deleteTransaction(Long collectionId, Long transactionId) {
         CollectionCardTransactionHistory collectionCardTransactionHistory = collectionCardTransactionHistoryRepository.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection card transaction not found with id: " + transactionId));
+
+        CollectionCard parentCollectionCard = collectionCardTransactionHistory.getCollectionCard();
+
+        if (!parentCollectionCard.getCollection().getId().equals(collectionId)) {
+            throw new IllegalArgumentException("Transaction " + transactionId + " does not belong to collection " + collectionId);
+        }
+
         collectionCardTransactionHistoryRepository.delete(collectionCardTransactionHistory);
-        triggerCollectionUpdate(collectionId);
+        log.info("Deleted transaction ID: {}", transactionId);
+
+        long remainingCount = collectionCardTransactionHistoryRepository.countByCollectionCardId(parentCollectionCard.getId());
+        log.debug("Remaining transactions for CollectionCard ID {}: {}", parentCollectionCard.getId(), remainingCount);
+
+        if (remainingCount == 0) {
+            collectionCardRepository.delete(parentCollectionCard);
+            log.info("Deleted CollectionCard ID: {} as it has no remaining transactions.", parentCollectionCard.getId());
+        }
     }
 
     @Override
@@ -313,7 +361,7 @@ public class CollectionServiceImpl implements CollectionService {
             requestingUserAuth0Id = authentication.getName();
         }
 
-        Class<? extends Collection> entityClassFilter = null; // Use the base class Collection
+        Class<? extends Collection> entityClassFilter = null;
         if (collectionType != null) {
             entityClassFilter = switch (collectionType) {
                 case PORTFOLIO -> Portfolio.class;
@@ -321,41 +369,32 @@ public class CollectionServiceImpl implements CollectionService {
             };
         }
 
+        // 1. Fetch the page of entities
         Page<Collection> collectionsPage = collectionRepository.findVisibleCollectionsByUserId(
                 targetUserAuth0Id,
                 requestingUserAuth0Id,
                 entityClassFilter,
                 pageable);
-        return collectionsPage.map(collectionMapper::toCollectionDto);
-    }
 
-    @Transactional
-    protected Collection triggerCollectionUpdate(Long collectionId) {
-        Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId + " during update trigger."));
-
-        // Calculate common values using repository methods
-        BigDecimal newCollectionValue = collectionRepository.calculateCollectionValue(collectionId);
-        int newNumProducts = collectionRepository.calculateCollectionSize(collectionId);
-
-        // Update common fields
-        collection.setCurrentValue(newCollectionValue);
-        collection.setNumProducts(newNumProducts);
-        collection.setUpdatedAt(LocalDateTime.now());
-
-        // Handle portfolio specific updates
-        if (collection instanceof Portfolio portfolio) {
-            BigDecimal newTotalCostBasis = collectionRepository.calculateCollectionTotalCostBasis(collectionId);
-            portfolio.setTotalCostBasis(newTotalCostBasis);
-            log.info("Updated Portfolio-specific fields for ID: {}. New Cost Basis: {}", collectionId, newTotalCostBasis);
-        } else {
-            log.info("Updated common fields for CollectionList ID: {}", collectionId);
+        if (!collectionsPage.hasContent()) {
+            return Page.empty(pageable);
         }
 
-        Collection savedCollection = collectionRepository.save(collection);
-        log.info("Triggered value update complete for Collection ID: {}. New Value: {}, NumProducts: {}",
-                collectionId, newCollectionValue, newNumProducts);
-        return savedCollection;
+        // 2. Get IDs and fetch all stats in one batch query
+        List<Long> collectionIds = collectionsPage.stream()
+                .map(Collection::getId)
+                .toList();
+
+        Map<Long, CollectionStats> statsMap = collectionRepository.getBulkStatsForCollections(collectionIds).stream()
+                .collect(Collectors.toMap(CollectionStats::collectionId, stats -> stats));
+
+        // 3. Map to DTOs, combining entities with their fetched stats
+        return collectionsPage.map(collection -> {
+            // Use the helper method you created earlier, but provide it with stats
+            return populateCollectionDtoWithStats(collection, statsMap.getOrDefault(collection.getId(),
+                    new CollectionStats(collection.getId(), 0L, BigDecimal.ZERO, BigDecimal.ZERO)));
+        });
+
     }
 
     @Override
@@ -378,13 +417,13 @@ public class CollectionServiceImpl implements CollectionService {
                     // NOTE: If using pages, triggerCollectionValueUpdate might need adjustments
                     // if it relies on specific transactional boundaries not spanning the whole page.
                     // It might be safer to recalculate/update directly here or call trigger method carefully.
-                    Collection updatedCollection = triggerCollectionUpdate(collection.getId()); // Assuming trigger works per item transactionally
+//                    Collection updatedCollection = triggerCollectionUpdate(collection.getId()); // Assuming trigger works per item transactionally
                     updatedCount++;
 
-                    if (updatedCollection instanceof Portfolio portfolio) {
+                    if (collection instanceof Portfolio portfolio) {
                         PortfolioValueHistory historyEntry = new PortfolioValueHistory();
                         historyEntry.setPortfolio(portfolio);
-                        historyEntry.setValue(portfolio.getCurrentValue());
+                        historyEntry.setValue(collectionRepository.calculateCollectionValue(collection.getId()));
                         historyEntry.setTimestamp(portfolio.getUpdatedAt());
                         portfolioValueHistoryRepository.save(historyEntry);
                         historyCreatedCount++;
@@ -399,8 +438,50 @@ public class CollectionServiceImpl implements CollectionService {
         log.info("Finished scheduled collection value update. Collections processed: {}, History entries created: {}, Errors: {}", updatedCount, historyCreatedCount, errorCount);
     }
 
+
+    /* Helper Methods */
     private UserEntity findUserByAuth0IdOrThrow(String auth0Id) {
         return userRepository.findByAuth0Id(auth0Id).orElseThrow(() ->
                 new ResourceNotFoundException("User not found with auth0Id: " + auth0Id));
     }
+
+    private CollectionDTO populateCollectionDto(Collection collection) {
+        Long collectionId = collection.getId();
+
+        // 1. Calculate the dynamic values
+        int numProducts = collectionRepository.calculateCollectionSize(collectionId);
+        BigDecimal currentValue = collectionRepository.calculateCollectionValue(collectionId);
+
+        // 2. Use the mapper to handle polymorphism and map base fields
+        CollectionDTO dto;
+        if (collection instanceof Portfolio) {
+            PortfolioDTO portfolioDTO = collectionMapper.toPortfolioDto((Portfolio) collection);
+//            dto = collectionMapper.toPortfolioDto((Portfolio) collection);
+            portfolioDTO.setTotalCostBasis(collectionRepository.calculateCollectionTotalCostBasis(collectionId));
+            dto = portfolioDTO;
+        } else { // Handles CollectionList and any other non-portfolio types
+            dto = collectionMapper.toCollectionListDto((CollectionList) collection);
+        }
+
+        // 3. Set the calculated values on the DTO
+        dto.setNumProducts(numProducts);
+        dto.setCurrentValue(currentValue);
+
+        return dto;
+    }
+
+    private CollectionDTO populateCollectionDtoWithStats(Collection collection, CollectionStats stats) {
+        CollectionDTO dto;
+        if (collection instanceof Portfolio) {
+            dto = collectionMapper.toPortfolioDto((Portfolio) collection);
+            ((PortfolioDTO) dto).setTotalCostBasis(stats.totalCostBasis());
+        } else {
+            dto = collectionMapper.toCollectionListDto((CollectionList) collection);
+        }
+        dto.setNumProducts((int) stats.numProducts());
+        dto.setCurrentValue(stats.currentValue());
+        // The mapper correctly sets the collectionType via the abstract getter
+        return dto;
+    }
+
 }

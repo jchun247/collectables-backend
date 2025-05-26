@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="063" author="jchun247">
+        <dropColumn tableName="collection_cards" schemaName="collectables" columnName="quantity"/>
+        <dropColumn tableName="collections" schemaName="collectables" columnName="num_products"/>
+        <dropColumn tableName="collections" schemaName="collectables" columnName="current_value"/>
+        <dropColumn tableName="collections" schemaName="collectables" columnName="total_cost_basis"/>
+    </changeSet>
+</databaseChangeLog>

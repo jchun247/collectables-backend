@@ -8,5 +8,5 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CreatePortfolioDTO extends CreateCollectionDTO{
-    private BigDecimal totalCostBasis;
+//    private BigDecimal totalCostBasis;
 }

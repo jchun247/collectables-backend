@@ -19,8 +19,6 @@ import java.util.Set;
 @NoArgsConstructor
 @SuperBuilder
 public class Portfolio extends Collection {
-    private BigDecimal totalCostBasis;
-
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PortfolioValueHistory> valueHistory;
 

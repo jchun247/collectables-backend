@@ -6,14 +6,11 @@ import io.github.jchun247.collectables.model.collection.CollectionType;
 import io.github.jchun247.collectables.service.collection.CollectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.sql.Delete;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/collections")
@@ -58,8 +55,8 @@ public class CollectionController {
     public void removeCardsFromCollection(
             @PathVariable Long collectionId,
             @PathVariable Long collectionCardId,
-            @RequestParam(name="quantity") int quantity) {
-        collectionService.deleteCardFromCollection(collectionId, collectionCardId, quantity);
+            @RequestBody @Valid DeleteCardFromCollectionDTO deleteCardFromCollectionDTO) {
+        collectionService.deleteCardFromCollection(collectionId, collectionCardId, deleteCardFromCollectionDTO);
     }
 
     @GetMapping("/{collectionId}")
