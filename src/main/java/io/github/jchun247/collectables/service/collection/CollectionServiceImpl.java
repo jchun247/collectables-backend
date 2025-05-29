@@ -17,6 +17,7 @@ import io.github.jchun247.collectables.security.VerifyCollectionViewAccess;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
@@ -248,21 +249,47 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     @Transactional(readOnly = true)
     @VerifyCollectionViewAccess
-    public Page<CollectionCardDTO> getCollectionCards(Long collectionId, Pageable pageable) {
+    public Page<CollectionCardDTO> getCollectionCards(Long collectionId, @Nullable String cardName, Pageable pageable) {
         log.debug("Fetching cards for collection ID: {}", collectionId);
 
-        Page<CollectionCard> collectionCardsPage = collectionCardRepository.findPageByCollectionId(collectionId, pageable);
+        // Get a page of sorted CollectionCardIDs and their calculated total stack values
+        Page<Object[]> sortedIdAndTotalStackValuePage = collectionCardRepository.findCollectionCardIdsAndTotalStackValueSorted(collectionId, cardName, pageable);
 
-        if (!collectionCardsPage.hasContent()) {
+        if (!sortedIdAndTotalStackValuePage.hasContent()) {
             return Page.empty(pageable);
         }
 
-        List<Long> collectionCardIds = collectionCardsPage.stream().map(CollectionCard::getId).toList();
-        List<Long> cardIds = collectionCardsPage.stream().map(cc -> cc.getCard().getId()).toList();
+        // Extract the sorted list of IDs and their values into maps
+        List<Long> sortedCollectionCardIds = sortedIdAndTotalStackValuePage.getContent().stream()
+                .map(row -> (Long) row[0]) // First element is collection card ID
+                .toList();
 
-        // Fetch raw results as an object array and manually map them to CollectionCardStats
-        List<Object[]> results = collectionCardTransactionHistoryRepository.getBulkStatsForCollectionCards(collectionCardIds);
+        Map<Long, BigDecimal> totalStackValueMap = sortedIdAndTotalStackValuePage.getContent().stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],      // collectionCardId
+                        row -> (BigDecimal) row[1] // calculatedTotalStackValue
+                ));
 
+        // Fetch the full collection card entities for these IDs
+        Map<Long, CollectionCard> collectionCardMap = collectionCardRepository.findAllByIdsEagerly(sortedCollectionCardIds).stream()
+                .collect(Collectors.toMap(CollectionCard::getId, cc -> cc));
+
+        // Re-order them according to sortedCollectionCardIds to maintain the sort
+        List<CollectionCard> sortedCollectionCards = sortedCollectionCardIds.stream()
+                .map(collectionCardMap::get)
+                .filter(java.util.Objects::nonNull) // Filter out any nulls if an ID wasn't found (shouldn't happen)
+                .toList();
+
+        // Should not happen if sortedIdAndTotalStackValuePage had content
+        if (sortedCollectionCards.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // Fetch other bulk stats and card details using sortedCollectionCardIDs
+        List<Long> cardEntityIds = sortedCollectionCards.stream().map(cc -> cc.getCard().getId()).toList();
+
+        // Fetch raw results and manually map them into CollectionCardStats, then collect to a map
+        List<Object[]> results = collectionCardTransactionHistoryRepository.getBulkStatsForCollectionCards(sortedCollectionCardIds);
         Map<Long, CollectionCardStats> statsMap = results.stream()
                 .map(row -> new CollectionCardStats(
                         (Long) row[0],                                  // collectionCardId
@@ -274,16 +301,48 @@ public class CollectionServiceImpl implements CollectionService {
                 ))
                 .collect(Collectors.toMap(CollectionCardStats::collectionCardId, stats -> stats));
 
-        Map<Long, Card> cardDetailsMap = cardRepository.findCardsWithDetailsByIds(cardIds)
+        Map<Long, Card> cardDetailsMap = cardRepository.findCardsWithDetailsByIds(cardEntityIds)
                 .stream()
                 .collect(Collectors.toMap(Card::getId, card -> card));
 
-        return collectionCardsPage.map(collectionCard -> {
-            collectionCard.setCard(cardDetailsMap.get(collectionCard.getCard().getId()));
-            CollectionCardStats stats = statsMap.get(collectionCard.getId());
+        List<CollectionCardDTO> collectionCardDTOs = sortedCollectionCards.stream()
+                .map(collectionCard -> {
+                    // Ensure the Card entity within CollectionCard is the fully loaded one
+                    Card detailedCard = cardDetailsMap.get(collectionCard.getCard().getId());
+                    if (detailedCard != null) {
+                        collectionCard.setCard(detailedCard);
+                    }
 
-            return populateCollectionCardDtoWithStats(collectionCard, stats);
-        });
+                    CollectionCardDTO dto = collectionMapper.toCollectionCardDto(collectionCard);
+                    CollectionCardStats stats = statsMap.get(collectionCard.getId());
+                    // Get the pre-calculated total stack value for this card (this is what we sorted by)
+                    BigDecimal preCalculatedTotalStackValue = totalStackValueMap.get(collectionCard.getId());
+
+                    if (stats != null) {
+                        // Calculate financial values based on the building blocks from CollectionCardStats
+                        BigDecimal costOfGoodsSold = stats.totalProceedsFromSells().subtract(stats.totalRealizedGain());
+                        BigDecimal costBasisOfRemaining = stats.totalCostOfBuys().subtract(costOfGoodsSold);
+                        BigDecimal unrealizedGain = (preCalculatedTotalStackValue != null ? preCalculatedTotalStackValue : BigDecimal.ZERO).subtract(costBasisOfRemaining);
+
+                        dto.setQuantity((int) stats.totalQuantity());
+                        // The 'currentValue' field in CollectionCardDTO should represent the total stack value.
+                        dto.setCurrentValue(preCalculatedTotalStackValue != null ? preCalculatedTotalStackValue : BigDecimal.ZERO);
+                        dto.setTotalCostBasis(costBasisOfRemaining);
+                        dto.setRealizedGain(stats.totalRealizedGain());
+                        dto.setUnrealizedGain(unrealizedGain);
+                    } else {
+                        // Default values if no stats (e.g., card exists but has no transactions yet)
+                        dto.setQuantity(0);
+                        dto.setCurrentValue(preCalculatedTotalStackValue != null ? preCalculatedTotalStackValue : BigDecimal.ZERO);
+                        dto.setTotalCostBasis(BigDecimal.ZERO);
+                        dto.setUnrealizedGain(BigDecimal.ZERO);
+                        dto.setRealizedGain(BigDecimal.ZERO);
+                    }
+                    return dto;
+                }).toList();
+
+        // Return a new Page object with the sorted DTOs and original pagination info from the ID-sorted query.
+        return new PageImpl<>(collectionCardDTOs, pageable, sortedIdAndTotalStackValuePage.getTotalElements());
     }
 
     @Override
