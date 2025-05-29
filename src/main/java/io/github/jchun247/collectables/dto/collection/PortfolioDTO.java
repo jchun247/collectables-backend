@@ -9,4 +9,8 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 public class PortfolioDTO extends CollectionDTO {
     private BigDecimal totalCostBasis;
+    private BigDecimal unrealizedGain;
+    private BigDecimal realizedGain;
+    private BigDecimal totalReturn;
+    private BigDecimal lifetimeROI;
 }

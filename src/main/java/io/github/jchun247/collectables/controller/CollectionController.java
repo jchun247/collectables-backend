@@ -52,16 +52,22 @@ public class CollectionController {
 
     @DeleteMapping("/{collectionId}/cards/{collectionCardId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeCardsFromCollection(
+    public void removeCardFromCollection(
             @PathVariable Long collectionId,
-            @PathVariable Long collectionCardId,
-            @RequestBody @Valid DeleteCardFromCollectionDTO deleteCardFromCollectionDTO) {
-        collectionService.deleteCardFromCollection(collectionId, collectionCardId, deleteCardFromCollectionDTO);
+            @PathVariable Long collectionCardId) {
+        collectionService.deleteCardFromCollection(collectionId, collectionCardId);
     }
 
     @GetMapping("/{collectionId}")
     public CollectionDTO getCollectionDetails(@PathVariable Long collectionId) {
         return collectionService.getCollectionDetails(collectionId);
+    }
+
+    @GetMapping("/{collectionId}/cards/{collectionCardId}")
+    public CollectionCardDTO getCollectionCardDetails(
+            @PathVariable Long collectionId,
+            @PathVariable Long collectionCardId) {
+        return collectionService.getCollectionCardDetails(collectionId, collectionCardId);
     }
 
     @GetMapping("/{collectionId}/cards")
@@ -80,14 +86,13 @@ public class CollectionController {
         return new PagedResponse<>(page);
     }
 
-    @GetMapping("/{collectionId}/cards/{collectionCardId}/transaction-history")
-    public PagedResponse<CollectionCardTransactionHistoryDTO> getCollectionCardTransactionHistory(
+    @PostMapping("/{collectionId}/cards/{collectionCardId}/transactions")
+    public ResponseEntity<CollectionCardTransactionHistoryDTO> addTransaction(
             @PathVariable Long collectionId,
             @PathVariable Long collectionCardId,
-            Pageable pageable) {
-        Page<CollectionCardTransactionHistoryDTO> page = collectionService.getCollectionCardTransactionHistory(
-                collectionId, collectionCardId, pageable);
-        return new PagedResponse<>(page);
+            @RequestBody @Valid CreateTransactionDTO createTransactionDTO) {
+        CollectionCardTransactionHistoryDTO transaction = collectionService.addTransaction(collectionId, collectionCardId, createTransactionDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
     }
 
     @PatchMapping("/{collectionId}/transactions/{transactionId}")
@@ -104,6 +109,16 @@ public class CollectionController {
             @PathVariable Long collectionId,
             @PathVariable Long transactionId) {
         collectionService.deleteTransaction(collectionId, transactionId);
+    }
+
+    @GetMapping("/{collectionId}/cards/{collectionCardId}/transaction-history")
+    public PagedResponse<CollectionCardTransactionHistoryDTO> getCollectionCardTransactionHistory(
+            @PathVariable Long collectionId,
+            @PathVariable Long collectionCardId,
+            Pageable pageable) {
+        Page<CollectionCardTransactionHistoryDTO> page = collectionService.getCollectionCardTransactionHistory(
+                collectionId, collectionCardId, pageable);
+        return new PagedResponse<>(page);
     }
 
     @GetMapping("/users/{auth0UserId}")

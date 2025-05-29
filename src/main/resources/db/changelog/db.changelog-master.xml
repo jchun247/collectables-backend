@@ -68,4 +68,5 @@
     <include file="db/changelog/changes/061-add_finish_field.xml"/>
     <include file="db/changelog/changes/062-add_collection_card_transaction_history_table.xml"/>
     <include file="db/changelog/changes/063-remove-quantity-column.xml"/>
+    <include file="db/changelog/changes/064-add_transaction_type_col.xml"/>
 </databaseChangeLog>

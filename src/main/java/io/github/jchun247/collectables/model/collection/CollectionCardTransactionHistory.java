@@ -32,7 +32,11 @@ public class CollectionCardTransactionHistory {
     @Enumerated(EnumType.STRING)
     private CardFinish finish;
 
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
+
     private int quantity;
     private LocalDate purchaseDate;
     private BigDecimal costBasis;
+    private BigDecimal realizedGain;
 }

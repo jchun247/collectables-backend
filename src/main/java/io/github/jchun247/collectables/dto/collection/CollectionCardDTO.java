@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 
 @Data
 @Builder
@@ -18,6 +20,10 @@ public class CollectionCardDTO {
     private Long collectionId;
     private CardCondition condition;
     private CardFinish finish;
-    private int quantity;
+    private long quantity;
     private BasicCardDTO card;
+    private BigDecimal currentValue;
+    private BigDecimal totalCostBasis;
+    private BigDecimal unrealizedGain;
+    private BigDecimal realizedGain;
 }

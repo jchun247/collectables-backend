@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -152,34 +153,29 @@ public class CollectionServiceImpl implements CollectionService {
                     return collectionCardRepository.save(newCollectionCard);
                 });
 
-        // Add a new transaction history record and save it
-        CollectionCardTransactionHistory newTransaction = CollectionCardTransactionHistory.builder()
-                .collectionCard(collectionCard)
-                .condition(addCardToCollectionDTO.getCondition())
-                .finish(addCardToCollectionDTO.getFinish())
-                .quantity(addCardToCollectionDTO.getQuantity())
-                .purchaseDate(addCardToCollectionDTO.getPurchaseDate())
-                .costBasis(addCardToCollectionDTO.getCostBasis() != null ? addCardToCollectionDTO.getCostBasis() : BigDecimal.ZERO)
-                .build();
+        CreateTransactionDTO createTransactionDTO = new CreateTransactionDTO();
+        createTransactionDTO.setCondition(addCardToCollectionDTO.getCondition());
+        createTransactionDTO.setFinish(addCardToCollectionDTO.getFinish());
+        createTransactionDTO.setTransactionType(TransactionType.BUY);
+        createTransactionDTO.setQuantity(addCardToCollectionDTO.getQuantity());
+        createTransactionDTO.setPurchaseDate(addCardToCollectionDTO.getPurchaseDate() != null ? addCardToCollectionDTO.getPurchaseDate() : LocalDate.now());
+        createTransactionDTO.setCostBasis(addCardToCollectionDTO.getCostBasis() != null ? addCardToCollectionDTO.getCostBasis() : BigDecimal.ZERO);
 
-        collectionCardTransactionHistoryRepository.save(newTransaction);
+        addTransaction(collectionId, collectionCard.getId(), createTransactionDTO);
+
         log.info("Added/updated card {} (CollectionCard ID: {}) to collection {}.",
                 collectionCard.getCard().getId(), collectionCard.getId(), collection.getId());
 
+        int newQuantity = collectionCardTransactionHistoryRepository.sumQuantityByCollectionCardId(collectionCard.getId());
         CollectionCardDTO dto = collectionMapper.toCollectionCardDto(collectionCard);
-        dto.setQuantity(collectionRepository.calculateCollectionSize(collectionId));
+        dto.setQuantity(newQuantity);
         return dto;
     }
 
     @Override
     @Transactional
     @VerifyCollectionAccess
-    public void deleteCardFromCollection(Long collectionId, Long collectionCardId, DeleteCardFromCollectionDTO deleteCardFromCollectionDTO) {
-        if (deleteCardFromCollectionDTO.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Quantity to remove must be positive.");
-        }
-        int quantityToRemove = deleteCardFromCollectionDTO.getQuantity();
-
+    public void deleteCardFromCollection(Long collectionId, Long collectionCardId) {
         // Check if collection and collectionCard exist
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
@@ -192,33 +188,17 @@ public class CollectionServiceImpl implements CollectionService {
                     " does not belong to collection with id " + collectionId);
         }
 
-        int currentQuantity = collectionCardTransactionHistoryRepository.sumQuantityByCollectionCardId(collectionCardId);
-
-        if (quantityToRemove > currentQuantity) {
-            throw new IllegalArgumentException("Cannot remove more cards (" + quantityToRemove +
-                    ") than are in the collection (" + currentQuantity + ")");
+        // Delete all transactions for this CollectionCard
+        List<CollectionCardTransactionHistory> transactions = collectionCardTransactionHistoryRepository.findAllByCollectionCardId(collectionCardId);
+        if (transactions.isEmpty()) {
+            log.warn("No transactions found for CollectionCard ID: {}. Nothing to delete.", collectionCardId);
+            return;
         }
 
-        if (quantityToRemove == currentQuantity) {
-            // If the final quantity will be zero, remove the card and all its history.
-            collectionCardRepository.delete(collectionCard);
-            log.info("Deleted CollectionCard ID: {} and its history from collection ID: {} as quantity became zero.",
-                    collectionCardId, collectionId);
-        } else {
-            // If there's remaining quantity, record the removal as a negative transaction.
-            CollectionCardTransactionHistory removalTransaction = CollectionCardTransactionHistory.builder()
-                    .collectionCard(collectionCard)
-                    .condition(collectionCard.getCondition())
-                    .finish(collectionCard.getFinish())
-                    .quantity(-quantityToRemove)
-                    .purchaseDate(LocalDate.now())
-                    .costBasis(deleteCardFromCollectionDTO.getCostBasis())
-                    .build();
-
-            collectionCardTransactionHistoryRepository.save(removalTransaction);
-            log.info("Recorded removal of {} item(s) for CollectionCard ID: {}. New calculated quantity: {}",
-                    quantityToRemove, collectionCardId, (currentQuantity - quantityToRemove));
-        }
+        // Delete the CollectionCard itself if it has no remaining transactions
+        collectionCardTransactionHistoryRepository.deleteAll(transactions);
+        log.info("Deleted all transactions for CollectionCard ID: {} in Collection ID: {}", collectionCardId, collectionId);
+        collectionCardRepository.delete(collectionCard);
     }
 
     @Override
@@ -230,6 +210,39 @@ public class CollectionServiceImpl implements CollectionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
 
         return populateCollectionDto(collection);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @VerifyCollectionViewAccess
+    public CollectionCardDTO getCollectionCardDetails(Long collectionId, Long collectionCardId) {
+        log.debug("Fetching details for CollectionCard ID: {} in Collection ID: {}", collectionCardId, collectionId);
+        CollectionCard collectionCard = collectionCardRepository.findById(collectionCardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection card not found with id: " + collectionCardId));
+
+        // Ensure the card belongs to the specified collection
+        if (!collectionCard.getCollection().getId().equals(collectionId)) {
+            throw new IllegalArgumentException("CollectionCard with id " + collectionCardId +
+                    " does not belong to collection with id " + collectionId);
+        }
+
+        // Fetch stats for this specific card
+        CollectionCardStats stats = collectionCardTransactionHistoryRepository
+                .getBulkStatsForCollectionCards(List.of(collectionCardId))
+                .stream()
+                .map(row -> new CollectionCardStats(
+                        (Long) row[0],                                  // collectionCardId
+                        ((Number) row[1]).longValue(),                  // totalQuantity
+                        (BigDecimal) row[2],                            // currentValue
+                        (BigDecimal) row[3],                            // totalCostOfBuys
+                        (BigDecimal) row[4],                            // totalProceedsFromSells
+                        (BigDecimal) row[5]                             // totalRealizedGain
+                ))
+                .findFirst()
+                .orElse(null); // Return null if no stats are found
+
+        // Use the new helper method to populate and return the DTO
+        return populateCollectionCardDtoWithStats(collectionCard, stats);
     }
 
     @Override
@@ -247,27 +260,29 @@ public class CollectionServiceImpl implements CollectionService {
         List<Long> collectionCardIds = collectionCardsPage.stream().map(CollectionCard::getId).toList();
         List<Long> cardIds = collectionCardsPage.stream().map(cc -> cc.getCard().getId()).toList();
 
-        Map<Long, Integer> quantityMap = collectionCardTransactionHistoryRepository.sumQuantitiesByCollectionCardIds(collectionCardIds)
-                .stream()
-                .collect(Collectors.toMap(
-                        CollectionCardQuantity::collectionCardId,
-                        stats -> stats.totalQuantity().intValue()
-                ));
+        // Fetch raw results as an object array and manually map them to CollectionCardStats
+        List<Object[]> results = collectionCardTransactionHistoryRepository.getBulkStatsForCollectionCards(collectionCardIds);
+
+        Map<Long, CollectionCardStats> statsMap = results.stream()
+                .map(row -> new CollectionCardStats(
+                        (Long) row[0],                                  // collectionCardId
+                        ((Number) row[1]).longValue(),                  // totalQuantity
+                        (BigDecimal) row[2],                            // currentValue
+                        (BigDecimal) row[3],                            // totalCostOfBuys
+                        (BigDecimal) row[4],                            // totalProceedsFromSells
+                        (BigDecimal) row[5]                             // totalRealizedGain
+                ))
+                .collect(Collectors.toMap(CollectionCardStats::collectionCardId, stats -> stats));
 
         Map<Long, Card> cardDetailsMap = cardRepository.findCardsWithDetailsByIds(cardIds)
                 .stream()
                 .collect(Collectors.toMap(Card::getId, card -> card));
 
         return collectionCardsPage.map(collectionCard -> {
-            // Replace the potentially lazy Card object with our fully loaded one.
             collectionCard.setCard(cardDetailsMap.get(collectionCard.getCard().getId()));
+            CollectionCardStats stats = statsMap.get(collectionCard.getId());
 
-            // The mapper can now access all details (prices, images) without triggering lazy loads.
-            CollectionCardDTO dto = collectionMapper.toCollectionCardDto(collectionCard);
-
-            // Set the correct quantity from our map.
-            dto.setQuantity(quantityMap.getOrDefault(collectionCard.getId(), 0));
-            return dto;
+            return populateCollectionCardDtoWithStats(collectionCard, stats);
         });
     }
 
@@ -296,6 +311,63 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     @Transactional
     @VerifyCollectionAccess
+    public CollectionCardTransactionHistoryDTO addTransaction(Long collectionId, Long collectionCardId, CreateTransactionDTO createTransactionDTO) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
+
+        CollectionCard collectionCard = collectionCardRepository.findById(collectionCardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection card not found with id: " + collectionCardId));
+
+        // Ensure the card belongs to the specified collection
+        if (!collectionCard.getCollection().getId().equals(collectionId)) {
+            throw new IllegalArgumentException("CollectionCard with id " + collectionCardId +
+                    " does not belong to collection with id " + collectionId);
+        }
+
+        // Create a new transaction history record
+        CollectionCardTransactionHistory.CollectionCardTransactionHistoryBuilder transactionHistoryBuilder = CollectionCardTransactionHistory.builder()
+                .collectionCard(collectionCard)
+                .condition(createTransactionDTO.getCondition())
+                .finish(createTransactionDTO.getFinish())
+                .transactionType(createTransactionDTO.getTransactionType())
+                .quantity(createTransactionDTO.getQuantity())
+                .purchaseDate(createTransactionDTO.getPurchaseDate() != null ? createTransactionDTO.getPurchaseDate() : LocalDate.now())
+                .costBasis(createTransactionDTO.getCostBasis() != null ? createTransactionDTO.getCostBasis() : BigDecimal.ZERO);
+
+        if (createTransactionDTO.getTransactionType() == TransactionType.SELL) {
+            // For a SELL, 'costBasis' from the DTO represents the sale price per item.
+            BigDecimal salePricePerItem = createTransactionDTO.getCostBasis();
+
+            // Calculate the average cost of the items being sold.
+            AverageCostInfo avgCostInfo = collectionCardTransactionHistoryRepository
+                    .getAverageCostForBuys(collectionCardId);
+
+            if (avgCostInfo == null || avgCostInfo.totalBuyQuantity() <= 0) {
+                // Cannot sell something with no purchase history, treat as zero-cost basis.
+                avgCostInfo = new AverageCostInfo(BigDecimal.ZERO, 0L);
+            }
+
+            BigDecimal averageCostPerItem = avgCostInfo.getAverageCost();
+
+            // Realized Gain for this specific transaction = (Sale Price - Average Cost) * Quantity Sold
+            BigDecimal realizedGainForThisTransaction = (salePricePerItem.subtract(averageCostPerItem))
+                    .multiply(new BigDecimal(createTransactionDTO.getQuantity()));
+
+            // Set the calculated gain on the transaction to be saved.
+            transactionHistoryBuilder.realizedGain(realizedGainForThisTransaction);
+            log.info("Calculated realized gain of {} for sale of {} items of card {}.",
+                    realizedGainForThisTransaction, createTransactionDTO.getQuantity(), collectionCardId);
+        }
+
+        CollectionCardTransactionHistory savedTransaction = collectionCardTransactionHistoryRepository.save(transactionHistoryBuilder.build());
+        log.info("Added transaction for CollectionCard ID: {} in Collection ID: {}", collectionCardId, collectionId);
+
+        return collectionMapper.toCollectionCardTransactionHistoryDto(savedTransaction);
+    }
+
+    @Override
+    @Transactional
+    @VerifyCollectionAccess
     public CollectionCardTransactionHistoryDTO updateTransactionDetails(Long collectionId, Long transactionId, UpdateTransactionDTO updateTransactionDTO) {
         CollectionCardTransactionHistory transactionHistory = collectionCardTransactionHistoryRepository.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction history not found with id: " + transactionId));
@@ -307,12 +379,6 @@ public class CollectionServiceImpl implements CollectionService {
 
         if (newQuantity == 0) {
             throw new IllegalArgumentException("Updating quantity to zero is not allowed. Please use the delete transaction endpoint instead.");
-        }
-
-        // Prevent changing the transaction type (buy vs. sell)
-        // This check fails if one quantity is positive and the other is negative.
-        if ((long) transactionHistory.getQuantity() * newQuantity < 0) {
-            throw new IllegalArgumentException("Cannot change the transaction from a purchase to a sale (or vice-versa). Please create a new transaction to record a sale.");
         }
 
         transactionHistory.setQuantity(newQuantity);
@@ -385,14 +451,15 @@ public class CollectionServiceImpl implements CollectionService {
                 .map(Collection::getId)
                 .toList();
 
-        Map<Long, CollectionStats> statsMap = collectionRepository.getBulkStatsForCollections(collectionIds).stream()
-                .collect(Collectors.toMap(CollectionStats::collectionId, stats -> stats));
+        Map<Long, PortfolioStatBuildingBlocks> statsMap = collectionRepository.getBulkStatBuildingBlocks(collectionIds).stream()
+                .collect(Collectors.toMap(PortfolioStatBuildingBlocks::collectionId, stats -> stats));
 
         // 3. Map to DTOs, combining entities with their fetched stats
         return collectionsPage.map(collection -> {
             // Use the helper method you created earlier, but provide it with stats
             return populateCollectionDtoWithStats(collection, statsMap.getOrDefault(collection.getId(),
-                    new CollectionStats(collection.getId(), 0L, BigDecimal.ZERO, BigDecimal.ZERO)));
+                    new PortfolioStatBuildingBlocks(collection.getId(), 0L, BigDecimal.ZERO,
+                            BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)));
         });
 
     }
@@ -404,40 +471,63 @@ public class CollectionServiceImpl implements CollectionService {
         int pageNumber = 0;
         int pageSize = 100; // Adjust batch size
         Page<Collection> collectionPage;
-        int updatedCount = 0;
         int historyCreatedCount = 0;
         int errorCount = 0;
 
+        log.info("Starting scheduled job to create daily portfolio value history snapshots.");
+
         do {
+            // Fetch one page of collections
             collectionPage = collectionRepository.findAllCollectionsPaged(PageRequest.of(pageNumber, pageSize));
             log.info("Processing page {} with {} collections.", pageNumber, collectionPage.getNumberOfElements());
 
-            for (Collection collection : collectionPage.getContent()) {
-                try {
-                    // NOTE: If using pages, triggerCollectionValueUpdate might need adjustments
-                    // if it relies on specific transactional boundaries not spanning the whole page.
-                    // It might be safer to recalculate/update directly here or call trigger method carefully.
-//                    Collection updatedCollection = triggerCollectionUpdate(collection.getId()); // Assuming trigger works per item transactionally
-                    updatedCount++;
+            if (!collectionPage.hasContent()) {
+                break; // Exit if the page is empty
+            }
 
-                    if (collection instanceof Portfolio portfolio) {
+            // Get all collection IDs from the current page
+            List<Long> collectionIdsOnPage = collectionPage.stream()
+                    .map(Collection::getId)
+                    .toList();
+
+            // Fetch all stats for the entire page in a SINGLE batch query to avoid N+1 issues
+            Map<Long, PortfolioStatBuildingBlocks> statsMap = collectionRepository.getBulkStatBuildingBlocks(collectionIdsOnPage)
+                    .stream()
+                    .collect(Collectors.toMap(PortfolioStatBuildingBlocks::collectionId, stats -> stats));
+
+            // Process each collection using the pre-fetched stats from the map
+            for (Collection collection : collectionPage.getContent()) {
+                // We only create value history for Portfolios
+                if (!(collection instanceof Portfolio portfolio)) {
+                    continue;
+                }
+
+                try {
+                    // Look up the stats for the current portfolio from our map
+                    PortfolioStatBuildingBlocks currentStats = statsMap.get(collection.getId());
+
+                    // If a portfolio has stats, create a history entry
+                    if (currentStats != null) {
                         PortfolioValueHistory historyEntry = new PortfolioValueHistory();
                         historyEntry.setPortfolio(portfolio);
-                        historyEntry.setValue(collectionRepository.calculateCollectionValue(collection.getId()));
-                        historyEntry.setTimestamp(portfolio.getUpdatedAt());
+                        // Use the 'currentValue' from the pre-fetched stats object
+                        historyEntry.setValue(currentStats.currentValue());
+                        // Use the current time to mark when the snapshot was taken
+                        historyEntry.setTimestamp(LocalDateTime.now());
+
                         portfolioValueHistoryRepository.save(historyEntry);
                         historyCreatedCount++;
                     }
                 } catch (Exception e) {
                     errorCount++;
-                    log.error("Failed to update collection {} during scheduled job (page {}): {}", collection.getId(), pageNumber, e.getMessage(), e);
+                    log.error("Failed to create value history for portfolio {} during scheduled job: {}", collection.getId(), e.getMessage(), e);
                 }
             }
             pageNumber++;
         } while (collectionPage.hasNext());
-        log.info("Finished scheduled collection value update. Collections processed: {}, History entries created: {}, Errors: {}", updatedCount, historyCreatedCount, errorCount);
-    }
 
+        log.info("Finished scheduled portfolio value history update. New history entries created: {}, Errors: {}", historyCreatedCount, errorCount);
+    }
 
     /* Helper Methods */
     private UserEntity findUserByAuth0IdOrThrow(String auth0Id) {
@@ -448,40 +538,91 @@ public class CollectionServiceImpl implements CollectionService {
     private CollectionDTO populateCollectionDto(Collection collection) {
         Long collectionId = collection.getId();
 
-        // 1. Calculate the dynamic values
-        int numProducts = collectionRepository.calculateCollectionSize(collectionId);
-        BigDecimal currentValue = collectionRepository.calculateCollectionValue(collectionId);
+        Map<Long, PortfolioStatBuildingBlocks> statsMap = collectionRepository
+                .getBulkStatBuildingBlocks(List.of(collectionId)).stream()
+                .collect(Collectors.toMap(PortfolioStatBuildingBlocks::collectionId, stats -> stats));
 
-        // 2. Use the mapper to handle polymorphism and map base fields
-        CollectionDTO dto;
-        if (collection instanceof Portfolio) {
-            PortfolioDTO portfolioDTO = collectionMapper.toPortfolioDto((Portfolio) collection);
-//            dto = collectionMapper.toPortfolioDto((Portfolio) collection);
-            portfolioDTO.setTotalCostBasis(collectionRepository.calculateCollectionTotalCostBasis(collectionId));
-            dto = portfolioDTO;
-        } else { // Handles CollectionList and any other non-portfolio types
-            dto = collectionMapper.toCollectionListDto((CollectionList) collection);
-        }
+        PortfolioStatBuildingBlocks stats = statsMap.getOrDefault(collectionId,
+                new PortfolioStatBuildingBlocks(collectionId, 0L,
+                        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
 
-        // 3. Set the calculated values on the DTO
-        dto.setNumProducts(numProducts);
-        dto.setCurrentValue(currentValue);
-
-        return dto;
+        return populateCollectionDtoWithStats(collection, stats);
     }
 
-    private CollectionDTO populateCollectionDtoWithStats(Collection collection, CollectionStats stats) {
-        CollectionDTO dto;
-        if (collection instanceof Portfolio) {
-            dto = collectionMapper.toPortfolioDto((Portfolio) collection);
-            ((PortfolioDTO) dto).setTotalCostBasis(stats.totalCostBasis());
-        } else {
-            dto = collectionMapper.toCollectionListDto((CollectionList) collection);
+    private CollectionDTO populateCollectionDtoWithStats(Collection collection, PortfolioStatBuildingBlocks stats) {
+        // For CollectionLists, the logic is simple.
+        if (collection instanceof CollectionList) {
+            CollectionListDTO dto = collectionMapper.toCollectionListDto((CollectionList) collection);
+            dto.setNumProducts((int) stats.numProducts());
+            dto.setCurrentValue(stats.currentValue());
+            return dto;
         }
+
+        // --- Logic for Portfolios ---
+        PortfolioDTO dto = collectionMapper.toPortfolioDto((Portfolio) collection);
+
+        // Get the raw building blocks from the stats object.
+        BigDecimal currentValue = stats.currentValue();
+        BigDecimal totalCostOfBuys = stats.totalCostOfBuys();
+        BigDecimal totalProceedsFromSells = stats.totalProceedsFromSells();
+        BigDecimal totalRealizedGain = stats.totalRealizedGain();
+
+        // --- Perform Final Calculations in Java ---
+
+        // 1. Cost Basis of Remaining Items = (Total Cost of Buys) - (Cost of Goods Sold)
+        //    where Cost of Goods Sold = (Total Sale Proceeds) - (Total Realized Gain)
+        BigDecimal costOfGoodsSold = totalProceedsFromSells.subtract(totalRealizedGain);
+        BigDecimal totalCostBasis = totalCostOfBuys.subtract(costOfGoodsSold);
+
+        // 2. Unrealized Gain = (Current Market Value) - (Cost Basis of Remaining Items)
+        BigDecimal unrealizedGain = currentValue.subtract(totalCostBasis);
+
+        // 3. Total Return = (Unrealized Gain) + (Realized Gain)
+        BigDecimal totalReturn = unrealizedGain.add(totalRealizedGain);
+
+        // 4. Lifetime ROI = (Total Return / Total Cost Of All Buys) * 100
+        BigDecimal lifetimeROI = BigDecimal.ZERO;
+        // Avoid division by zero if no purchases were ever made.
+        if (totalCostOfBuys.compareTo(BigDecimal.ZERO) > 0) {
+            lifetimeROI = totalReturn.divide(totalCostOfBuys, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+        }
+
+        // --- Populate the DTO ---
         dto.setNumProducts((int) stats.numProducts());
-        dto.setCurrentValue(stats.currentValue());
-        // The mapper correctly sets the collectionType via the abstract getter
+        dto.setCurrentValue(currentValue);
+        dto.setTotalCostBasis(totalCostBasis);
+        dto.setUnrealizedGain(unrealizedGain);
+        dto.setRealizedGain(totalRealizedGain);
+        dto.setTotalReturn(totalReturn);
+        dto.setLifetimeROI(lifetimeROI);
+
         return dto;
     }
 
+    private CollectionCardDTO populateCollectionCardDtoWithStats(CollectionCard collectionCard, @Nullable CollectionCardStats stats) {
+        // First, create the basic DTO from the entity
+        CollectionCardDTO dto = collectionMapper.toCollectionCardDto(collectionCard);
+
+        if (stats != null) {
+            // Calculate final values from the stat building blocks
+            BigDecimal costOfGoodsSold = stats.totalProceedsFromSells().subtract(stats.totalRealizedGain());
+            BigDecimal costBasisOfRemaining = stats.totalCostOfBuys().subtract(costOfGoodsSold);
+            BigDecimal unrealizedGain = stats.currentValue().subtract(costBasisOfRemaining);
+
+            // Set all calculated values on the DTO
+            dto.setQuantity(stats.totalQuantity());
+            dto.setCurrentValue(stats.currentValue());
+            dto.setTotalCostBasis(costBasisOfRemaining);
+            dto.setRealizedGain(stats.totalRealizedGain());
+            dto.setUnrealizedGain(unrealizedGain);
+        } else {
+            // Default values for a card with no transaction history
+            dto.setQuantity(0);
+            dto.setCurrentValue(BigDecimal.ZERO);
+            dto.setTotalCostBasis(BigDecimal.ZERO);
+            dto.setUnrealizedGain(BigDecimal.ZERO);
+            dto.setRealizedGain(BigDecimal.ZERO);
+        }
+        return dto;
+    }
 }

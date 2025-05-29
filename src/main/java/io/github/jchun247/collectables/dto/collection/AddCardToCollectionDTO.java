@@ -24,4 +24,3 @@ public class AddCardToCollectionDTO {
     @NotNull
     private BigDecimal costBasis;
 }
-
