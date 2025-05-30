@@ -22,7 +22,7 @@ public interface CardMapper {
     @Mapping(source = "set.name", target = "setName")
     @Mapping(source = "set.id", target = "setId")
     @Mapping(source = "prices", target = "prices", qualifiedByName = "mapPrices")
-    @Mapping(source = "priceHistory", target = "priceHistory", qualifiedByName = "mapPriceHistory")
+//    @Mapping(source = "priceHistory", target = "priceHistory", qualifiedByName = "mapPriceHistory")
     @Mapping(source = "pokemonDetails", target = "pokemonDetails", qualifiedByName = "mapPokemonDetails")
     @Mapping(source = "pokemonDetails.types", target = "pokemonDetails.types")
     @Mapping(source = "pokemonDetails.attacks", target = "pokemonDetails.attacks")
@@ -30,6 +30,10 @@ public interface CardMapper {
     CardDTO toCardDTO(Card card);
 
     BasicCardSetDTO toBasicCardSetDTO(CardSet cardSet);
+    CardPriceHistoryDTO toCardPriceHistoryDTO(CardPriceHistory priceHistory);
+//    CardVariantGroupDTO toCardVariantGroupDTO(CardVariantGroup variantGroup);
+    CardPriceDTO toCardPriceDTO(CardPrice price);
+    CardPokemonDetailsDTO toCardPokemonDetailsDTO(CardPokemonDetails cardPokemonDetails);
 
     @Named("mapImageUrl")
     default String mapImageUrl(Set<CardImage> images) {
@@ -53,15 +57,15 @@ public interface CardMapper {
                 .collect(Collectors.toSet());
     }
 
-    @Named("mapPriceHistory")
-    default Set<CardPriceHistoryDTO> mapPriceHistory(Set<CardPriceHistory> priceHistory) {
-        if (priceHistory == null) {
-            return Collections.emptySet();
-        }
-        return priceHistory.stream()
-                .map(this::toCardPriceHistoryDTO)
-                .collect(Collectors.toSet());
-    }
+//    @Named("mapPriceHistory")
+//    default Set<CardPriceHistoryDTO> mapPriceHistory(Set<CardPriceHistory> priceHistory) {
+//        if (priceHistory == null) {
+//            return Collections.emptySet();
+//        }
+//        return priceHistory.stream()
+//                .map(this::toCardPriceHistoryDTO)
+//                .collect(Collectors.toSet());
+//    }
 
     @Named("mapPokemonDetails")
     default CardPokemonDetailsDTO mapPokemonDetails(CardPokemonDetails cardPokemonDetails) {
@@ -70,12 +74,4 @@ public interface CardMapper {
         }
         return toCardPokemonDetailsDTO(cardPokemonDetails);
     }
-
-//    CardVariantGroupDTO toCardVariantGroupDTO(CardVariantGroup variantGroup);
-
-    CardPriceDTO toCardPriceDTO(CardPrice price);
-
-    CardPriceHistoryDTO toCardPriceHistoryDTO(CardPriceHistory priceHistory);
-
-    CardPokemonDetailsDTO toCardPokemonDetailsDTO(CardPokemonDetails cardPokemonDetails);
 }

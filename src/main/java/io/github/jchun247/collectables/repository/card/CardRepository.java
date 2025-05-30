@@ -89,7 +89,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     // TODO: retrieving price history should be a separate query
     @EntityGraph(attributePaths = {
             "prices",
-            "priceHistory",
+//            "priceHistory",
             "rules",
             "subTypes",
             "images",

@@ -20,7 +20,6 @@ public class CardDTO {
     private CardPokemonDetailsDTO pokemonDetails;
     private Set<CardRuleDTO> rules = new LinkedHashSet<>();
     private Set<CardPriceDTO> prices;
-    private Set<CardPriceHistoryDTO> priceHistory;
     private Set<CardSubType> subTypes;
     private Set<CardImage> images;
 }

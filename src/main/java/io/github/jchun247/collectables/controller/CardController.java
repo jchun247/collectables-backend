@@ -2,11 +2,12 @@ package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.dto.card.BasicCardDTO;
 import io.github.jchun247.collectables.dto.PagedResponse;
-import io.github.jchun247.collectables.dto.card.CardDTO;
+import io.github.jchun247.collectables.dto.card.CardPriceHistoryDTO;
 import io.github.jchun247.collectables.model.card.*;
 import io.github.jchun247.collectables.service.card.CardService;
-import jakarta.persistence.Basic;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,5 +65,12 @@ public class CardController {
         PagedResponse<BasicCardDTO> response = cardService.getCards(page, size, null,
                 setId, rarity, condition, sortOption, minPrice, maxPrice, searchQuery, finish);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{cardId}/price-history")
+    public PagedResponse<CardPriceHistoryDTO> getCardPriceHistory(
+            @PathVariable Long cardId, Pageable pageable) {
+        Page<CardPriceHistoryDTO> page = cardService.getCardPriceHistory(cardId, pageable);
+        return new PagedResponse<>(page);
     }
 }

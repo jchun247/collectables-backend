@@ -5,6 +5,7 @@ import io.github.jchun247.collectables.dto.PagedResponse;
 import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.mapper.CardMapper;
 import io.github.jchun247.collectables.model.card.*;
+import io.github.jchun247.collectables.repository.card.CardPriceHistoryRepository;
 import io.github.jchun247.collectables.repository.card.CardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -20,6 +21,7 @@ import java.util.List;
 public class CardServiceImpl implements CardService{
 
     private final CardRepository cardRepository;
+    private final CardPriceHistoryRepository cardPriceHistoryRepository;
     private final CardMapper cardMapper;
 
     private static final BigDecimal MAX_PRICE = new BigDecimal("9999999.99");
@@ -101,5 +103,11 @@ public class CardServiceImpl implements CardService{
     public CardDTO getCardWithAllData(Long id) {
         return cardMapper.toCardDTO(cardRepository.findWithAllDataById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id)));
+    }
+
+    @Override
+    public Page<CardPriceHistoryDTO> getCardPriceHistory(Long cardId, Pageable pageable) {
+        Page<CardPriceHistory> priceHistoryPage = cardPriceHistoryRepository.findPriceHistoryByCardId(cardId, pageable);
+        return priceHistoryPage.map(cardMapper::toCardPriceHistoryDTO);
     }
 }
