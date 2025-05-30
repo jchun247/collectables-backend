@@ -86,10 +86,8 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("SELECT c FROM Card c WHERE c.id = :id")
     Optional<Card> findWithBasicDataById(@Param("id") Long id);
 
-    // TODO: retrieving price history should be a separate query
     @EntityGraph(attributePaths = {
             "prices",
-//            "priceHistory",
             "rules",
             "subTypes",
             "images",

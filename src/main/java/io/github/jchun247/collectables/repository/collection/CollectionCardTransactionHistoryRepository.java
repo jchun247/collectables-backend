@@ -1,8 +1,6 @@
 package io.github.jchun247.collectables.repository.collection;
 
 import io.github.jchun247.collectables.dto.collection.AverageCostInfo;
-//import io.github.jchun247.collectables.dto.collection.CollectionCardQuantity;
-import io.github.jchun247.collectables.dto.collection.CollectionCardStats;
 import io.github.jchun247.collectables.model.collection.CollectionCardTransactionHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
