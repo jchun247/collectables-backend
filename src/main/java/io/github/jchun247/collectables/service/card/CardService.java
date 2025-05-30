@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CardService {
@@ -21,5 +22,7 @@ public interface CardService {
                                          String searchQuery, CardFinish finish);
     BasicCardDTO getCardWithBasicData(Long id);
     CardDTO getCardWithAllData(Long id);
-    Page<CardPriceHistoryDTO> getCardPriceHistory(Long cardId, Pageable pageable);
+    Page<CardPriceHistoryDTO> getCardPriceHistory(
+            Long cardId, LocalDateTime startDate,
+            LocalDateTime endDate, Pageable pageable);
 }

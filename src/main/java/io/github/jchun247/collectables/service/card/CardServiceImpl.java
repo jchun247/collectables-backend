@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -106,8 +107,13 @@ public class CardServiceImpl implements CardService{
     }
 
     @Override
-    public Page<CardPriceHistoryDTO> getCardPriceHistory(Long cardId, Pageable pageable) {
-        Page<CardPriceHistory> priceHistoryPage = cardPriceHistoryRepository.findPriceHistoryByCardId(cardId, pageable);
+    public Page<CardPriceHistoryDTO> getCardPriceHistory(
+            Long cardId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable pageable) {
+        Page<CardPriceHistory> priceHistoryPage = cardPriceHistoryRepository.findByCardIdAndTimestampBetween(
+                cardId, startDate, endDate, pageable);
         return priceHistoryPage.map(cardMapper::toCardPriceHistoryDTO);
     }
 }

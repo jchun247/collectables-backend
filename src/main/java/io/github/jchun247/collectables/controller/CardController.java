@@ -8,10 +8,12 @@ import io.github.jchun247.collectables.service.card.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -69,8 +71,11 @@ public class CardController {
 
     @GetMapping("/{cardId}/price-history")
     public PagedResponse<CardPriceHistoryDTO> getCardPriceHistory(
-            @PathVariable Long cardId, Pageable pageable) {
-        Page<CardPriceHistoryDTO> page = cardService.getCardPriceHistory(cardId, pageable);
-        return new PagedResponse<>(page);
+            @PathVariable Long cardId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            Pageable pageable) {
+        Page<CardPriceHistoryDTO> priceHistoryPage = cardService.getCardPriceHistory(cardId, startDate, endDate, pageable);
+        return new PagedResponse<>(priceHistoryPage);
     }
 }
