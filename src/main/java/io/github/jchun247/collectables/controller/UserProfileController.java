@@ -1,7 +1,6 @@
 package io.github.jchun247.collectables.controller;
 
 import com.auth0.exception.APIException;
-import com.auth0.exception.Auth0Exception;
 import io.github.jchun247.collectables.dto.user.UpdateProfileRequest;
 import io.github.jchun247.collectables.service.user.Auth0ManagementService;
 import io.github.jchun247.collectables.service.user.UserService;

@@ -7,7 +7,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -22,7 +21,6 @@ public interface CardMapper {
     @Mapping(source = "set.name", target = "setName")
     @Mapping(source = "set.id", target = "setId")
     @Mapping(source = "prices", target = "prices", qualifiedByName = "mapPrices")
-//    @Mapping(source = "priceHistory", target = "priceHistory", qualifiedByName = "mapPriceHistory")
     @Mapping(source = "pokemonDetails", target = "pokemonDetails", qualifiedByName = "mapPokemonDetails")
     @Mapping(source = "pokemonDetails.types", target = "pokemonDetails.types")
     @Mapping(source = "pokemonDetails.attacks", target = "pokemonDetails.attacks")
@@ -56,16 +54,6 @@ public interface CardMapper {
                 .map(this::toCardPriceDTO)
                 .collect(Collectors.toSet());
     }
-
-//    @Named("mapPriceHistory")
-//    default Set<CardPriceHistoryDTO> mapPriceHistory(Set<CardPriceHistory> priceHistory) {
-//        if (priceHistory == null) {
-//            return Collections.emptySet();
-//        }
-//        return priceHistory.stream()
-//                .map(this::toCardPriceHistoryDTO)
-//                .collect(Collectors.toSet());
-//    }
 
     @Named("mapPokemonDetails")
     default CardPokemonDetailsDTO mapPokemonDetails(CardPokemonDetails cardPokemonDetails) {

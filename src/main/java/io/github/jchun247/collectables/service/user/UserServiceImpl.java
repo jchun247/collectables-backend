@@ -1,7 +1,6 @@
 package io.github.jchun247.collectables.service.user;
 
 import io.github.jchun247.collectables.dto.user.UserEntityDTO;
-import io.github.jchun247.collectables.exception.ResourceNotFoundException;
 import io.github.jchun247.collectables.mapper.UserMapper;
 import io.github.jchun247.collectables.model.user.UserEntity;
 import io.github.jchun247.collectables.repository.user.UserRepository;

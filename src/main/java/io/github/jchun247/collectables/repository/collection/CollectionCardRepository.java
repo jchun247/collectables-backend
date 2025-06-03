@@ -1,6 +1,5 @@
 package io.github.jchun247.collectables.repository.collection;
 
-import io.github.jchun247.collectables.dto.collection.CollectionCardDTO;
 import io.github.jchun247.collectables.model.card.CardCondition;
 import io.github.jchun247.collectables.model.card.CardFinish;
 import io.github.jchun247.collectables.model.collection.CollectionCard;

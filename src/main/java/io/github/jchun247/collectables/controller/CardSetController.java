@@ -2,7 +2,6 @@ package io.github.jchun247.collectables.controller;
 
 import io.github.jchun247.collectables.dto.card.BasicCardSetDTO;
 import io.github.jchun247.collectables.model.card.CardSeries;
-import io.github.jchun247.collectables.model.card.CardSet;
 import io.github.jchun247.collectables.service.set.CardSetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
