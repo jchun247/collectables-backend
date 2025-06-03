@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 public class CardPriceDTO {
@@ -18,4 +19,5 @@ public class CardPriceDTO {
     private CardFinish finish;
 
     private BigDecimal price;
+    private LocalDateTime updatedAt;
 }
