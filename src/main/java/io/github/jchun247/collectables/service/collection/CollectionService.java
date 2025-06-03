@@ -5,6 +5,8 @@ import io.github.jchun247.collectables.model.collection.CollectionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+
 public interface CollectionService {
     CollectionListDTO createCollectionList(CreateCollectionListDTO createCollectionListDTO);
     PortfolioDTO createPortfolio(CreatePortfolioDTO createPortfolioDTO);
@@ -15,7 +17,7 @@ public interface CollectionService {
     CollectionDTO getCollectionDetails(Long collectionId);
     CollectionCardDTO getCollectionCardDetails(Long collectionId, Long collectionCardId);
     Page<CollectionCardDTO> getCollectionCards(Long collectionId, String cardName, Pageable pageable);
-    Page<PortfolioValueHistoryDTO> getPortfolioValueHistory(Long portfolioId, Pageable pageable);
+    Page<PortfolioValueHistoryDTO> getPortfolioValueHistory(Long portfolioId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
     Page<CollectionCardTransactionHistoryDTO> getCollectionCardTransactionHistory(Long collectionId, Long collectionCardId, Pageable pageable);
     CollectionCardTransactionHistoryDTO addTransaction(
             Long collectionId,

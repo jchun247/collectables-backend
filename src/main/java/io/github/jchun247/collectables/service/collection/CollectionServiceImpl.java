@@ -348,9 +348,11 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     @Transactional(readOnly = true)
     @VerifyCollectionViewAccess
-    public Page<PortfolioValueHistoryDTO> getPortfolioValueHistory(Long collectionId, Pageable pageable) {
+    public Page<PortfolioValueHistoryDTO> getPortfolioValueHistory(
+            Long collectionId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         log.debug("Fetching value history for portfolio (collection) ID: {}", collectionId);
-        Page<PortfolioValueHistory> valueHistoryPage = portfolioValueHistoryRepository.findAllByPortfolioId(collectionId, pageable);
+        Page<PortfolioValueHistory> valueHistoryPage = portfolioValueHistoryRepository
+                .findByPortfolioIdAndTimestampBetween(collectionId, startDate, endDate, pageable);
         return valueHistoryPage.map(collectionMapper::toPortfolioValueHistoryDto);
     }
 

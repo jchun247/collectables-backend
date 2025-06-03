@@ -10,9 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/collections")
@@ -84,8 +87,11 @@ public class CollectionController {
     @GetMapping("/{collectionId}/value-history")
     public PagedResponse<PortfolioValueHistoryDTO> getPortfolioValueHistory(
             @PathVariable Long collectionId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             Pageable pageable) {
-        Page<PortfolioValueHistoryDTO> page = collectionService.getPortfolioValueHistory(collectionId, pageable);
+        Page<PortfolioValueHistoryDTO> page = collectionService.getPortfolioValueHistory(
+                collectionId, startDate, endDate, pageable);
         return new PagedResponse<>(page);
     }
 
