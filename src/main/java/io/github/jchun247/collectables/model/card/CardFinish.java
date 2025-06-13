@@ -4,5 +4,9 @@ public enum CardFinish {
     NORMAL,
     REVERSE_HOLO,
     STAMP,
-    HOLOFOIL
+    HOLOFOIL,
+    FIRST_EDITION_HOLOFOIL,
+    UNLIMITED_HOLOFOIL,
+    FIRST_EDITION,
+    UNLIMITED
 }
