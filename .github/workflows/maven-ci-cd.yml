@@ -80,9 +80,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: List files in the workspace
-        run: ls -la
-
       - name: Render Amazon ECS task definition
         id: render-ecs-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1

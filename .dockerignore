@@ -17,6 +17,7 @@ build/
 
 # Docker files
 Dockerfile
+docker-compose.yml
 .dockerignore
 
 # Other build outputs/temp files
