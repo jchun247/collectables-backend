@@ -2,9 +2,9 @@ name: Java CI/CD with Maven, Docker, and AWS ECR/ECS
 
 on:
   push:
-    branches: [ "master", "dev" ]
+    branches: [ "master", "staging" ]
   pull_request:
-    branches: [ "master", "dev" ]
+    branches: [ "master", "staging" ]
 
 jobs:
   build_and_test:
@@ -27,8 +27,8 @@ jobs:
   build_push_ecr_deploy_ecs:
     name: Build, Push to ECR & Deploy to ECS
     needs: build_and_test
-    # Run on push to master or dev branches
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev')
+    # Run on push to master or staging branches
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/staging')
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     permissions:
@@ -64,8 +64,8 @@ jobs:
             # For production: <short-sha> and latest
             # For staging: staging-<short-sha> and staging-latest
             type=sha,prefix=${{ github.ref_name == 'staging' && 'staging-' || '' }},format=short
-            type=raw,value=latest,enable=${{ github.ref_name == 'production' }}
-            type=raw,value=dev-latest,enable=${{ github.ref_name == 'staging' }}
+            type=raw,value=latest,enable=${{ github.ref_name == 'master' }}
+            type=raw,value=staging-latest,enable=${{ github.ref_name == 'staging' }}
 
       - name: Build and push Docker image to ECR
         id: build-image
