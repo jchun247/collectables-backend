@@ -1,0 +1,88 @@
+{
+  "family": "collectables-api-task",
+  "executionRoleArn": "arn:aws:iam::654654440171:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "3072",
+  "containerDefinitions": [
+    {
+      "name": "collectables-api",
+      "image": "YOUR_IMAGE_URI_PLACEHOLDER",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "name": "collectables-api-8080-tcp",
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "AUTH0_DOMAIN",
+          "value": "dev-xmd0t7c7kpg2tvxf.us.auth0.com"
+        },
+        {
+          "name": "AUTH0_AUDIENCE",
+          "value": "https://api.dev-collectables.com"
+        },
+        {
+          "name": "AUTH0_ISSUER_URI",
+          "value": "https://dev-xmd0t7c7kpg2tvxf.us.auth0.com/"
+        },
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "staging"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "APP_LIQUIBASE_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/db-credentials-liquibase-2qpOSI:password::"
+        },
+        {
+          "name": "APP_LIQUIBASE_USER",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/db-credentials-liquibase-2qpOSI:username::"
+        },
+        {
+          "name": "AUTH0_ACTION_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/auth0-action-secret-DtxK7P"
+        },
+        {
+          "name": "AUTH0_CLIENT_ID",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/auth0-client-id-dOSwJm"
+        },
+        {
+          "name": "AUTH0_CLIENT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/auth0-client-secret-t9yanv"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/db-credentials-KTdoSV:password::"
+        },
+        {
+          "name": "DB_URL",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/db-credentials-KTdoSV:host::"
+        },
+        {
+          "name": "DB_USER",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/db-credentials-KTdoSV:username::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/collectables-api-task",
+          "awslogs-create-group": "true",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
