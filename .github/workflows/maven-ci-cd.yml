@@ -86,7 +86,7 @@ jobs:
         with:
           task-definition: ${{ vars.ECS_TASK_DEFINITION_FILE }}
           container-name: ${{ vars.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.digest }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}@${{ steps.build-image.outputs.digest }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
