@@ -25,7 +25,7 @@
       "environment": [
         {
           "name": "AUTH0_DOMAIN",
-          "value": "dev-xmd0t7c7kpg2tvxf.us.auth0.com"
+          "value": "auth.getcollectables.xyz"
         },
         {
           "name": "AUTH0_AUDIENCE",
@@ -33,7 +33,7 @@
         },
         {
           "name": "AUTH0_ISSUER_URI",
-          "value": "https://dev-xmd0t7c7kpg2tvxf.us.auth0.com/"
+          "value": "https://auth.getcollectables.xyz/"
         },
         {
           "name": "SPRING_PROFILES_ACTIVE",
