@@ -4,6 +4,7 @@ import io.github.jchun247.collectables.dto.security.ProvisionUserRequestDTO;
 import io.github.jchun247.collectables.dto.user.UserEntityDTO;
 import io.github.jchun247.collectables.model.user.UserEntity;
 import io.github.jchun247.collectables.service.user.UserService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,11 @@ public class UserController {
 
     @Value("${auth0.action.secret}")
     private String auth0ActionSecret;
+
+    @PostConstruct
+    public void init() {
+        log.info("Successfully loaded Auth0 Action Secret: ['{}']", auth0ActionSecret);
+    }
 
     @GetMapping("/me")
     public ResponseEntity<UserEntityDTO> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
@@ -42,6 +48,8 @@ public class UserController {
     public ResponseEntity<?> provisionUser(
             @RequestBody ProvisionUserRequestDTO request,
             @RequestHeader("X-Auth0-Action-Secret") String secretHeader) {
+
+        log.info("Received provision request with secret header: ['{}']", secretHeader);
 
         if (!secureCompare(secretHeader, auth0ActionSecret)) {
             log.warn("Unauthorized attempt to provision user: Invalid secret");
