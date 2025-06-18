@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,7 +37,6 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/cards/**").permitAll()
                         .requestMatchers("/api/sets/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/collections/{collectionId}/cards").permitAll()
@@ -54,7 +54,6 @@ public class SecurityConfig {
                             if (requestURI.startsWith("/api/cards") ||
                                 requestURI.startsWith("/api/sets") ||
                                 requestURI.startsWith("/api/users/provision") ||
-                                requestURI.startsWith("/actuator/health") ||
                                 (HttpMethod.GET.matches(request.getMethod()) && requestURI.matches("/api/collections/[^/]+/(?:cards|value-history)"))
                             ) {
                                     response.setStatus(HttpServletResponse.SC_OK);
@@ -66,6 +65,19 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .build();
+    }
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain managementSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher("/actuator/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf.disable())
                 .build();
     }
 
