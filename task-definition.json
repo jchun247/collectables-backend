@@ -50,18 +50,6 @@
           "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/db-credentials-liquibase-2qpOSI:username::"
         },
         {
-          "name": "AUTH0_ACTION_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/auth0-action-secret-DtxK7P"
-        },
-        {
-          "name": "AUTH0_CLIENT_ID",
-          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/auth0-client-id-dOSwJm"
-        },
-        {
-          "name": "AUTH0_CLIENT_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/auth0-client-secret-t9yanv"
-        },
-        {
           "name": "DB_PASSWORD",
           "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/db-credentials-KTdoSV:password::"
         },
