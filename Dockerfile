@@ -1,18 +1,28 @@
-# --- Build Stage ----
-FROM maven:3.8-amazoncorretto-17 AS build
+# ---- Build Stage: Build the layered JAR and extract the layers ----
+FROM maven:3.8-amazoncorretto-17 AS builder
 WORKDIR /app
 COPY pom.xml .
-# Download all project dependencies.
-RUN mvn dependency:go-offline
-# The cache for this layer is invalidated when code changes.
+RUN mvn dependency:go-offline -B
+
 COPY src ./src
-# This command runs only when the source code or pom.xml has changed.
+# Build the layered JAR
 RUN mvn package -DskipTests
 
-# ---- Run Stage ----
+# Use layertools to extract the application layers
+RUN java -Djarmode=layertools -jar target/collectables.jar extract
+
+# ---- Final Stage: Create the final image with optimized layers ----
 FROM amazoncorretto:17-alpine
+
 WORKDIR /app
-# Copy the built JAR file from the build stage.
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Copy the extracted layers from the builder stage
+# Dependencies are copied first as they change infrequently
+COPY --from=builder /app/dependencies/ ./
+COPY --from=builder /app/spring-boot-loader/ ./
+COPY --from=builder /app/snapshot-dependencies/ ./
+COPY --from=builder /app/application/ ./
+
+# The entrypoint now uses the Spring Boot loader directly
+# Needed to run the layered JAR
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
