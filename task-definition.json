@@ -60,6 +60,18 @@
         {
           "name": "DB_USER",
           "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/db-credentials-KTdoSV:username::"
+        },
+        {
+          "name": "AUTH0_ACTION_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/backend-api-secrets-zUMA7n:AUTH0_ACTION_SECRET::"
+        },
+        {
+          "name": "AUTH0_CLIENT_ID",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/backend-api-secrets-zUMA7n:AUTH0_CLIENT_ID::"
+        },
+        {
+          "name": "AUTH0_CLIENT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:654654440171:secret:staging/collectables/backend-api-secrets-zUMA7n:AUTH0_CLIENT_SECRET::"
         }
       ],
       "healthCheck": {
