@@ -33,62 +33,51 @@ public class CardServiceImpl implements CardService{
                                            String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
                                                 String searchQuery, final CardFinish finish) {
 
-        List<Long> allMatchingIds = cardRepository.findMatchingCardIds(
-                games, setId, rarity,
-                condition == null ? CardCondition.NEAR_MINT : condition,
-                finish, searchQuery,
-                minPrice == null ? BigDecimal.ZERO : minPrice,
-                maxPrice == null ? MAX_PRICE : maxPrice
-        );
+        String sortField;
+        Sort.Direction direction = Sort.Direction.ASC;
+        boolean sortByPrice = false;
 
-        if (allMatchingIds.isEmpty()) {
-            return new PagedResponse<>(Page.empty());
+        if (sortOption != null && sortOption.endsWith("-desc")) {
+            direction = Sort.Direction.DESC;
         }
 
-        // Count total matches for pagination
-        long totalElements = cardRepository.countMatchingCardIds(
-                games, setId, rarity,
-                condition == null ? CardCondition.NEAR_MINT : condition,
-                finish, searchQuery,
-                minPrice == null ? BigDecimal.ZERO : minPrice,
-                maxPrice == null ? MAX_PRICE : maxPrice
-        );
+        if (sortOption != null && sortOption.startsWith("price")) {
+            sortField = "p.price";
+            sortByPrice = true;
+        } else if (sortOption != null && sortOption.startsWith("rarity")) {
+            sortField = "rarity";
+        } else {
+            sortField = "name"; // Default
+        }
 
-        // Apply sorting and pagination
-        List<Card> sortedCards;
-        if (sortOption != null && (sortOption.equals("price-asc") || sortOption.equals("price-desc"))) {
-            Sort priceSort = Sort.by(sortOption.equals("price-asc") ?
-                    Sort.Direction.ASC : Sort.Direction.DESC, "p.price");
-            sortedCards = cardRepository.findCardsByIdsSortedByPrice(
-                    allMatchingIds,
+        Sort sort = Sort.by(direction, sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Card> cardPage;
+
+        // Call the appropriate repository method based on the sort criteria
+        if (sortByPrice) {
+            cardPage = cardRepository.findAndPaginateSortedByPrice(
+                    games, setId, rarity,
                     condition == null ? CardCondition.NEAR_MINT : condition,
-                    finish,
-                    priceSort
+                    finish, searchQuery,
+                    minPrice == null ? BigDecimal.ZERO : minPrice,
+                    maxPrice == null ? MAX_PRICE : maxPrice,
+                    pageable
             );
         } else {
-            Sort nameSort = Sort.by("name-desc".equals(sortOption) ?
-                    Sort.Direction.DESC : Sort.Direction.ASC, "name");
-            sortedCards = cardRepository.findCardsByIdsSortedByName(allMatchingIds, nameSort);
+            cardPage = cardRepository.findAndPaginate(
+                    games, setId, rarity,
+                    condition == null ? CardCondition.NEAR_MINT : condition,
+                    finish, searchQuery,
+                    minPrice == null ? BigDecimal.ZERO : minPrice,
+                    maxPrice == null ? MAX_PRICE : maxPrice,
+                    pageable
+            );
         }
 
-        // Apply pagination manually (after sorting)
-        int fromIndex = page * size;
-        int toIndex = Math.min(fromIndex + size, sortedCards.size());
-
-        // Ensure fromIndex is within bounds
-        if (fromIndex >= sortedCards.size()) {
-            return new PagedResponse<>(Page.empty());
-        }
-
-        List<Card> pageOfCards = sortedCards.subList(fromIndex, toIndex);
-
-        List<BasicCardDTO> basicCardDTOs = pageOfCards.stream()
-                .map(cardMapper::toBasicDTO)
-                .toList();
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<BasicCardDTO> pageOfBasicCardDTOs = new PageImpl<>(basicCardDTOs, pageable, totalElements);
-        return new PagedResponse<>(pageOfBasicCardDTOs);
+        Page<BasicCardDTO> dtoPage = cardPage.map(cardMapper::toBasicDTO);
+        return new PagedResponse<>(dtoPage);
     }
 
     @Override
