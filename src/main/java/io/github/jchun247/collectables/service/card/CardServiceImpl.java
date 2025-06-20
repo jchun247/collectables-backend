@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,49 +36,47 @@ public class CardServiceImpl implements CardService{
                                            String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
                                                 String searchQuery, final CardFinish finish) {
 
-        String sortField;
-        Sort.Direction direction = Sort.Direction.ASC;
-        boolean sortByPrice = false;
+        // Create the Sort object from the request parameter
+        String effectiveSortOption = (sortOption == null || sortOption.isBlank()) ? "name-asc" : sortOption;
+        String[] sortParts = effectiveSortOption.split("-");
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortParts[1]) ? Sort.Direction.DESC : Sort.Direction.ASC;
 
-        if (sortOption != null && sortOption.endsWith("-desc")) {
-            direction = Sort.Direction.DESC;
-        }
-
-        if (sortOption != null && sortOption.startsWith("price")) {
-            sortField = "p.price";
-            sortByPrice = true;
-        } else if (sortOption != null && sortOption.startsWith("rarity")) {
-            sortField = "rarity";
-        } else {
-            sortField = "name"; // Default
-        }
-
-        Sort sort = Sort.by(direction, sortField);
+        Sort sort = Sort.by(direction, sortParts[0]);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Card> cardPage;
+        // Build the criteria object
+        CardSearchCriteria criteria = CardSearchCriteria.builder()
+                .games(games)
+                .setId(setId)
+                .rarity(rarity)
+                .condition(condition == null ? CardCondition.NEAR_MINT : condition)
+                .finish(finish)
+                .query(searchQuery)
+                .minPrice(minPrice == null ? BigDecimal.ZERO : minPrice)
+                .maxPrice(maxPrice == null ? MAX_PRICE : maxPrice)
+                .build();
 
-        // Call the appropriate repository method based on the sort criteria
-        if (sortByPrice) {
-            cardPage = cardRepository.findAndPaginateSortedByPrice(
-                    games, setId, rarity,
-                    condition == null ? CardCondition.NEAR_MINT : condition,
-                    finish, searchQuery,
-                    minPrice == null ? BigDecimal.ZERO : minPrice,
-                    maxPrice == null ? MAX_PRICE : maxPrice,
-                    pageable
-            );
-        } else {
-            cardPage = cardRepository.findAndPaginate(
-                    games, setId, rarity,
-                    condition == null ? CardCondition.NEAR_MINT : condition,
-                    finish, searchQuery,
-                    minPrice == null ? BigDecimal.ZERO : minPrice,
-                    maxPrice == null ? MAX_PRICE : maxPrice,
-                    pageable
-            );
+        // Execute the SINGLE dynamic ID query
+        Page<Long> idPage = cardRepository.findCardIdsByCriteria(criteria, pageable);
+        List<Long> cardIds = idPage.getContent();
+
+        if (cardIds.isEmpty()) {
+            return new PagedResponse<>(Page.empty(pageable));
         }
 
+        // Execute the SECOND query to get full data for the page of IDs
+        List<Card> unsortedCards = cardRepository.findFullCardsByIds(cardIds);
+
+        // 5. Perform an efficient in-memory sort to match the ID order.
+        Map<Long, Card> cardMap = unsortedCards.stream()
+                .collect(Collectors.toMap(Card::getId, Function.identity()));
+
+        List<Card> cards = cardIds.stream()
+                .map(cardMap::get)
+                .collect(Collectors.toList());
+
+        // Build the final Page and return the response
+        Page<Card> cardPage = new PageImpl<>(cards, pageable, idPage.getTotalElements());
         Page<BasicCardDTO> dtoPage = cardPage.map(cardMapper::toBasicDTO);
         return new PagedResponse<>(dtoPage);
     }
