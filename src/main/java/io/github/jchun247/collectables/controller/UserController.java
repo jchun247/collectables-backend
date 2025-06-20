@@ -24,11 +24,6 @@ public class UserController {
     @Value("${auth0.action.secret}")
     private String auth0ActionSecret;
 
-    @PostConstruct
-    public void init() {
-        log.info("Successfully loaded Auth0 Action Secret: ['{}']", auth0ActionSecret);
-    }
-
     @GetMapping("/me")
     public ResponseEntity<UserEntityDTO> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
          if (jwt == null) {
@@ -49,8 +44,6 @@ public class UserController {
             @RequestBody ProvisionUserRequestDTO request,
             @RequestHeader("X-Auth0-Action-Secret") String secretHeader) {
 
-        log.info("Received provision request with secret header: ['{}']", secretHeader);
-
         if (!secureCompare(secretHeader, auth0ActionSecret)) {
             log.warn("Unauthorized attempt to provision user: Invalid secret");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid secret");
@@ -69,7 +62,6 @@ public class UserController {
                     request.getEmail(),
                     request.getUsername()
             );
-            // Consider returning just 200 OK or 204 No Content if the user data isn't needed by Auth0 Action
             // Return 204 No Content since user data isn't needed
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
@@ -82,8 +74,6 @@ public class UserController {
         if (a == null || b == null) {
             return false;
         }
-        // Use a constant-time comparison if possible, especially for secrets
-        // For simplicity here, using standard equals, but consider MessageDigest.isEqual
         return a.equals(b);
     }
 }
