@@ -3,6 +3,7 @@ package io.github.jchun247.collectables.repository.card;
 import io.github.jchun247.collectables.dto.card.CardSearchCriteria;
 import io.github.jchun247.collectables.model.card.Card;
 import io.github.jchun247.collectables.model.card.CardPrice;
+import io.github.jchun247.collectables.model.card.CardRarity;
 import io.github.jchun247.collectables.model.card.CardSet;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -98,6 +99,24 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
                 orders.add(cb.asc(cb.min(prices.get("price"))));
             } else {
                 orders.add(cb.desc(cb.min(prices.get("price"))));
+            }
+        } else if ("rarity".equals(property)) {
+            CriteriaBuilder.Case<Integer> caseExpression = cb.selectCase();
+
+            for (CardRarity rarity : CardRarity.values()) {
+                caseExpression = caseExpression.when(cb.equal(card.get("rarity"), rarity), rarity.getSortOrder());
+            }
+
+            // The final expression uses a large number for any fallback.
+            Expression<Integer> rarityOrderExpression = caseExpression.otherwise(9999);
+
+            // The sorting expression must be included in the GROUP BY clause
+            query.groupBy(card.get("id"), rarityOrderExpression);
+
+            if (sortOrder.isAscending()) {
+                orders.add(cb.asc(rarityOrderExpression));
+            } else {
+                orders.add(cb.desc(rarityOrderExpression));
             }
         } else { // Default to name or any other direct property
             query.groupBy(card.get("id"), card.get(property));
