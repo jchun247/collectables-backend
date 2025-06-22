@@ -39,7 +39,15 @@ public class CardServiceImpl implements CardService{
         // Create the Sort object from the request parameter
         String effectiveSortOption = (sortOption == null || sortOption.isBlank()) ? "name-asc" : sortOption;
         String[] sortParts = effectiveSortOption.split("-");
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortParts[1]) ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        // Retrieve the sort field
+        String sortBy = sortParts[0];
+
+        // Default to ascending order and only change to descending if it's specified.
+        Sort.Direction direction = Sort.Direction.ASC;
+        if (sortParts.length > 1 && "desc".equalsIgnoreCase(sortParts[1])) {
+            direction = Sort.Direction.DESC;
+        }
 
         Sort sort = Sort.by(direction, sortParts[0]);
         Pageable pageable = PageRequest.of(page, size, sort);
