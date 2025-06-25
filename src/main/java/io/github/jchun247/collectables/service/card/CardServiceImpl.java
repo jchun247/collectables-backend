@@ -40,9 +40,6 @@ public class CardServiceImpl implements CardService{
         String effectiveSortOption = (sortOption == null || sortOption.isBlank()) ? "name-asc" : sortOption;
         String[] sortParts = effectiveSortOption.split("-");
 
-        // Retrieve the sort field
-        String sortBy = sortParts[0];
-
         // Default to ascending order and only change to descending if it's specified.
         Sort.Direction direction = Sort.Direction.ASC;
         if (sortParts.length > 1 && "desc".equalsIgnoreCase(sortParts[1])) {
