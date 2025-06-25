@@ -80,7 +80,7 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
             predicates.add(cb.or(
                     cb.like(cb.lower(card.get("name")), likePattern),
                     cb.like(cb.lower(set.get("id")), likePattern),
-                    cb.like(cb.lower(card.get("setNumber")), likePattern)
+                    cb.like(cb.lower(card.get("combinedSetNumber")), likePattern)
             ));
         }
 

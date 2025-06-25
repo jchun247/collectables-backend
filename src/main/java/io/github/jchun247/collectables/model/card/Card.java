@@ -39,6 +39,7 @@ public class Card {
 
     private String illustratorName;
     private String setNumber;
+    private String combinedSetNumber;
 
     @OneToOne(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private CardPokemonDetails pokemonDetails;

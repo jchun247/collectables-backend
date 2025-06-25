@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="066" author="jchun247">
+        <comment>Adds a unique constraint on the external_id and set_id columns in the cards table to support the ON CONFLICT upsert logic.</comment>
+        <addUniqueConstraint
+                constraintName="uq_cards_external_id_set_id"
+                schemaName="collectables"
+                tableName="cards"
+                columnNames="external_id, set_id"/>
+    </changeSet>
+    <changeSet id="066-2" author="jchun247">
+        <comment>Adds a unique constraint on the card_id column in the card_pokemon_details table to support the ON CONFLICT upsert logic.</comment>
+        <addUniqueConstraint
+                constraintName="uq_card_pokemon_details_card_id"
+                schemaName="collectables"
+                tableName="card_pokemon_details"
+                columnNames="card_id"/>
+    </changeSet>
+</databaseChangeLog>

@@ -69,4 +69,6 @@
     <include file="db/changelog/changes/062-add_collection_card_transaction_history_table.xml"/>
     <include file="db/changelog/changes/063-remove-quantity-column.xml"/>
     <include file="db/changelog/changes/064-add_transaction_type_col.xml"/>
+    <include file="db/changelog/changes/065-rename_set_num_col.xml"/>
+    <include file="db/changelog/changes/066-add_unique_constraint.xml"/>
 </databaseChangeLog>

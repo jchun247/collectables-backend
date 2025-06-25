@@ -15,17 +15,19 @@ public class BasicCardDTO {
     private String setId;
     private String setName;
     private String setNumber;
+    private String combinedSetNumber;
     private CardRarity rarity;
     private Set<CardPriceDTO> prices;
     private String imageUrl;
 
     // Constructor for JPQL query instantiation
-    public BasicCardDTO(Long id, String name, String setId, String setName, String setNumber, CardRarity rarity) {
+    public BasicCardDTO(Long id, String name, String setId, String setName, String setNumber, String combinedSetNumber, CardRarity rarity) {
         this.id = id;
         this.name = name;
         this.setId = setId;
         this.setName = setName;
         this.setNumber = setNumber;
+        this.combinedSetNumber = combinedSetNumber;
         this.rarity = rarity;
         this.imageUrl = null;
         this.prices = new HashSet<>();

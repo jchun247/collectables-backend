@@ -15,6 +15,7 @@ public class CardDTO {
     private String setId;
     private String setName;
     private String setNumber;
+    private String combinedSetNumber;
     private CardRarity rarity;
     private String illustratorName;
     private CardPokemonDetailsDTO pokemonDetails;
