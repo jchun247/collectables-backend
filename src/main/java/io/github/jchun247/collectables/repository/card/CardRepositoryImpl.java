@@ -118,6 +118,27 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
             } else {
                 orders.add(cb.desc(rarityOrderExpression));
             }
+        } else if ("setNumber".equals(property)) {
+            // 1. Extract the numeric part of the string.
+            Expression<String> setNumberAsString = cb.function("REGEXP_REPLACE", String.class, card.get("setNumber"), cb.literal("[^0-9]"), cb.literal(""));
+
+            // 2. CAST the extracted string to an INTEGER for correct numeric sorting.
+            Expression<Integer> setNumberAsInteger = setNumberAsString.as(Integer.class);
+
+            // 3. Extract the alphabetical part for tie-breaking (e.g., "10A" vs "10B").
+            Expression<String> setNumberAlpha = cb.function("REGEXP_REPLACE", String.class, card.get("setNumber"), cb.literal("[0-9]"), cb.literal(""));
+
+            // 4. Group by the expressions used in the ORDER BY clause.
+            query.groupBy(card.get("id"), setNumberAsInteger, setNumberAlpha);
+
+            // 5. Apply the sorting order.
+            if (sortOrder.isAscending()) {
+                orders.add(cb.asc(setNumberAsInteger));
+                orders.add(cb.asc(setNumberAlpha)); // Sort by letters ascending for tie-breakers
+            } else {
+                orders.add(cb.desc(setNumberAsInteger));
+                orders.add(cb.desc(setNumberAlpha)); // Sort by letters descending for tie-breakers
+            }
         } else { // Default to name or any other direct property
             query.groupBy(card.get("id"), card.get(property));
             if (sortOrder.isAscending()) {
