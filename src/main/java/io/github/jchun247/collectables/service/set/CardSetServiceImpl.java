@@ -5,6 +5,7 @@ import io.github.jchun247.collectables.mapper.CardMapper;
 import io.github.jchun247.collectables.model.card.CardSeries;
 import io.github.jchun247.collectables.repository.card.CardSetRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,26 @@ public class CardSetServiceImpl implements CardSetService{
 
     private final CardSetRepository cardSetRepository;
     private final CardMapper cardMapper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BasicCardSetDTO> getAllCardSets(String sortBy) {
+        Sort sort = Sort.unsorted();
+
+        // Build Sort object based on the parameter
+        if (sortBy != null && !sortBy.isBlank()) {
+            if (sortBy.equalsIgnoreCase("releaseDate-asc")) {
+                sort = Sort.by("releaseDate").ascending();
+            } else if (sortBy.equalsIgnoreCase("releaseDate-desc")) {
+                sort = Sort.by("releaseDate").descending();
+            }
+        }
+
+        return cardSetRepository.findAllWithCollections(sort)
+                .stream()
+                .map(cardMapper::toBasicCardSetDTO)
+                .toList();
+    }
 
     @Override
     @Transactional(readOnly = true)

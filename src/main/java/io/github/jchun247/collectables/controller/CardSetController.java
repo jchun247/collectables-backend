@@ -18,6 +18,11 @@ import java.util.List;
 public class CardSetController {
     private final CardSetService cardSetService;
 
+    @GetMapping
+    public ResponseEntity<List<BasicCardSetDTO>> getAllCardSets(@RequestParam(name = "sort", required = false) String sortBy) {
+        return ResponseEntity.ok(cardSetService.getAllCardSets(sortBy));
+    }
+
     @GetMapping("/series")
     public ResponseEntity<List<CardSeries>> getAllCardSeries() {
         return ResponseEntity.ok(cardSetService.getAllCardSeries());

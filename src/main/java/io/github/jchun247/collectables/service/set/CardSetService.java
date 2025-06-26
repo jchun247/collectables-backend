@@ -6,6 +6,7 @@ import io.github.jchun247.collectables.model.card.CardSeries;
 import java.util.List;
 
 public interface CardSetService {
+    List<BasicCardSetDTO> getAllCardSets(String sortBy);
     List<BasicCardSetDTO> getCardSetsBySeries(CardSeries series);
     List<CardSeries> getAllCardSeries();
 }
