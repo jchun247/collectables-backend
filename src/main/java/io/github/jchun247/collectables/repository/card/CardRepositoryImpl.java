@@ -60,8 +60,8 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
         if (criteria.getGames() != null && !criteria.getGames().isEmpty()) {
             predicates.add(card.get("game").in(criteria.getGames()));
         }
-        if (criteria.getSetId() != null) {
-            predicates.add(cb.equal(set.get("id"), criteria.getSetId()));
+        if (criteria.getSetIds() != null) {
+            predicates.add(set.get("id").in(criteria.getSetIds()));
         }
         if (criteria.getRarity() != null) {
             predicates.add(cb.equal(card.get("rarity"), criteria.getRarity()));
@@ -69,8 +69,8 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
         if (criteria.getCondition() != null) {
             predicates.add(cb.equal(prices.get("condition"), criteria.getCondition()));
         }
-        if (criteria.getFinish() != null) {
-            predicates.add(cb.equal(prices.get("finish"), criteria.getFinish()));
+        if (criteria.getFinishes() != null && !criteria.getFinishes().isEmpty()) {
+            predicates.add(prices.get("finish").in(criteria.getFinishes()));
         }
         if (criteria.getMinPrice() != null && criteria.getMaxPrice() != null) {
             predicates.add(cb.between(prices.get("price"), criteria.getMinPrice(), criteria.getMaxPrice()));

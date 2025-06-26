@@ -17,9 +17,9 @@ import java.util.List;
 
 public interface CardService {
     PagedResponse<BasicCardDTO> getCards(int page, int size, List<CardGame> games,
-                                         String setId, CardRarity rarity, CardCondition condition,
+                                         List<String> setIds, CardRarity rarity, CardCondition condition,
                                          String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
-                                         String searchQuery, CardFinish finish);
+                                         String searchQuery, List<CardFinish> finishes);
     BasicCardDTO getCardWithBasicData(Long id);
     CardDTO getCardWithAllData(Long id);
     Page<CardPriceHistoryDTO> getCardPriceHistory(

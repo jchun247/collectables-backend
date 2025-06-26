@@ -28,16 +28,16 @@ public class CardController {
             @RequestParam(defaultValue = "15") int size,
             @RequestParam(defaultValue = "name") String sortOption,
             @RequestParam(required = false) List<CardGame> games,
-            @RequestParam(required = false) String setId,
+            @RequestParam(required = false) List<String> setIds,
             @RequestParam(required = false) CardRarity rarity,
             @RequestParam(defaultValue = "NEAR_MINT") CardCondition condition,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) String searchQuery,
-            @RequestParam(required = false) CardFinish finish
+            @RequestParam(required = false) List<CardFinish> finishes
     ){
         PagedResponse<BasicCardDTO> response = cardService.getCards(page, size, games,
-                setId, rarity, condition, sortOption, minPrice, maxPrice, searchQuery, finish);
+                setIds, rarity, condition, sortOption, minPrice, maxPrice, searchQuery, finishes);
         return ResponseEntity.ok(response);
     }
 
@@ -63,9 +63,10 @@ public class CardController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) String searchQuery,
-            @RequestParam(required = false) CardFinish finish){
+            @RequestParam(required = false) List<CardFinish> finishes){
+        List<String> setIdAsList = List.of(setId);
         PagedResponse<BasicCardDTO> response = cardService.getCards(page, size, null,
-                setId, rarity, condition, sortOption, minPrice, maxPrice, searchQuery, finish);
+                setIdAsList, rarity, condition, sortOption, minPrice, maxPrice, searchQuery, finishes);
         return ResponseEntity.ok(response);
     }
 

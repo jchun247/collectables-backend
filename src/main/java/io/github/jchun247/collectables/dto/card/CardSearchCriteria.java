@@ -14,10 +14,10 @@ import java.util.List;
 @Builder
 public class CardSearchCriteria {
     private final List<CardGame> games;
-    private final String setId;
+    private final List<String> setIds;
     private final CardRarity rarity;
     private final CardCondition condition;
-    private final CardFinish finish;
+    private final List<CardFinish> finishes;
     private final String query;
     private final BigDecimal minPrice;
     private final BigDecimal maxPrice;

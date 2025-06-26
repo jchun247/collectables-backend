@@ -32,9 +32,9 @@ public class CardServiceImpl implements CardService{
     @Override
     @Transactional(readOnly = true)
     public PagedResponse<BasicCardDTO> getCards(int page, int size, List<CardGame> games,
-                                           String setId, CardRarity rarity, CardCondition condition,
+                                           List<String> setIds, CardRarity rarity, CardCondition condition,
                                            String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
-                                                String searchQuery, final CardFinish finish) {
+                                                String searchQuery, List<CardFinish> finishes) {
 
         // Create the Sort object from the request parameter
         String effectiveSortOption = (sortOption == null || sortOption.isBlank()) ? "name-asc" : sortOption;
@@ -52,10 +52,10 @@ public class CardServiceImpl implements CardService{
         // Build the criteria object
         CardSearchCriteria criteria = CardSearchCriteria.builder()
                 .games(games)
-                .setId(setId)
+                .setIds(setIds)
                 .rarity(rarity)
                 .condition(condition == null ? CardCondition.NEAR_MINT : condition)
-                .finish(finish)
+                .finishes(finishes)
                 .query(searchQuery)
                 .minPrice(minPrice == null ? BigDecimal.ZERO : minPrice)
                 .maxPrice(maxPrice == null ? MAX_PRICE : maxPrice)
