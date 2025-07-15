@@ -82,15 +82,11 @@ public class CardServiceImpl implements CardService{
 
         // Build the final Page and return the response
         Page<Card> cardPage = new PageImpl<>(cards, pageable, idPage.getTotalElements());
-        Page<BasicCardDTO> dtoPage = cardPage.map(cardMapper::toBasicDTO);
+        Page<BasicCardDTO> dtoPage = cardPage.map(card -> {
+            var filterContext = new CardMapper.PriceFilterContext(condition, finishes);
+            return cardMapper.toBasicDTO(card, filterContext);
+        });
         return new PagedResponse<>(dtoPage);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public BasicCardDTO getCardWithBasicData(Long id) {
-        return cardMapper.toBasicDTO(cardRepository.findWithBasicDataById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id)));
     }
 
     @Override
@@ -109,5 +105,18 @@ public class CardServiceImpl implements CardService{
         Page<CardPriceHistory> priceHistoryPage = cardPriceHistoryRepository.findByCardIdAndTimestampBetween(
                 cardId, startDate, endDate, pageable);
         return priceHistoryPage.map(cardMapper::toCardPriceHistoryDTO);
+    }
+
+    @Override
+    public List<CardPriceHistoryDTO> getCardPriceHistoryForChart(
+            Long cardId,
+            LocalDateTime startDate,
+            LocalDateTime endDate) {
+        List<CardPriceHistory> priceHistory = cardPriceHistoryRepository.findAllByCardIdAndTimestampBetweenOrderByTimestampAsc(
+                cardId, startDate, endDate);
+
+        return priceHistory.stream()
+                .map(cardMapper::toCardPriceHistoryDTO)
+                .collect(Collectors.toList());
     }
 }

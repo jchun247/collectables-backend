@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -45,11 +46,12 @@ public class CardController {
     public ResponseEntity<?> getCardById(
             @PathVariable Long id,
             @RequestParam(name="view", defaultValue = "FULL") CardView view) {
-        if (view == CardView.BASIC) {
-            return ResponseEntity.ok(cardService.getCardWithBasicData(id));
-        } else {
-            return ResponseEntity.ok(cardService.getCardWithAllData(id));
-        }
+//        if (view == CardView.BASIC) {
+//            return ResponseEntity.ok(cardService.getCardWithBasicData(id));
+//        } else {
+//            return ResponseEntity.ok(cardService.getCardWithAllData(id));
+//        }
+        return ResponseEntity.ok(cardService.getCardWithAllData(id));
     }
 
     @GetMapping("/set/{setId}")
@@ -78,5 +80,20 @@ public class CardController {
             Pageable pageable) {
         Page<CardPriceHistoryDTO> priceHistoryPage = cardService.getCardPriceHistory(cardId, startDate, endDate, pageable);
         return new PagedResponse<>(priceHistoryPage);
+    }
+
+    @GetMapping("/{cardId}/price-history/chart")
+    public ResponseEntity<?> getCardPriceHistoryForChart(
+            @PathVariable Long cardId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+        long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+
+        if (daysBetween > 365) {
+            return ResponseEntity.badRequest()
+                    .body("Date range cannot exceed 1 year for the chart view.");
+        }
+        List<CardPriceHistoryDTO> priceHistory = cardService.getCardPriceHistoryForChart(cardId, startDate, endDate);
+        return ResponseEntity.ok(priceHistory);
     }
 }

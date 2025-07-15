@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface CardPriceHistoryRepository extends JpaRepository<CardPriceHistory, Long> {
     Page<CardPriceHistory> findByCardIdAndTimestampBetween(
@@ -13,4 +14,10 @@ public interface CardPriceHistoryRepository extends JpaRepository<CardPriceHisto
             LocalDateTime startDate,
             LocalDateTime endDate,
             Pageable pageable);
+
+    List<CardPriceHistory> findAllByCardIdAndTimestampBetweenOrderByTimestampAsc(
+            Long cardId,
+            LocalDateTime startDate,
+            LocalDateTime endDate
+    );
 }

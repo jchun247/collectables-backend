@@ -20,9 +20,12 @@ public interface CardService {
                                          List<String> setIds, CardRarity rarity, CardCondition condition,
                                          String sortOption, BigDecimal minPrice, BigDecimal maxPrice,
                                          String searchQuery, List<CardFinish> finishes);
-    BasicCardDTO getCardWithBasicData(Long id);
     CardDTO getCardWithAllData(Long id);
     Page<CardPriceHistoryDTO> getCardPriceHistory(
             Long cardId, LocalDateTime startDate,
             LocalDateTime endDate, Pageable pageable);
+    List<CardPriceHistoryDTO> getCardPriceHistoryForChart(
+            Long cardId,
+            LocalDateTime startDate,
+            LocalDateTime endDate);
 }
