@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/sets/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/collections/{collectionId}/cards").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/collections/{collectionId}/value-history").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/collections/{collectionId}/value-history/chart").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/users/provision", "POST")).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -54,7 +55,7 @@ public class SecurityConfig {
                             if (requestURI.startsWith("/api/cards") ||
                                 requestURI.startsWith("/api/sets") ||
                                 requestURI.startsWith("/api/users/provision") ||
-                                (HttpMethod.GET.matches(request.getMethod()) && requestURI.matches("/api/collections/[^/]+/(?:cards|value-history)"))
+                                (HttpMethod.GET.matches(request.getMethod()) && requestURI.matches("/api/collections/[^/]+/(?:cards|value-history(?:/chart)?)"))
                             ) {
                                     response.setStatus(HttpServletResponse.SC_OK);
                                     return;

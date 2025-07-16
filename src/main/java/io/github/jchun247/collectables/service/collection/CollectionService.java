@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface CollectionService {
     CollectionListDTO createCollectionList(CreateCollectionListDTO createCollectionListDTO);
@@ -18,6 +19,7 @@ public interface CollectionService {
     CollectionCardDTO getCollectionCardDetails(Long collectionId, Long collectionCardId);
     Page<CollectionCardDTO> getCollectionCards(Long collectionId, String cardName, Pageable pageable);
     Page<PortfolioValueHistoryDTO> getPortfolioValueHistory(Long portfolioId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    List<PortfolioValueHistoryDTO> getPortfolioValueHistoryForChart(Long collectionId, LocalDateTime startDate, LocalDateTime endDate);
     Page<CollectionCardTransactionHistoryDTO> getCollectionCardTransactionHistory(Long collectionId, Long collectionCardId, Pageable pageable);
     CollectionCardTransactionHistoryDTO addTransaction(
             Long collectionId,

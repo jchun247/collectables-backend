@@ -6,8 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface PortfolioValueHistoryRepository extends JpaRepository<PortfolioValueHistory, Long>  {
     Page<PortfolioValueHistory> findByPortfolioIdAndTimestampBetween(
             Long portfolioId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+    List<PortfolioValueHistory> findAllByPortfolioIdAndTimestampBetweenOrderByTimestampAsc(
+            Long collectionId,
+            LocalDateTime startDate,
+            LocalDateTime endDate);
 }

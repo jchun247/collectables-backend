@@ -357,6 +357,18 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @VerifyCollectionViewAccess
+    public List<PortfolioValueHistoryDTO> getPortfolioValueHistoryForChart(Long collectionId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<PortfolioValueHistory> valueHistory = portfolioValueHistoryRepository.findAllByPortfolioIdAndTimestampBetweenOrderByTimestampAsc(
+                collectionId, startDate, endDate);
+
+        return valueHistory.stream()
+                .map(collectionMapper::toPortfolioValueHistoryDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     @VerifyCollectionViewAccess
     public Page<CollectionCardTransactionHistoryDTO> getCollectionCardTransactionHistory(

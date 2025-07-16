@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/collections")
@@ -93,6 +95,24 @@ public class CollectionController {
         Page<PortfolioValueHistoryDTO> page = collectionService.getPortfolioValueHistory(
                 collectionId, startDate, endDate, pageable);
         return new PagedResponse<>(page);
+    }
+
+    @GetMapping("/{collectionId}/value-history/chart")
+    public ResponseEntity<?> getPortfolioValueHistoryForChart(
+            @PathVariable Long collectionId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+
+        // Enforce a maximum date range of 1 year
+        long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+        if (daysBetween > 365) {
+            return ResponseEntity.badRequest()
+                    .body("Date range cannot exceed 1 year for the chart view.");
+        }
+
+        List<PortfolioValueHistoryDTO> valueHistory = collectionService.getPortfolioValueHistoryForChart(
+                collectionId, startDate, endDate);
+        return ResponseEntity.ok(valueHistory);
     }
 
     @PostMapping("/{collectionId}/cards/{collectionCardId}/transactions")
