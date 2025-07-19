@@ -38,6 +38,7 @@ public enum CardRarity {
     RARE_RAINBOW("Rare Rainbow", 310),
     HYPER_RARE("Hyper Rare", 320),
     SHINY_ULTRA_RARE("Shiny Ultra Rare", 330),
+    BLACK_WHITE_RARE("Black White Rare", 331),
     PROMO("Promo", 340);
 
     private final String databaseValue;
