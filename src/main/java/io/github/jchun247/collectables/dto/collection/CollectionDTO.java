@@ -17,7 +17,8 @@ public class CollectionDTO {
     private String description;
     private CollectionType collectionType;
     private boolean isPublic;
-    private boolean isFavourite;
+    private boolean isOwner;
+    private Boolean isFavourite;
     private int numProducts;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

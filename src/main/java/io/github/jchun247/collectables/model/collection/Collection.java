@@ -49,4 +49,9 @@ public abstract class Collection {
 
     @Transient
     public abstract CollectionType getCollectionType();
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

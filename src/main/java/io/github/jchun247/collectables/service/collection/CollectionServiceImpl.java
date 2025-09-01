@@ -167,6 +167,8 @@ public class CollectionServiceImpl implements CollectionService {
         log.info("Added/updated card {} (CollectionCard ID: {}) to collection {}.",
                 collectionCard.getCard().getId(), collectionCard.getId(), collection.getId());
 
+        updateCollectionTimestamp(collectionId);
+
         int newQuantity = collectionCardTransactionHistoryRepository.sumQuantityByCollectionCardId(collectionCard.getId());
         CollectionCardDTO dto = collectionMapper.toCollectionCardDto(collectionCard);
         dto.setQuantity(newQuantity);
@@ -200,6 +202,7 @@ public class CollectionServiceImpl implements CollectionService {
         collectionCardTransactionHistoryRepository.deleteAll(transactions);
         log.info("Deleted all transactions for CollectionCard ID: {} in Collection ID: {}", collectionCardId, collectionId);
         collectionCardRepository.delete(collectionCard);
+        updateCollectionTimestamp(collectionId);
     }
 
     @Override
@@ -435,6 +438,7 @@ public class CollectionServiceImpl implements CollectionService {
         CollectionCardTransactionHistory savedTransaction = collectionCardTransactionHistoryRepository.save(transactionHistoryBuilder.build());
         log.info("Added transaction for CollectionCard ID: {} in Collection ID: {}", collectionCardId, collectionId);
 
+        updateCollectionTimestamp(collectionId);
         return collectionMapper.toCollectionCardTransactionHistoryDto(savedTransaction);
     }
 
@@ -463,6 +467,7 @@ public class CollectionServiceImpl implements CollectionService {
             transactionHistory.setPurchaseDate(updateTransactionDTO.getPurchaseDate());
         }
         CollectionCardTransactionHistory updatedTransaction = collectionCardTransactionHistoryRepository.save(transactionHistory);
+        updateCollectionTimestamp(collectionId);
         return collectionMapper.toCollectionCardTransactionHistoryDto(updatedTransaction);
     }
 
@@ -489,15 +494,18 @@ public class CollectionServiceImpl implements CollectionService {
             collectionCardRepository.delete(parentCollectionCard);
             log.info("Deleted CollectionCard ID: {} as it has no remaining transactions.", parentCollectionCard.getId());
         }
+        updateCollectionTimestamp(collectionId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<CollectionDTO> getCollectionsByUserId(String targetUserAuth0Id, @Nullable CollectionType collectionType, Pageable pageable) {
-        String requestingUserAuth0Id = null;
+        String requestingUserAuth0Id;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
             requestingUserAuth0Id = authentication.getName();
+        } else {
+            requestingUserAuth0Id = null;
         }
 
         Class<? extends Collection> entityClassFilter = null;
@@ -529,10 +537,13 @@ public class CollectionServiceImpl implements CollectionService {
 
         // 3. Map to DTOs, combining entities with their fetched stats
         return collectionsPage.map(collection -> {
+            boolean isOwner = collection.getUser().getAuth0Id().equals(requestingUserAuth0Id);
+
             // Use the helper method you created earlier, but provide it with stats
             return populateCollectionDtoWithStats(collection, statsMap.getOrDefault(collection.getId(),
                     new PortfolioStatBuildingBlocks(collection.getId(), 0L, BigDecimal.ZERO,
-                            BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)));
+                            BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)),
+                    isOwner);
         });
 
     }
@@ -603,6 +614,25 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     /* Helper Methods */
+    private void updateCollectionTimestamp(Long collectionId) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Collection not found with id: " + collectionId));
+
+        collectionRepository.save(collection);
+        log.debug("Updated 'updatedAt' timestamp for collection {}.", collectionId);
+    }
+
+    private boolean isCurrentUserOwnerOfCollection(Collection collection) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() ||
+                authentication instanceof AnonymousAuthenticationToken) {
+            return false;
+        }
+
+        String currentUserAuth0Id = authentication.getName();
+        return collection.getUser().getAuth0Id().equals(currentUserAuth0Id);
+    }
+
     private UserEntity findUserByAuth0IdOrThrow(String auth0Id) {
         return userRepository.findByAuth0Id(auth0Id).orElseThrow(() ->
                 new ResourceNotFoundException("User not found with auth0Id: " + auth0Id));
@@ -623,11 +653,23 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     private CollectionDTO populateCollectionDtoWithStats(Collection collection, PortfolioStatBuildingBlocks stats) {
+        boolean isOwner = isCurrentUserOwnerOfCollection(collection);
+        return populateCollectionDtoWithStats(collection, stats, isOwner);
+    }
+
+    private CollectionDTO populateCollectionDtoWithStats(Collection collection, PortfolioStatBuildingBlocks stats, boolean isOwner) {
         // For CollectionLists, the logic is simple.
         if (collection instanceof CollectionList) {
             CollectionListDTO dto = collectionMapper.toCollectionListDto((CollectionList) collection);
             dto.setNumProducts((int) stats.numProducts());
             dto.setCurrentValue(stats.currentValue());
+            dto.setOwner(isOwner);
+
+            if (isOwner) {
+                dto.setIsFavourite(collection.isFavourite());
+            } else {
+                dto.setIsFavourite(null);
+            }
             return dto;
         }
 
@@ -668,6 +710,13 @@ public class CollectionServiceImpl implements CollectionService {
         dto.setRealizedGain(totalRealizedGain);
         dto.setTotalReturn(totalReturn);
         dto.setLifetimeROI(lifetimeROI);
+        dto.setOwner(isOwner);
+
+        if (isOwner) {
+            dto.setIsFavourite(collection.isFavourite());
+        } else {
+            dto.setIsFavourite(null);
+        }
 
         return dto;
     }
