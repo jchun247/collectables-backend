@@ -1,9 +1,9 @@
-# Git files
+# Git
 .git
 .gitignore
 
-# Build directories (JAR is copied explicitly)
-build/
+# Maven build directory
+target/
 
 # IDE files
 .idea/
@@ -15,15 +15,7 @@ build/
 # Log files
 *.log
 
-# Docker files
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# Other build outputs/temp files
+# Maven wrapper files
 **/mvnw
 **/mvnw.cmd
 **/.mvn/
-**/gradlew
-**/gradlew.bat
-**/.gradle/
